@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
+    "@netlify/blobs": "^10.7.13",
     "@portabletext/to-html": "^6.0.0",
     "@sanity/client": "^8.9.0",
     "@sanity/image-url": "^2.1.1",

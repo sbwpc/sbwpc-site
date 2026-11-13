@@ -5,6 +5,6 @@ export default defineConfig({
   site: 'https://sbwpc.org',
   trailingSlash: 'ignore',
   build: {format: 'directory'},
-  integrations: [sitemap({filter: (page) => !page.includes('/admin')})],
+  integrations: [sitemap({filter: (page) => !page.includes('/admin') && !page.includes('-preview')})],
   prefetch: {prefetchAll: true, defaultStrategy: 'hover'},
 })

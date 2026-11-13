@@ -39,3 +39,9 @@
     X-Robots-Tag = "noindex, nofollow"
     Referrer-Policy = "no-referrer"
     Content-Security-Policy = "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src https://rbvhmrsepsategvrmqcv.supabase.co wss://rbvhmrsepsategvrmqcv.supabase.co; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+
+# Apple Pay checks this file to confirm the site may show Apple Pay. The file itself comes from PayPal.
+[[headers]]
+  for = "/.well-known/apple-developer-merchantid-domain-association"
+  [headers.values]
+    Content-Type = "application/octet-stream"

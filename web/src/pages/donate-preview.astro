@@ -1,0 +1,15 @@
+---
+// Test page for the new on-site form. Not linked from anywhere and hidden from search engines.
+// The live /donate page keeps the JotForm form until this one passes testing.
+import Layout from '../layouts/Layout.astro'
+import Hero from '../components/Hero.astro'
+import Sections from '../components/Sections.astro'
+import {loadAll} from '../lib/data.js'
+const {pages} = await loadAll()
+const page = pages.find((p) => p.path === 'donate')
+const sections = (page.sections || []).map((s) => (s._type === 'sectionGive' ? {...s, checkout: true} : s))
+---
+<Layout title="Donate preview" description={page.hero?.body} image={page.hero?.image} path="donate" noindex>
+  {page.hero && <Hero hero={page.hero} />}
+  <Sections sections={sections} />
+</Layout>

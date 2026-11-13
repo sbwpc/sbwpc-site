@@ -14,10 +14,12 @@ import Embed from './sections/Embed.astro'
 import Cta from './sections/Cta.astro'
 import Give from './sections/Give.astro'
 import Newsletter from './sections/Newsletter.astro'
+import Checkout from './sections/Checkout.astro'
 const map = {sectionText: Text, sectionCards: Cards, sectionStats: Stats, sectionSplit: Split, sectionQuote: Quote, sectionTimeline: Timeline, sectionNameList: NameList, sectionAccordion: Accordion, sectionLinks: Links, sectionCollection: Collection, sectionGallery: Gallery, sectionEmbed: Embed, sectionCta: Cta, sectionGive: Give, sectionNewsletter: Newsletter}
 const {sections = []} = Astro.props
 ---
 {sections.map((s) => {
-  const C = map[s._type]
+  // A give section marked checkout: true takes payment on the page instead of showing the JotForm form
+  const C = s._type === 'sectionGive' && s.checkout ? Checkout : map[s._type]
   return C ? <C s={s} /> : null
 })}

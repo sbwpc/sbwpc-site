@@ -8,7 +8,7 @@ import Footer from '../components/Footer.astro'
 import Banner from '../components/Banner.astro'
 import {loadAll, img} from '../lib/data.js'
 
-const {title, description, image, path = '', noBanner = false} = Astro.props
+const {title, description, image, path = '', noBanner = false, noindex = false} = Astro.props
 const {settings} = await loadAll()
 const siteTitle = settings.title || "Santa Barbara Women's Political Committee"
 const fullTitle = title && path !== 'home' ? `${title} | SBWPC` : siteTitle
@@ -26,7 +26,7 @@ const showBanner = !noBanner && settings.banner?.enabled
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     {desc && <meta name="description" content={desc} />}
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex, nofollow" /> : <link rel="canonical" href={canonical} />}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteTitle} />
     <meta property="og:title" content={title || siteTitle} />

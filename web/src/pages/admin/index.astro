@@ -109,30 +109,17 @@ import '../../styles/admin.css'
         <button type="button" class="a-btn" id="a-denied-out">Sign out</button>
       </section>
 
-      <!-- Dashboard -->
-      <section id="v-dash" hidden aria-labelledby="h-dash">
-        <h1 id="h-dash">Members and donations</h1>
-        <p class="a-sub" id="dash-sub"></p>
-        <div class="a-tiles">
-          <div class="a-tile"><p class="a-num" id="n-active">0</p><p class="a-lab">Active members</p></div>
-          <div class="a-tile warn"><p class="a-num" id="n-expiring">0</p><p class="a-lab">Expiring in 30 days</p></div>
-          <div class="a-tile bad"><p class="a-num" id="n-expired">0</p><p class="a-lab">Expired</p></div>
-          <div class="a-tile"><p class="a-num" id="n-dues">$0</p><p class="a-lab">Dues this year</p></div>
-          <div class="a-tile"><p class="a-num" id="n-gifts">$0</p><p class="a-lab">Donations this year</p></div>
-          <div class="a-tile"><p class="a-num" id="n-report">0</p><p class="a-lab">Contributors at $100 or more</p></div>
-        </div>
-        <div class="a-panel">
-          <h2>Recent activity</h2>
-          <p class="a-empty" id="log-empty">No changes recorded yet.</p>
-          <table class="a-table" id="log-table" hidden>
-            <thead><tr><th scope="col">When</th><th scope="col">Who</th><th scope="col">What</th></tr></thead>
-            <tbody id="log-body"></tbody>
-          </table>
-        </div>
-        <div class="a-panel">
-          <h2>Admins</h2>
-          <ul class="a-list" id="admin-list"></ul>
-        </div>
+      <!-- Signed in: the admin screens are drawn into #app by the script -->
+      <section id="v-dash" hidden>
+        <nav class="a-nav" aria-label="Admin sections">
+          <a href="#/" data-nav="">Overview</a>
+          <a href="#/members" data-nav="members">Members</a>
+          <a href="#/payments" data-nav="payments">Donors and payments</a>
+          <a href="#/checks" data-nav="checks">Checks to confirm <span class="a-badge" id="nav-checks-n" hidden></span></a>
+          <a href="#/new" data-nav="new" id="nav-new" class="a-nav-add">Add a person</a>
+        </nav>
+        <p class="a-flash" id="a-flash" role="status" aria-live="polite" hidden></p>
+        <div id="app"></div>
       </section>
     </main>
 

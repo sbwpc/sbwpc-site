@@ -1,7 +1,8 @@
-// SBWPC admin: sign-in with required two-factor, then a summary dashboard.
+// SBWPC admin: sign-in with required two-factor, then the admin screens (console.js).
 // The database enforces access. This script only decides which screen to show.
 import {createClient} from '@supabase/supabase-js'
 import {SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY} from '../../lib/members-config.js'
+import {startConsole, stopConsole} from './console.js'
 
 const $ = (id) => document.getElementById(id)
 const VIEWS = ['signin', 'forgot', 'password', 'enroll', 'verify', 'denied', 'dash']
@@ -23,6 +24,8 @@ let needsPassword = linkType === 'invite' || linkType === 'recovery'
 function show(view) {
   $('a-loading').hidden = true
   for (const v of VIEWS) $('v-' + v).hidden = v !== view
+  document.body.classList.toggle('wide', view === 'dash')
+  if (view === 'dash') return
   const el = $('v-' + view)
   const target = el.querySelector('input:not([type=hidden])') || el.querySelector('h1')
   if (target) {
@@ -49,7 +52,6 @@ const friendly = (err) => {
   if (/network|fetch/i.test(m)) return 'Could not reach the server. Check your connection and try again.'
   return m || 'Something went wrong. Try again.'
 }
-const money = (cents) => '$' + Math.round(cents / 100).toLocaleString('en-US')
 
 // Decide which screen comes next for the current session
 async function route() {
@@ -95,44 +97,7 @@ async function loadDash() {
   const {data: role, error: roleErr} = await sb.rpc('staff_role')
   if (roleErr || !role) return show('denied')
   show('dash')
-  const year = new Date().getFullYear()
-  const [members, pays, totals, log, admins] = await Promise.all([
-    sb.from('membership_status').select('status'),
-    sb.from('payments').select('kind,amount_cents').eq('status', 'completed').gte('paid_on', `${year}-01-01`),
-    sb.from('contributor_totals').select('person_id').eq('year', year).eq('reportable', true),
-    sb.from('audit_log').select('at,actor,action,table_name').order('at', {ascending: false}).limit(12),
-    sb.from('admins').select('email,role,active').order('email'),
-  ])
-  const count = (s) => (members.data || []).filter((m) => m.status === s).length
-  $('n-active').textContent = count('active') + count('expiring_soon')
-  $('n-expiring').textContent = count('expiring_soon')
-  $('n-expired').textContent = count('expired')
-  const sum = (k) => (pays.data || []).filter((p) => p.kind === k).reduce((a, p) => a + p.amount_cents, 0)
-  $('n-dues').textContent = money(sum('dues'))
-  $('n-gifts').textContent = money(sum('donation'))
-  $('n-report').textContent = (totals.data || []).length
-  $('dash-sub').textContent = `Signed in as ${role === 'admin' ? 'an admin' : 'treasurer'} with two-factor. Figures are for ${year}.`
-
-  const rows = log.data || []
-  $('log-empty').hidden = rows.length > 0
-  $('log-table').hidden = rows.length === 0
-  const body = $('log-body')
-  body.replaceChildren()
-  const labels = {people: 'person', memberships: 'membership', payments: 'payment', recurring_plans: 'recurring plan', admins: 'admin'}
-  const verbs = {insert: 'Added a', update: 'Changed a', delete: 'Removed a'}
-  for (const r of rows) {
-    const tr = document.createElement('tr')
-    const cells = [new Date(r.at).toLocaleString('en-US', {dateStyle: 'medium', timeStyle: 'short'}), r.actor, `${verbs[r.action] || r.action} ${labels[r.table_name] || r.table_name}`]
-    for (const c of cells) { const td = document.createElement('td'); td.textContent = c; tr.appendChild(td) }
-    body.appendChild(tr)
-  }
-  const list = $('admin-list')
-  list.replaceChildren()
-  for (const a of admins.data || []) {
-    const li = document.createElement('li')
-    li.textContent = `${a.email} (${a.role}${a.active ? '' : ', turned off'})`
-    list.appendChild(li)
-  }
+  await startConsole(sb, role)
 }
 
 // ---------- forms ----------
@@ -193,6 +158,7 @@ $('f-enroll').addEventListener('submit', (e) => { e.preventDefault(); submitCode
 $('f-verify').addEventListener('submit', (e) => { e.preventDefault(); submitCode(e.currentTarget, 'e-verify') })
 
 async function signOut() {
+  stopConsole()
   await sb.auth.signOut()
   needsPassword = false
   factorId = null

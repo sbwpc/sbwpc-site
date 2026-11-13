@@ -1,0 +1,182 @@
+---
+// Membership and donation form with payment on the page (PayPal, Apple Pay or a mailed check).
+// Takes the same content as the Give section, so the Join and Donate pages need no new copy.
+import {LEVELS, COMMITTEES, CHECK, DONATION_MIN} from '../../lib/giving.js'
+const {s} = Astro.props
+const tone = s.tone || 'white'
+const amounts = s.amounts || []
+const dues = amounts.some((a) => a.title)
+const kind = dues ? 'dues' : 'donation'
+const id = `${s.anchor || 'give'}-co`
+const money = (n) => '$' + Number(n).toLocaleString('en-US')
+// A level tile is only offered if the server knows its price
+const tiles = dues ? amounts.filter((a) => LEVELS.some((l) => l.name === a.title && l.amount === a.amount)) : amounts
+if (dues && tiles.length !== amounts.length) throw new Error('Join page levels and prices must match web/src/lib/giving.js, which is what the server charges.')
+const STATES = 'AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY'.split(' ')
+---
+<section class:list={['section', `tone-${tone}`, 's-give', 's-checkout', {levels: dues}]} id={s.anchor || undefined} data-checkout={kind} data-id={id}>
+  <form class="co-form" id={id} novalidate>
+    <div class="wrap give-grid">
+      <div class="give-copy" data-reveal>
+        {s.heading && <h2 class="h2">{s.heading}</h2>}
+        {s.intro && <p class="lede">{dues ? s.intro : 'Pick an amount, add your details and pay right here. It takes about two minutes.'}</p>}
+        {s.points?.length > 0 && (
+          <ul class="give-points">
+            {s.points.map((pt) => <li>{pt}</li>)}
+          </ul>
+        )}
+      </div>
+      <div class="give-panel" data-reveal style="--d:120ms">
+        <fieldset class="co-set">
+          <legend class="give-panel-title">{dues ? 'Choose a level' : 'Choose an amount'}</legend>
+          {!dues && (
+            <div class="co-seg" role="radiogroup" aria-label="How often">
+              <label><input type="radio" name="frequency" value="once" checked /><span>One time</span></label>
+              <label><input type="radio" name="frequency" value="monthly" /><span>Monthly</span></label>
+              <label><input type="radio" name="frequency" value="yearly" /><span>Yearly</span></label>
+            </div>
+          )}
+          <div class="give-amounts co-tiles">
+            {tiles.map((a) => (
+              <label class="give-tile co-tile">
+                <input type="radio" name={dues ? 'level' : 'preset'} value={dues ? a.title : a.amount} data-amount={a.amount} />
+                {a.title && <span class="give-name">{a.title}</span>}
+                <span class="give-amount">{money(a.amount)}{s.period && <span class="give-period"> {s.period}</span>}</span>
+                {a.impact && <span class="give-impact">{a.impact}</span>}
+              </label>
+            ))}
+            {!dues && s.otherLabel && (
+              <label class="give-tile give-other co-tile">
+                <input type="radio" name="preset" value="other" />
+                <span class="give-amount">{s.otherLabel}</span>
+                <span class="give-impact">Enter your own below</span>
+              </label>
+            )}
+          </div>
+          {!dues && (
+            <div class="co-field co-other" hidden>
+              <label for={`${id}-amount`}>Your amount</label>
+              <div class="co-money"><span aria-hidden="true">$</span><input id={`${id}-amount`} name="amount" inputmode="decimal" autocomplete="off" aria-describedby={`${id}-amount-err`} data-min={DONATION_MIN} /></div>
+              <p class="co-err" id={`${id}-amount-err`} hidden></p>
+            </div>
+          )}
+          <p class="co-err" id={`${id}-choice-err`} hidden></p>
+        </fieldset>
+        {s.note && <p class="give-note">{s.note}</p>}
+        <p class="give-note">How we use and protect your information: <a href="/privacy">Privacy Policy</a></p>
+      </div>
+    </div>
+
+    <div class="wrap give-form-wrap">
+      <div class="give-form-card co-card">
+        <div class="co-errors" role="alert" tabindex="-1" hidden>
+          <p class="co-errors-title">Please fix these before you pay</p>
+          <ul></ul>
+        </div>
+
+        <h3 class="h3 give-form-title">Your details</h3>
+        <p class="give-form-intro">Fields are required unless marked optional.</p>
+        <div class="co-grid">
+          <div class="co-field"><label for={`${id}-first`}>First name</label><input id={`${id}-first`} name="first_name" autocomplete="given-name" required maxlength="80" /></div>
+          <div class="co-field"><label for={`${id}-last`}>Last name</label><input id={`${id}-last`} name="last_name" autocomplete="family-name" required maxlength="80" /></div>
+          <div class="co-field"><label for={`${id}-email`}>Email</label><input id={`${id}-email`} name="email" type="email" autocomplete="email" required maxlength="160" /></div>
+          <div class="co-field"><label for={`${id}-phone`}>Phone <span class="co-opt">(optional)</span></label><input id={`${id}-phone`} name="phone" type="tel" autocomplete="tel" maxlength="30" /></div>
+          <div class="co-field wide"><label for={`${id}-a1`}>Street address</label><input id={`${id}-a1`} name="address1" autocomplete="address-line1" required maxlength="120" /></div>
+          <div class="co-field wide"><label for={`${id}-a2`}>Apartment or unit <span class="co-opt">(optional)</span></label><input id={`${id}-a2`} name="address2" autocomplete="address-line2" maxlength="120" /></div>
+          <div class="co-field"><label for={`${id}-city`}>City</label><input id={`${id}-city`} name="city" autocomplete="address-level2" required maxlength="80" /></div>
+          <div class="co-field co-pair">
+            <div><label for={`${id}-state`}>State</label>
+              <select id={`${id}-state`} name="state" autocomplete="address-level1" required>
+                {STATES.map((st) => <option value={st} selected={st === 'CA'}>{st}</option>)}
+              </select>
+            </div>
+            <div><label for={`${id}-zip`}>ZIP code</label><input id={`${id}-zip`} name="zip" autocomplete="postal-code" inputmode="numeric" required maxlength="10" /></div>
+          </div>
+          <div class="co-field"><label for={`${id}-occ`}>Occupation</label><input id={`${id}-occ`} name="occupation" autocomplete="organization-title" required maxlength="120" aria-describedby={`${id}-fppc`} /></div>
+          <div class="co-field"><label for={`${id}-emp`}>Employer</label><input id={`${id}-emp`} name="employer" autocomplete="organization" required maxlength="120" aria-describedby={`${id}-fppc`} /></div>
+          <p class="co-hint wide" id={`${id}-fppc`}>California law requires us to ask for your occupation and employer. If you are retired or not working, write that. If you are self-employed, give your business name as employer.</p>
+
+          {dues ? (
+            <>
+              <div class="co-field wide co-household" hidden><label for={`${id}-house`}>Second household member's name <span class="co-opt">(optional)</span></label><input id={`${id}-house`} name="household_name" maxlength="160" /></div>
+              <fieldset class="co-set wide">
+                <legend>Committees you would like to join <span class="co-opt">(optional)</span></legend>
+                <div class="co-checks">
+                  {COMMITTEES.map((c) => <label class="co-check"><input type="checkbox" name="committees" value={c} /><span>{c}</span></label>)}
+                </div>
+              </fieldset>
+              <div class="co-field wide"><label for={`${id}-ref`}>Who referred you? <span class="co-opt">(optional)</span></label><input id={`${id}-ref`} name="referred_by" maxlength="160" /></div>
+            </>
+          ) : (
+            <fieldset class="co-set wide">
+              <legend>Dedicate this gift <span class="co-opt">(optional)</span></legend>
+              <div class="co-inline">
+                <label class="co-check"><input type="radio" name="honor_type" value="honor" checked /><span>In honor of</span></label>
+                <label class="co-check"><input type="radio" name="honor_type" value="memory" /><span>In memory of</span></label>
+              </div>
+              <label class="sr-only" for={`${id}-honor`}>Name of the person</label>
+              <input id={`${id}-honor`} name="in_honor_of" maxlength="160" placeholder="Name of the person" />
+            </fieldset>
+          )}
+          <label class="co-check wide"><input type="checkbox" name="email_opt_in" /><span>Yes, SBWPC may email me news, event invitations and endorsement announcements. I can unsubscribe at any time.</span></label>
+          <div class="co-hp" aria-hidden="true"><label for={`${id}-web`}>Leave this field empty</label><input id={`${id}-web`} name="website" tabindex="-1" autocomplete="off" /></div>
+        </div>
+
+        <h3 class="h3 give-form-title co-pay-title">Payment</h3>
+        <p class="co-summary" aria-live="polite">{dues ? 'Choose a level above to see your total.' : 'Choose an amount above to see your total.'}</p>
+        {dues && (
+          <label class="co-check co-renew"><input type="checkbox" name="auto_renew" /><span>Renew my membership automatically each year. I can cancel any time in my PayPal account.</span></label>
+        )}
+        <label class="co-check co-attest"><input type="checkbox" name="attest" required aria-describedby={`${id}-attest-err`} /><span>I confirm that this {dues ? 'payment' : 'gift'} comes from my own funds, that I am a United States citizen or lawful permanent resident, and that the details above are true.</span></label>
+        <p class="co-err" id={`${id}-attest-err`} hidden></p>
+
+        <fieldset class="co-set co-how">
+          <legend>How would you like to pay?</legend>
+          <div class="co-seg wide">
+            <label><input type="radio" name="pay" value="online" checked /><span>Pay online</span></label>
+            <label><input type="radio" name="pay" value="check" /><span>Mail a check</span></label>
+          </div>
+        </fieldset>
+
+        <div class="co-online">
+          <p class="co-wait">Choose {dues ? 'a level' : 'an amount'} above and the payment buttons will appear here.</p>
+          <div class="co-buttons" hidden>
+            <div class="co-apple" hidden></div>
+            <div class="co-paypal"></div>
+            <p class="co-secure">Payment is handled by PayPal. SBWPC never sees or stores your card number.</p>
+          </div>
+          <p class="co-off" hidden>Online payment is not available right now. You can mail a check instead, or email <a href="mailto:info@sbwpc.org">info@sbwpc.org</a>.</p>
+        </div>
+        <div class="co-check-pay" hidden>
+          <p>Send your details now and we will show you where to mail your check. Your {dues ? 'membership starts' : 'gift is recorded'} when we receive it.</p>
+          <p class="co-recurring-note" hidden>A check covers one payment. To give every month or year, pay online.</p>
+          <button type="submit" class="btn">Continue</button>
+        </div>
+        <p class="co-status" role="status" aria-live="polite" hidden></p>
+        <noscript><p class="co-off">This form needs JavaScript. You can also email <a href="mailto:info@sbwpc.org">info@sbwpc.org</a>.</p></noscript>
+      </div>
+    </div>
+  </form>
+
+  <div class="wrap give-form-wrap co-done" hidden>
+    <div class="give-form-card co-card co-receipt" tabindex="-1">
+      <h2 class="h2 co-done-title"></h2>
+      <p class="lede co-done-lede"></p>
+      <dl class="co-facts"></dl>
+      <div class="co-mail" hidden>
+        <h3 class="h3">Where to send it</h3>
+        <p>Make it payable to <strong>{CHECK.payable}</strong> and send it to:</p>
+        <address>{CHECK.address.map((line) => <>{line}<br /></>)}</address>
+        <p class="co-mail-memo"></p>
+      </div>
+      <p class="co-done-note"></p>
+      <div class="co-done-actions">
+        <button type="button" class="btn secondary co-print">Print this page</button>
+        <a class="btn" href="/">Back to the home page</a>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  import '../../scripts/checkout.js'
+</script>

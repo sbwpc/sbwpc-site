@@ -1,0 +1,34 @@
+---
+// Mailing list sign-up that stays on the page: Constant Contact's inline form, restyled to match the site.
+const {s} = Astro.props
+const tone = s.tone || 'white'
+const formId = s.formId || 'fe446b08-8637-4467-b4aa-dff083957072'
+const accountKey = s.accountKey || 'a2a4baae5861b0464c32ba73a822e50b'
+---
+<section class:list={['section', `tone-${tone}`, 's-news']} id={s.anchor || undefined}>
+  <div class="wrap news-grid">
+    <div class="news-copy" data-reveal>
+      {s.heading && <h2 class="h2">{s.heading}</h2>}
+      {s.intro && <p class="lede">{s.intro}</p>}
+      {s.points?.length > 0 && (
+        <ul class="give-points">
+          {s.points.map((pt) => <li>{pt}</li>)}
+        </ul>
+      )}
+    </div>
+    <div class="news-card" data-reveal style="--d:120ms">
+      <div class="ctct-inline-form" data-form-id={formId}></div>
+      <noscript><p>Email <a href="mailto:info@sbwpc.org?subject=Add%20me%20to%20the%20mailing%20list">info@sbwpc.org</a> to join the mailing list.</p></noscript>
+    </div>
+  </div>
+</section>
+<script is:inline define:vars={{accountKey}}>
+  window._ctct_m = accountKey
+  if (!document.getElementById('signupScript')) {
+    const sc = document.createElement('script')
+    sc.id = 'signupScript'
+    sc.src = 'https://static.ctctcdn.com/js/signup-form-widget/current/signup-form-widget.min.js'
+    sc.async = true
+    document.body.appendChild(sc)
+  }
+</script>

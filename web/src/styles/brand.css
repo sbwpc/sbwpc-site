@@ -1904,3 +1904,126 @@ body {
   border: 0;
   background: transparent;
 }
+
+/* Email chooser shown when someone clicks an email link */
+.mail-menu {
+  position: absolute;
+  z-index: 200;
+  min-width: 15rem;
+  padding: 0.5rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 1rem 2.5rem -1rem rgba(28, 12, 68, 0.35);
+}
+.mail-menu-to {
+  margin: 0.25rem 0.6rem 0.4rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.mail-opt {
+  display: block;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 0;
+  background: none;
+  border-radius: 3px;
+  font: inherit;
+  font-weight: 500;
+  color: var(--navy);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.mail-opt:hover,
+.mail-opt:focus-visible {
+  background: #f6f2fc;
+  color: var(--purple);
+  outline: none;
+}
+
+/* Mailing list sign-up: Constant Contact's inline form styled like the site */
+.news-grid {
+  display: grid;
+  gap: 2.5rem;
+  align-items: center;
+}
+@media (min-width: 64rem) {
+  .news-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(3rem, 6vw, 5.5rem);
+  }
+}
+.news-card {
+  background: var(--white);
+  border-top: 6px solid var(--purple);
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  box-shadow: 0 1.5rem 3rem -1.5rem rgba(28, 12, 68, 0.28);
+  min-height: 20rem;
+}
+.tone-white .news-card {
+  border: 1px solid var(--line);
+  border-top: 6px solid var(--purple);
+}
+.news-card .ctct-form-embed.form_0 .ctct-form-defaults,
+.news-card .ctct-form-defaults {
+  background: transparent !important;
+  padding: 0 !important;
+  font-family: var(--font-brand) !important;
+}
+.news-card .ctct-form-header,
+.news-card .ctct-form-text {
+  display: none !important;
+}
+.news-card .ctct-form-label {
+  font-family: var(--font-brand) !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: var(--navy) !important;
+  margin-bottom: 0.4rem !important;
+}
+.news-card .ctct-form-element {
+  font-family: var(--font-brand) !important;
+  height: 3rem !important;
+  font-size: 1.05rem !important;
+  border: 2px solid var(--line) !important;
+  border-radius: var(--radius) !important;
+  color: var(--ink) !important;
+  padding: 0 0.85rem !important;
+}
+.news-card .ctct-form-element:focus {
+  border-color: var(--purple) !important;
+  outline: 2px solid rgba(94, 55, 149, 0.25) !important;
+}
+.news-card .ctct-form-field {
+  margin: 0 0 1.1rem !important;
+}
+.news-card .ctct-form-button {
+  font-family: var(--font-brand) !important;
+  background: var(--red-text) !important;
+  border: 0 !important;
+  border-radius: var(--radius) !important;
+  height: 3.25rem !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  cursor: pointer;
+}
+.news-card .ctct-form-button:hover {
+  background: var(--navy-deep) !important;
+}
+.news-card .ctct-gdpr-text,
+.news-card .ctct-form-footer {
+  font-family: var(--font-brand) !important;
+  font-size: 0.8rem !important;
+  line-height: 1.5 !important;
+  color: var(--muted) !important;
+}
+.news-card .ctct-form-success {
+  font-family: var(--font-brand) !important;
+  color: var(--navy) !important;
+}
+/* The account's older pop-up form also loads with the sign-up code; keep it off the site */
+.ctct-popup-form {
+  display: none !important;
+}

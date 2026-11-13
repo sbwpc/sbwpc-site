@@ -898,7 +898,7 @@
     "type": "string"
    },
    "newsletterUrl": {
-    "type": "url"
+    "type": "string"
    },
    "social": {
     "type": "array",
@@ -1061,6 +1061,10 @@
      {
       "type": "sectionGive",
       "name": "sectionGive"
+     },
+     {
+      "type": "sectionNewsletter",
+      "name": "sectionNewsletter"
      }
     ]
    },
@@ -1230,6 +1234,10 @@
      {
       "type": "sectionGive",
       "name": "sectionGive"
+     },
+     {
+      "type": "sectionNewsletter",
+      "name": "sectionNewsletter"
      }
     ]
    }
@@ -1571,6 +1579,44 @@
    },
    "formIntro": {
     "type": "text"
+   }
+  }
+ },
+ "sectionNewsletter": {
+  "base": "object",
+  "fields": {
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "points": {
+    "type": "array",
+    "of": [
+     {
+      "type": "string",
+      "name": "string"
+     }
+    ]
+   },
+   "formId": {
+    "type": "string"
+   },
+   "accountKey": {
+    "type": "string"
    }
   }
  }

@@ -409,3 +409,77 @@ $$('.g-band').forEach((band) => {
   band.addEventListener('focusin', () => band.classList.add('paused'))
   band.addEventListener('focusout', () => band.classList.remove('paused'))
 })
+
+// Email links: many visitors have no desktop mail app set up, so a mailto link does nothing.
+// Offer Gmail, Outlook, the default mail app, or copying the address.
+;(() => {
+  let menu = null
+  let lastLink = null
+  const close = () => {
+    if (!menu) return
+    menu.remove()
+    menu = null
+    lastLink?.focus()
+  }
+  const open = (a) => {
+    close()
+    lastLink = a
+    const u = new URL(a.href)
+    const to = decodeURIComponent(u.pathname)
+    const subject = u.searchParams.get('subject') || ''
+    const enc = encodeURIComponent
+    const gmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${enc(to)}${subject ? `&su=${enc(subject)}` : ''}`
+    const outlook = `https://outlook.live.com/mail/0/deeplink/compose?to=${enc(to)}${subject ? `&subject=${enc(subject)}` : ''}`
+    menu = document.createElement('div')
+    menu.className = 'mail-menu'
+    menu.setAttribute('role', 'dialog')
+    menu.setAttribute('aria-label', `Email ${to}`)
+    menu.innerHTML = `
+      <p class="mail-menu-to">${to}</p>
+      <a class="mail-opt" href="${gmail}" target="_blank" rel="noopener">Open in Gmail</a>
+      <a class="mail-opt" href="${outlook}" target="_blank" rel="noopener">Open in Outlook</a>
+      <a class="mail-opt" href="${a.href}" data-native>Use my email app</a>
+      <button class="mail-opt" type="button" data-copy>Copy address</button>`
+    document.body.appendChild(menu)
+    const r = a.getBoundingClientRect()
+    const w = menu.offsetWidth
+    const left = Math.min(Math.max(12, r.left + scrollX), scrollX + document.documentElement.clientWidth - w - 12)
+    let top = r.bottom + scrollY + 8
+    if (r.bottom + menu.offsetHeight + 16 > innerHeight && r.top > menu.offsetHeight + 16) top = r.top + scrollY - menu.offsetHeight - 8
+    menu.style.left = `${left}px`
+    menu.style.top = `${top}px`
+    menu.querySelector('.mail-opt').focus()
+    menu.addEventListener('click', (e) => {
+      const t = e.target.closest('.mail-opt')
+      if (!t) return
+      if (t.hasAttribute('data-copy')) {
+        e.preventDefault()
+        const done = () => { t.textContent = 'Copied' ; setTimeout(close, 900) }
+        navigator.clipboard?.writeText(to).then(done, () => { t.textContent = to })
+        return
+      }
+      if (t.hasAttribute('data-native')) { e.preventDefault(); location.href = a.href }
+      setTimeout(close, 50)
+    })
+    menu.addEventListener('keydown', (e) => {
+      const items = [...menu.querySelectorAll('.mail-opt')]
+      const i = items.indexOf(document.activeElement)
+      if (e.key === 'Escape') { e.preventDefault(); close() }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus() }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus() }
+      else if (e.key === 'Tab' && ((e.shiftKey && i === 0) || (!e.shiftKey && i === items.length - 1))) { e.preventDefault(); items[e.shiftKey ? items.length - 1 : 0].focus() }
+    })
+  }
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest?.('a[href^="mailto:"]')
+    if (a && !a.closest('.mail-menu')) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey) return
+      e.preventDefault()
+      if (menu && lastLink === a) close()
+      else open(a)
+      return
+    }
+    if (menu && !e.target.closest('.mail-menu')) { menu.remove(); menu = null }
+  })
+  addEventListener('resize', () => { if (menu) { menu.remove(); menu = null } })
+})()

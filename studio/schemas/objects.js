@@ -316,6 +316,12 @@ export const sectionGive = section('sectionGive', 'Donation or membership amount
   defineField({name: 'formIntro', title: 'Form intro', type: 'text', rows: 2}),
 ])
 
+export const sectionNewsletter = section('sectionNewsletter', 'Mailing list sign-up', [
+  defineField({name: 'points', title: 'Short points', type: 'array', of: [{type: 'string'}]}),
+  defineField({name: 'formId', title: 'Constant Contact inline form ID', type: 'string', description: 'From Constant Contact: Sign-up forms, the inline form, View inline code'}),
+  defineField({name: 'accountKey', title: 'Constant Contact universal code key', type: 'string', description: 'The _ctct_m value in the universal code'}),
+])
+
 export const sectionCta = section('sectionCta', 'Call to action band', [])
 
 export const sectionEmbed = section('sectionEmbed', 'Embed (video, form, slides)', [
@@ -397,6 +403,7 @@ export const sectionTypes = [
   'sectionEmbed',
   'sectionCta',
   'sectionGive',
+  'sectionNewsletter',
 ]
 
 export const seo = defineType({
@@ -429,6 +436,7 @@ export default [
   sectionAccordion,
   sectionCta,
   sectionGive,
+  sectionNewsletter,
   sectionEmbed,
   sectionGallery,
   sectionLinks,

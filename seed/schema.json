@@ -895,7 +895,7 @@
     "type": "url"
    },
    "donateUrl": {
-    "type": "url"
+    "type": "string"
    },
    "newsletterUrl": {
     "type": "url"

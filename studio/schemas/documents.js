@@ -32,7 +32,7 @@ export const siteSettings = defineType({
     defineField({name: 'email', type: 'string', group: 'general'}),
     defineField({name: 'mailingAddress', type: 'string', group: 'general'}),
     defineField({name: 'joinUrl', title: 'Join or renew link', type: 'url', group: 'general'}),
-    defineField({name: 'donateUrl', title: 'Donate link', type: 'url', group: 'general'}),
+    defineField({name: 'donateUrl', title: 'Donate link', type: 'string', group: 'general', description: 'Where the Donate buttons go. Use /donate for the Donate page or a full https:// address.'}),
     defineField({name: 'newsletterUrl', title: 'Newsletter signup link', type: 'url', group: 'general'}),
     defineField({
       name: 'social',

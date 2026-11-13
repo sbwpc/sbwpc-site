@@ -1533,6 +1533,9 @@
    "formUrl": {
     "type": "url"
    },
+   "checkout": {
+    "type": "boolean"
+   },
    "amounts": {
     "type": "array",
     "of": [

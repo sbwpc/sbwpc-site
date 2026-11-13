@@ -10,7 +10,7 @@ Cookies are small files a website saves in your browser. Some are needed for a p
 - SBWPC does not use advertising cookies or tracking pixels, and we do not let ad networks track you on our site.
 - We ask before using analytics cookies. If you say no, they never load.
 - If your browser sends a Global Privacy Control or Do Not Track signal, we treat it as a no.
-- Some services built into our pages, such as the payment form, set their own cookies so they can work. They are listed below.
+- Some services built into our pages, such as the payment buttons, set their own cookies so they can work. They are listed below.
 
 ### Your cookie choice
 When you first visit, we ask whether you accept analytics cookies. We save your answer in your browser's local storage under the name sbwpc-consent so we do not ask again on every page. It holds only your choice and the date. It is not shared with anyone.
@@ -27,7 +27,7 @@ We do not use Google's advertising features, and we do not combine analytics dat
 ### Cookies set by services in our pages
 These services are part of how the site works. They load from the provider's own servers and follow the provider's own cookie and privacy policies. We list the cookies we observed when testing the site in November 2026. Providers can change their cookies without notice.
 
-**Donation and membership forms (JotForm, PayPal, Apple Pay).** Our Donate and Join pages show secure JotForm forms. When those pages load, PayPal sets cookies to prepare the payment buttons and help prevent fraud, and Google reCAPTCHA (_GRECAPTCHA) helps block spam. See [JotForm's privacy policy](https://www.jotform.com/privacy/) and [PayPal's privacy statement](https://www.paypal.com/us/legalhub/paypal/privacy-full).
+**Donation and membership payments (PayPal, Apple Pay).** The forms on our Donate and Join pages are part of this site and set no cookies of their own. Once you choose an amount or a membership level, the payment buttons load from PayPal, and PayPal sets cookies to run the buttons and help prevent fraud. If you do not choose an amount, or you choose to mail a check, PayPal does not load. See [PayPal's privacy statement](https://www.paypal.com/us/legalhub/paypal/privacy-full).
 
 **Mailing list sign-up (Constant Contact).** The sign-up form on our Contact page loads from Constant Contact. Its content network sets a short security cookie (__cf_bm) that helps block bots and expires after 30 minutes. See [Constant Contact's privacy center](https://www.constantcontact.com/forward/privacy-center) and [Cloudflare's cookie list](https://developers.cloudflare.com/fundamentals/reference/policies-compliances/cloudflare-cookies/).
 
@@ -40,7 +40,7 @@ These services are part of how the site works. They load from the provider's own
 ### How to control cookies
 - Use **Cookie settings** at the bottom of any page to accept or decline analytics.
 - Turn on [Global Privacy Control](https://globalprivacycontrol.org/) in your browser, and we will treat it as declining analytics.
-- Use your browser settings to block or delete cookies. If you block the cookies the forms need, the donation, membership or sign-up forms may not work.
+- Use your browser settings to block or delete cookies. If you block the cookies these services need, the payment buttons or the mailing list sign-up may not work.
 
 ### Changes to this policy
 We will update this page if we add, remove or change the tools we use, and we will change the effective date at the top.

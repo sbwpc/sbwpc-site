@@ -46,23 +46,25 @@ Membership dues and donations may both count as contributions. If you have quest
 
 We share information only in these cases:
 - **Service providers** that run parts of the site for us, under their own privacy policies:
-  - [JotForm](https://www.jotform.com/privacy/) for donation and membership forms
   - [PayPal](https://www.paypal.com/us/legalhub/paypal/privacy-full) for payments, including Apple Pay
+  - [Supabase](https://supabase.com/privacy) for the secure database that holds member and donor records
   - [Constant Contact](https://www.constantcontact.com/forward/privacy-center) for email
   - [Google](https://policies.google.com/privacy) for forms, the event calendar and analytics
-  - [Netlify](https://www.netlify.com/privacy/) for website hosting
+  - [Netlify](https://www.netlify.com/privacy/) for website hosting and encrypted backups
 - **Government agencies**, as required by the Political Reform Act and other laws, such as campaign finance reports.
 - **When the law requires it**, such as a subpoena or court order, or to protect the safety of our members, the public or SBWPC.
 
 ### Payments
-Payments are processed by PayPal through our secure JotForm form. SBWPC does not receive or store your full card number.
+Payments are processed by PayPal on our Join and Donate pages, including Apple Pay and cards. SBWPC does not receive or store your full card number.
+
+If you choose to mail a check instead, we keep the details you entered so we can match your check when it arrives.
 
 ### Do Not Track and Global Privacy Control
 We do not track visitors across other websites, and we do not allow advertising networks to do so on our site.
 
 If your browser sends a Global Privacy Control or Do Not Track signal, we treat it as a choice to decline analytics cookies. You do not need to do anything else. Learn more at [globalprivacycontrol.org](https://globalprivacycontrol.org/).
 
-Some third-party services embedded in our pages, such as the payment form or event calendar, set their own cookies to work. They are listed in our [Cookie Policy](/cookies).
+Some third-party services embedded in our pages, such as the payment buttons or event calendar, set their own cookies to work. They are listed in our [Cookie Policy](/cookies).
 
 ### How long we keep information
 We keep contribution and campaign finance records for as long as the law requires, which is at least four years under California's Political Reform Act. We keep other information only as long as we need it for the purposes above.
@@ -70,7 +72,7 @@ We keep contribution and campaign finance records for as long as the law require
 [SBWPC to confirm: how long member, mailing list and endorsement request records are kept, and when they are deleted.]
 
 ### How we protect information
-Our site uses encrypted connections (HTTPS). Forms and payments are handled by established providers that use their own security controls. We limit access to supporter records to the people who need it for SBWPC work.
+Our site uses encrypted connections (HTTPS). Member and donor records are kept in an access-controlled database. Only SBWPC administrators can open them, and each one signs in with a password and a second verification step. Changes to records are logged, and backups are encrypted. Payments are handled by PayPal under its own security controls. We limit access to supporter records to the people who need it for SBWPC work.
 
 [SBWPC to confirm: who has access to supporter records and the tools they are kept in.]
 

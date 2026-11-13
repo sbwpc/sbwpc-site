@@ -41,7 +41,7 @@ Contributions and dues are not tax deductible.
 When you submit an endorsement request, comment or other material, you confirm that it is accurate and that you have the right to share it. You let SBWPC use it for the purpose you sent it for, such as reviewing an endorsement request.
 
 ### Other websites and services
-Our site links to and embeds services run by others, such as JotForm, PayPal, Constant Contact, Google and YouTube. We do not control them, and their own terms and privacy policies apply when you use them. A link to another site does not mean we endorse it.
+Our site links to and embeds services run by others, such as PayPal, Constant Contact, Google and YouTube. We do not control them, and their own terms and privacy policies apply when you use them. A link to another site does not mean we endorse it.
 
 ### No warranties
 We provide this site "as is." We do our best to keep it accurate and available, but we do not promise that it will always be complete, current, error free or online.

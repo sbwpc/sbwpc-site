@@ -19,7 +19,7 @@ const STATES = 'AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD M
     <div class="wrap give-grid">
       <div class="give-copy" data-reveal>
         {s.heading && <h2 class="h2">{s.heading}</h2>}
-        {s.intro && <p class="lede">{dues ? s.intro : 'Pick an amount, add your details and pay right here. It takes about two minutes.'}</p>}
+        {s.intro && <p class="lede">{s.intro}</p>}
         {s.points?.length > 0 && (
           <ul class="give-points">
             {s.points.map((pt) => <li>{pt}</li>)}

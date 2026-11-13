@@ -288,7 +288,8 @@ export const sectionAccordion = section('sectionAccordion', 'Expandable list', [
 ])
 
 export const sectionGive = section('sectionGive', 'Donation or membership amounts with form', [
-  defineField({name: 'formUrl', title: 'Form link', type: 'url', description: 'The JotForm form for donations or membership'}),
+  defineField({name: 'checkout', title: 'Take payment on this page', type: 'boolean', initialValue: true, description: 'Shows the built-in form with PayPal, Apple Pay and mail a check. Turn off to show the JotForm form below instead.'}),
+  defineField({name: 'formUrl', title: 'JotForm link (fallback)', type: 'url', description: 'Only used when Take payment on this page is off'}),
   defineField({name: 'embed', title: 'Show the form on this page', type: 'boolean', initialValue: true}),
   defineField({name: 'prefill', title: 'Fill the chosen amount into the form', type: 'boolean', initialValue: true, description: 'Works with the donation form. Turn off for membership levels.'}),
   defineField({name: 'period', title: 'Amount label', type: 'string', description: 'Optional, like per year'}),

@@ -35,9 +35,9 @@ const fill = async (page, over = {}) => {
 
 async function join(name, opts) {
   const {browser, page, errors} = await prepare(opts, {apple: name === 'phone'})
-  await page.goto(origin + '/join-preview/')
+  await page.goto(origin + '/join/')
   await page.waitForSelector('.co-form')
-  ok(`${name}: preview page is hidden from search engines`, (await page.getAttribute('meta[name=robots]', 'content')) === 'noindex, nofollow')
+  ok(`${name}: the Join page is open to search engines and has no JotForm form`, (await page.locator('meta[name=robots]').count()) === 0 && (await page.locator('iframe.jf-frame').count()) === 0)
   await page.locator('.s-checkout').scrollIntoViewIfNeeded()
   await page.addStyleTag({content: '[data-reveal]{opacity:1!important;transform:none!important} .site-header,body>header{position:static!important} .consent,[class*=consent]{display:none!important}'})
   const clip = async (n) => { await page.waitForTimeout(300); await page.locator('.s-checkout').screenshot({path: (await import('./browser.mjs')).OUT + `form-join-${name}-${n}.png`}) }
@@ -115,7 +115,7 @@ async function join(name, opts) {
 async function donate(name, opts) {
   const {browser, page, errors} = await prepare(opts)
   const O = (await import('./browser.mjs')).OUT
-  await page.goto(origin + '/donate-preview/')
+  await page.goto(origin + '/donate/')
   await page.waitForSelector('.co-form')
   await page.addStyleTag({content: '[data-reveal]{opacity:1!important;transform:none!important} .site-header,body>header{position:static!important} .consent,[class*=consent]{display:none!important}'})
   await page.locator('.s-checkout').scrollIntoViewIfNeeded()
@@ -167,7 +167,7 @@ async function donate(name, opts) {
 // Keyboard only: choose, fill and reach the pay button without a mouse
 async function keyboard() {
   const {browser, page} = await prepare(DESK)
-  await page.goto(origin + '/join-preview/')
+  await page.goto(origin + '/join/')
   await page.waitForSelector('.co-form')
   await page.focus('input[name=level]')
   await page.keyboard.press('Space')
@@ -178,18 +178,19 @@ async function keyboard() {
   await browser.close()
 }
 
-// The live pages still use JotForm and do not load the new form or PayPal
+// PayPal's script is not loaded until someone chooses an amount, and the old test pages are gone
 {
   const {browser, page} = await open(DESK)
   let paypalLoaded = false
   page.on('request', (r) => { if (/paypal\.com\/sdk/.test(r.url())) paypalLoaded = true })
-  await page.route(/jotfor|googletagmanager|constantcontact|ctctcdn/, (r) => r.abort())
-  await page.goto(origin + '/join/')
-  ok('the live Join page is unchanged: JotForm form, no new checkout', (await page.locator('iframe.jf-frame').count()) === 1 && (await page.locator('.co-form').count()) === 0 && !paypalLoaded)
+  await page.route(/googletagmanager|constantcontact|ctctcdn/, (r) => r.abort())
   await page.goto(origin + '/donate/')
-  ok('the live Donate page is unchanged: JotForm form, no new checkout', (await page.locator('iframe.jf-frame').count()) === 1 && (await page.locator('.co-form').count()) === 0)
+  await page.waitForSelector('.co-form')
+  ok('PayPal does not load until an amount is chosen', !paypalLoaded)
+  ok('the test pages are removed', (await (await fetch(origin + '/join-preview/')).status) === 404 && (await (await fetch(origin + '/donate-preview/')).status) === 404)
   const sm = fs.readFileSync(new URL('../../web/dist/sitemap-0.xml', import.meta.url), 'utf8')
-  ok('preview and admin pages are left out of the sitemap', !sm.includes('preview') && !sm.includes('/admin'))
+  ok('admin pages are left out of the sitemap, Join and Donate are in it', !sm.includes('/admin') && sm.includes('/join/') && sm.includes('/donate/'))
+  for (const p of ['privacy', 'cookies', 'terms']) ok(`${p} policy no longer mentions JotForm`, !/jotform/i.test(fs.readFileSync(new URL(`../../web/dist/${p}/index.html`, import.meta.url), 'utf8')))
   await browser.close()
 }
 await join('desktop', DESK)

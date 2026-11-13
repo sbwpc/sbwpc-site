@@ -34,6 +34,7 @@ export const siteSettings = defineType({
     defineField({name: 'joinUrl', title: 'Join or renew link', type: 'string', group: 'general', description: 'Where the Join buttons go. Use /join for the membership page or a full https:// address.'}),
     defineField({name: 'donateUrl', title: 'Donate link', type: 'string', group: 'general', description: 'Where the Donate buttons go. Use /donate for the Donate page or a full https:// address.'}),
     defineField({name: 'newsletterUrl', title: 'Newsletter signup link', type: 'string', group: 'general', description: 'Where mailing list buttons go. Use /contact#newsletter for the on-page sign-up.'}),
+    defineField({name: 'analyticsId', title: 'Google Analytics ID', type: 'string', group: 'general', description: 'The GA4 measurement ID, like G-XXXXXXXXXX. Analytics loads only for visitors who accept cookies.', validation: (r) => r.regex(/^G-[A-Z0-9]+$/, {name: 'GA4 ID'})}),
     defineField({
       name: 'social',
       type: 'array',

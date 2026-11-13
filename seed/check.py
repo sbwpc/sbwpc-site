@@ -6,7 +6,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 S = json.load(open(os.path.join(HERE, 'schema.json')))
 PRIMS = {'string', 'text', 'number', 'boolean', 'url', 'date', 'datetime', 'slug'}
 VALID_PATHS = set(
-    """home about/history about/board about/committees about/positions about/seat-at-the-table contact
+    """home privacy terms cookies about/history about/board about/committees about/positions about/seat-at-the-table contact
 elections elections/endorsements elections/past elections/candidate-corner elections/endorsement-process
 elections/request-endorsement elections/campaign-finance elections/governors-race elections/candidate-forums
 take-action take-action/boards-and-commissions take-action/letters-and-statements advocacy advocacy/playbook

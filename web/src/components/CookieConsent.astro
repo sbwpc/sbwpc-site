@@ -1,0 +1,84 @@
+---
+// Cookie choice. Shows once on first visit; Google Analytics loads only after Accept.
+// Global Privacy Control and Do Not Track count as Decline. "Cookie settings" in the footer reopens it.
+const {analyticsId = ''} = Astro.props
+---
+<section class="consent" id="cookie-consent" aria-labelledby="consent-title" data-ga={analyticsId} hidden>
+  <div class="consent-inner">
+    <p class="consent-title" id="consent-title" tabindex="-1">Your privacy</p>
+    <p class="consent-text">
+      SBWPC uses only the cookies our forms and videos need to work. With your OK, we would also use Google Analytics to
+      see which pages help people most. We never use ad tracking.{' '}<a href="/cookies">Cookie Policy</a>
+    </p>
+    <p class="consent-gpc" hidden>Your browser's privacy signal is on, so analytics stay off unless you choose Accept.</p>
+    <div class="consent-actions">
+      <button type="button" class="btn consent-btn" data-consent="accept">Accept</button>
+      <button type="button" class="btn consent-btn" data-consent="decline">Decline</button>
+    </div>
+  </div>
+</section>
+<script is:inline>
+  ;(() => {
+    const KEY = 'sbwpc-consent'
+    const box = document.getElementById('cookie-consent')
+    if (!box) return
+    const gaId = box.dataset.ga
+    const signal = navigator.globalPrivacyControl === true || navigator.doNotTrack === '1' || window.doNotTrack === '1'
+    const read = () => { try { return JSON.parse(localStorage.getItem(KEY) || 'null') } catch { return null } }
+    const save = (analytics, source) => { try { localStorage.setItem(KEY, JSON.stringify({v: 1, analytics, source, date: new Date().toISOString().slice(0, 10)})) } catch {} }
+    let opener = null
+    const loadGA = () => {
+      if (!gaId || window.__sbwpcGA) return
+      window.__sbwpcGA = true
+      window['ga-disable-' + gaId] = false
+      window.dataLayer = window.dataLayer || []
+      window.gtag = function () { dataLayer.push(arguments) }
+      gtag('js', new Date())
+      gtag('config', gaId, {allow_google_signals: false, allow_ad_personalization_signals: false})
+      const s = document.createElement('script')
+      s.async = true
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gaId)
+      document.head.appendChild(s)
+    }
+    const stopGA = () => {
+      if (!gaId) return
+      window['ga-disable-' + gaId] = true
+      const host = location.hostname
+      const domains = ['', host, '.' + host, '.' + host.split('.').slice(-2).join('.')]
+      document.cookie.split(';').map((c) => c.trim().split('=')[0]).filter((n) => n === '_ga' || n.startsWith('_ga_')).forEach((n) => {
+        domains.forEach((d) => { document.cookie = n + '=; Max-Age=0; path=/' + (d ? '; domain=' + d : '') })
+      })
+    }
+    const show = (fromSettings) => {
+      box.querySelector('.consent-gpc').hidden = !signal
+      box.hidden = false
+      requestAnimationFrame(() => box.classList.add('on'))
+      if (fromSettings) box.querySelector('#consent-title').focus()
+    }
+    const hide = () => {
+      box.classList.remove('on')
+      box.hidden = true
+      if (opener) { opener.focus(); opener = null }
+    }
+    box.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-consent]')
+      if (!b) return
+      const yes = b.dataset.consent === 'accept'
+      save(yes, 'choice')
+      yes ? loadGA() : stopGA()
+      hide()
+    })
+    box.addEventListener('keydown', (e) => { if (e.key === 'Escape' && opener) hide() })
+    document.addEventListener('click', (e) => {
+      const t = e.target.closest('[data-cookie-settings]')
+      if (!t) return
+      e.preventDefault()
+      opener = t
+      show(true)
+    })
+    const c = read()
+    if (c) { if (c.analytics) loadGA() }
+    else if (signal) save(false, 'signal')
+    else show(false)
+  })()
+</script>

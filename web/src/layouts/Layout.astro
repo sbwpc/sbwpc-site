@@ -1,4 +1,5 @@
 ---
+import CookieConsent from '../components/CookieConsent.astro'
 import '../styles/global.css'
 import '../styles/components.css'
 import '../styles/brand.css'
@@ -45,6 +46,7 @@ const showBanner = !noBanner && settings.banner?.enabled
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
+    <CookieConsent analyticsId={settings?.analyticsId || ''} />
     <Header settings={settings} path={path} />
     {showBanner && <Banner banner={settings.banner} />}
     <main id="main" tabindex="-1">

@@ -31,7 +31,7 @@ export const siteSettings = defineType({
     defineField({name: 'shareImage', type: 'image', group: 'general', description: 'Default image when the site is shared on social media'}),
     defineField({name: 'email', type: 'string', group: 'general'}),
     defineField({name: 'mailingAddress', type: 'string', group: 'general'}),
-    defineField({name: 'joinUrl', title: 'Join or renew link', type: 'url', group: 'general'}),
+    defineField({name: 'joinUrl', title: 'Join or renew link', type: 'string', group: 'general', description: 'Where the Join buttons go. Use /join for the membership page or a full https:// address.'}),
     defineField({name: 'donateUrl', title: 'Donate link', type: 'string', group: 'general', description: 'Where the Donate buttons go. Use /donate for the Donate page or a full https:// address.'}),
     defineField({name: 'newsletterUrl', title: 'Newsletter signup link', type: 'url', group: 'general'}),
     defineField({

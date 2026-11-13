@@ -892,7 +892,7 @@
     "type": "string"
    },
    "joinUrl": {
-    "type": "url"
+    "type": "string"
    },
    "donateUrl": {
     "type": "string"

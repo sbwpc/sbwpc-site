@@ -93,6 +93,11 @@ Apple Pay also needs: Apple Pay turned on for the PayPal app, sbwpc.org register
 - A payment from an email already on file updates that person's contact details. The audit log keeps the old values.
 - Payments made with PayPal test money are saved with the note "SANDBOX TEST" and are removed from the live database before the switch.
 
+### Where things stand (November 13, 2026)
+- Netlify has SUPABASE_URL and PAYPAL_ENV (sandbox). The four secret values are still to be entered by Luke: handoff/membership-system/keys-checklist.md.
+- Branch sandbox-ready: labels sandbox payments. Deploy it together with the keys.
+- Branch forms-live: puts the new forms on /join and /donate, updates the Privacy, Cookie and Terms pages, removes the test pages. Deploy only after sandbox testing passes and PayPal is switched to live. Set the policy effective dates to the deploy date.
+
 ### Open questions for SBWPC
 - Confirm the statement people tick before paying: own funds, US citizen or lawful permanent resident, details are true.
 - Is there a smallest or largest gift SBWPC wants to accept online? The form allows $1 to $25,000 as a safety limit only.

@@ -7,7 +7,7 @@ const {items, past = false} = Astro.props
 {items.length === 0 ? (
   <div class="empty" data-reveal>
     <p class="h4">New dates are on the way.</p>
-    <p>Follow SBWPC on Substack or Instagram, or join the mailing list, to hear about the next gathering first.</p>
+    <p>Follow SBWPC on Instagram or join the mailing list to hear about the next gathering first.</p>
   </div>
 ) : (
   <ul class:list={['events', {past}]}>

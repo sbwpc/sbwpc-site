@@ -1012,11 +1012,21 @@ body {
     text-align: right;
   }
 }
+/* Small source photos: no bleed. A framed print sits beside the text,
+   inside the normal page width, so the pair reads as one unit. */
+.split-grid.img-small {
+  width: min(100% - 2 * var(--gutter), var(--wrap));
+  margin-inline: auto;
+  align-items: start;
+}
+.split-grid.img-small .split-copy {
+  padding-inline: 0;
+}
 .img-small .split-frame {
   aspect-ratio: auto;
   height: auto;
-  width: min(100% - 2 * var(--gutter), 17rem);
-  margin-inline: var(--gutter);
+  width: min(100%, 17rem);
+  margin: 0;
   padding: 0.75rem;
   background: var(--white);
   border: 1px solid var(--line);
@@ -1027,11 +1037,24 @@ body {
   height: auto;
 }
 @media (min-width: 64rem) {
-  .split-grid.img-small {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  .split-grid.img-small,
+  .split-grid.img-small.img-left {
+    grid-template-columns: 17rem minmax(0, 44rem);
+    justify-content: center;
+    gap: clamp(3rem, 5vw, 5rem);
+  }
+  .split-grid.img-small.img-right {
+    grid-template-columns: minmax(0, 44rem) 17rem;
+  }
+  .split-grid.img-small .split-copy {
+    padding-inline: 0;
   }
   .img-small .split-media {
-    justify-self: center;
+    padding-top: 0.5rem;
+  }
+  .img-small .split-media .caption {
+    padding: 0;
+    text-align: left;
   }
 }
 
@@ -1594,5 +1617,30 @@ body {
 @media (min-width: 64rem) {
   .hero-split .hero-grid {
     min-height: clamp(30rem, 66vh, 42rem);
+  }
+}
+
+/* ---------- Layout fixes (Nov 2026 review) ---------- */
+/* Stat grids are two columns: an odd last item fills its row
+   instead of leaving an empty grey cell */
+@media (min-width: 40rem) {
+  .stat-grid > div:last-child:nth-child(odd):not(:only-child) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Image-and-text bleed: on very wide screens the photo stops at a
+   100rem frame instead of running to the monitor edge, so the photo
+   and text stay balanced */
+@media (min-width: 64rem) {
+  .s-split .split-grid:not(.img-small) {
+    max-width: 100rem;
+    margin-inline: auto;
+  }
+  .s-split .split-grid.img-right:not(.img-small) .split-copy {
+    padding-left: max(var(--gutter), calc((min(100vw, 100rem) - var(--wrap)) / 2));
+  }
+  .s-split .split-grid.img-left:not(.img-small) .split-copy {
+    padding-right: max(var(--gutter), calc((min(100vw, 100rem) - var(--wrap)) / 2));
   }
 }

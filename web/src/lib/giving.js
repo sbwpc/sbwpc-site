@@ -23,7 +23,7 @@ export const COMMITTEES = [
 // Online gifts outside this range are stopped as a safety check, not as SBWPC policy
 export const DONATION_MIN = 1
 export const DONATION_MAX = 25000
-// Where checks go. SBWPC to confirm the payee name.
+// Where checks go
 export const CHECK = {
   payable: "Santa Barbara Women's Political Committee",
   address: ['SBWPC', 'P.O. Box 90618', 'Santa Barbara, CA 93190-0618'],

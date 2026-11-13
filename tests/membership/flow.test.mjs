@@ -43,6 +43,7 @@ let m = (await sql(`select m.*, p.email, p.email_opt_in from public.memberships 
 ok('member record created: active for 12 months, committees cleaned', m.state === 'active' && m.level === 'Advocate' && m.committees.join() === 'Media' && c.receipt.expires_on === m.expires_on && m.email_opt_in === true, JSON.stringify(m))
 const firstExpiry = m.expires_on
 const c2 = await post('/api/checkout/capture', {checkoutId: r.checkoutId, orderId: r.orderId})
+ok('payments made with PayPal test money are labelled SANDBOX TEST', (await sql(`select note from public.payments`))[0].note === 'SANDBOX TEST')
 ok('confirming the same payment twice records it once', c2.ok && c2.receipt.transaction_id === c.receipt.transaction_id && (await count('payments')) === 1)
 
 console.log('\n== Renewal by the same email ==')

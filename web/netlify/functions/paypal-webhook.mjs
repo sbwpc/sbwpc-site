@@ -2,8 +2,9 @@
 // a plan is cancelled, a charge fails, or a payment is refunded. Every message is verified with PayPal first.
 import {json, fail, log} from '../lib/http.mjs'
 import {db, dbReady, must, getCheckout, recordPayment} from '../lib/db.mjs'
-import {verifyWebhook} from '../lib/paypal.mjs'
-import {completeCheckout} from '../lib/finish.mjs'
+import {verifyWebhook, paypalEnv} from '../lib/paypal.mjs'
+import {completeCheckout, SANDBOX_NOTE} from '../lib/finish.mjs'
+
 
 const cents = (value) => Math.round(Number(value) * 100)
 const one = async (query) => (await must(query.limit(1)))[0] || null
@@ -21,7 +22,7 @@ async function recurringPayment(sale) {
     await completeCheckout(checkout, {captureId: sale.id, subscriptionId: subId, method: 'paypal', amountCents})
     return 'first payment recorded'
   }
-  const p = {kind: plan.kind, person_id: plan.person_id, amount_cents: amountCents, method: 'paypal', source: 'web', paypal_capture_id: sale.id, subscription_id: subId, frequency: plan.frequency}
+  const p = {kind: plan.kind, person_id: plan.person_id, amount_cents: amountCents, method: 'paypal', source: 'web', paypal_capture_id: sale.id, subscription_id: subId, frequency: plan.frequency, note: paypalEnv() === 'live' ? null : SANDBOX_NOTE}
   if (plan.kind === 'dues') {
     const m = await one(db().from('memberships').select('level').eq('person_id', plan.person_id).neq('state', 'cancelled').order('expires_on', {ascending: false}))
     if (!m) return 'no membership for plan'

@@ -87,8 +87,13 @@ Apple Pay also needs: Apple Pay turned on for the PayPal app, sbwpc.org register
 5. Create the live PayPal app and webhook, switch PAYPAL_ENV to live, test one small real payment and refund it.
 6. Switch /join and /donate to the new form (set checkout: true on the two give sections), update the Privacy and Cookie policies to drop JotForm, and retire the JotForm forms.
 
+### Decided November 13, 2026
+- Switch plan: test in the PayPal sandbox on the test pages first, then swap the live Join and Donate pages.
+- Checks are payable to "Santa Barbara Women's Political Committee", mailed to P.O. Box 90618, Santa Barbara, CA 93190-0618. Change it in web/src/lib/giving.js if the client corrects it.
+- A payment from an email already on file updates that person's contact details. The audit log keeps the old values.
+- Payments made with PayPal test money are saved with the note "SANDBOX TEST" and are removed from the live database before the switch.
+
 ### Open questions for SBWPC
-- Checks: confirm the payee name ("Santa Barbara Women's Political Committee") and the mailing address (P.O. Box 90618, Santa Barbara, CA 93190-0618).
 - Confirm the statement people tick before paying: own funds, US citizen or lawful permanent resident, details are true.
 - Is there a smallest or largest gift SBWPC wants to accept online? The form allows $1 to $25,000 as a safety limit only.
 - Should the second household member name be offered at levels above Feminist Household too?

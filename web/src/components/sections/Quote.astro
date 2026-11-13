@@ -1,0 +1,17 @@
+---
+import Link from '../Link.astro'
+const {s} = Astro.props
+const tone = s.tone || 'cream'
+---
+<section class:list={['section', `tone-${tone}`, 's-quote']} id={s.anchor || undefined}>
+  <div class="wrap quote-wrap" data-reveal>
+    {s.eyebrow && <p class="eyebrow gold">{s.eyebrow}</p>}
+    {s.heading && <h2 class="h3 quote-head">{s.heading}</h2>}
+    <blockquote class="quote">
+      <p>{s.quote}</p>
+      {s.attribution && <footer>{s.attribution}</footer>}
+    </blockquote>
+    {s.intro && <p class="lede">{s.intro}</p>}
+    {s.link?.url && <p><Link class="textlink" href={s.link.url}><span class="arrow">{s.link.label}</span></Link></p>}
+  </div>
+</section>

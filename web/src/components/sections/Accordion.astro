@@ -1,0 +1,22 @@
+---
+import Shell from './Shell.astro'
+import RichText from '../RichText.astro'
+const {s} = Astro.props
+---
+<Shell s={s}>
+  <div class="accordion" data-reveal>
+    {(s.items || []).map((it) => (
+      <details class="acc">
+        <summary>
+          <span class="acc-head">
+            {it.kicker && <span class="kicker">{it.kicker}</span>}
+            <span class="acc-title">{it.title}</span>
+            {it.summary && <span class="acc-sum">{it.summary}</span>}
+          </span>
+          <span class="acc-icon" aria-hidden="true"></span>
+        </summary>
+        <div class="acc-body"><RichText value={it.body} /></div>
+      </details>
+    ))}
+  </div>
+</Shell>

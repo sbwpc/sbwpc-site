@@ -1,0 +1,42 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import Breadcrumbs from '../../components/Breadcrumbs.astro'
+import RichText from '../../components/RichText.astro'
+import Img from '../../components/Img.astro'
+import Posts from '../../components/collections/Posts.astro'
+import {loadAll, fmtDate} from '../../lib/data.js'
+export async function getStaticPaths() {
+  const {posts} = await loadAll()
+  return posts.filter((p) => p.slug?.current && !p.externalUrl).map((post) => ({params: {slug: post.slug.current}, props: {post, more: posts.filter((x) => x._id !== post._id).slice(0, 3)}}))
+}
+const {post, more} = Astro.props
+---
+<Layout title={post.title} description={post.excerpt} image={post.image} path={`news/${post.slug.current}`}>
+  <Breadcrumbs path={`news/${post.slug.current}`} title={post.title} />
+  <article class="article">
+    <header class="section tone-cream article-head">
+      <div class="wrap narrow" data-reveal>
+        <p class="eyebrow">{[post.category, fmtDate(post.date)].filter(Boolean).join(' · ')}</p>
+        <h1 class="h1">{post.title}</h1>
+        {post.excerpt && <p class="lede">{post.excerpt}</p>}
+      </div>
+    </header>
+    {post.image && (
+      <figure class="wrap article-img" data-reveal>
+        <div class="frame"><Img image={post.image} width={1600} sizes="(min-width: 76rem) 76rem, 100vw" eager /></div>
+        {post.image.caption && <figcaption class="caption">{post.image.caption}</figcaption>}
+      </figure>
+    )}
+    <div class="section tone-white">
+      <div class="wrap narrow"><RichText value={post.body} /></div>
+    </div>
+  </article>
+  {more.length > 0 && (
+    <section class="section tone-cream">
+      <div class="wrap">
+        <div class="section-head split"><div><p class="eyebrow">Keep reading</p><h2 class="h2">More from SBWPC</h2></div><p class="lede"><a class="textlink" href="/news"><span class="arrow">All news</span></a></p></div>
+        <Posts items={more} />
+      </div>
+    </section>
+  )}
+</Layout>

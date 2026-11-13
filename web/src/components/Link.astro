@@ -1,0 +1,7 @@
+---
+// Link that opens outside sites in a new tab and keeps internal links normal.
+import {isExternal} from '../lib/data.js'
+const {href = '#', ...rest} = Astro.props
+const ext = isExternal(href)
+---
+<a href={href} {...rest} {...(ext ? {target: '_blank', rel: 'noopener'} : {})}><slot />{ext && <span class="sr-only"> (opens in a new tab)</span>}</a>

@@ -1,0 +1,37 @@
+---
+import Link from './Link.astro'
+const {settings} = Astro.props
+const year = new Date().getFullYear()
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="/brand/sbwpc-logo-primary-tagline-reverse-1.svg" alt="Santa Barbara Women's Political Committee. Access, Voice, Power." width="370" height="121" />
+      </div>
+      <div class="footer-cta on-dark">
+        {settings.joinUrl && <a class="btn accent small" href={settings.joinUrl}>Join or Renew</a>}
+        {settings.donateUrl && <a class="btn small" href={settings.donateUrl}>Donate</a>}
+      </div>
+    </div>
+    <div class="footer-cols">
+      {(settings.footerColumns || []).map((col) => (
+        <div>
+          <p class="footer-h">{col.title}</p>
+          <ul>{(col.links || []).map((l) => <li><Link href={l.url}>{l.label}</Link></li>)}</ul>
+        </div>
+      ))}
+    </div>
+    <div class="footer-bottom">
+      <ul class="footer-social">
+        {settings.email && <li><a href={`mailto:${settings.email}`}>{settings.email}</a></li>}
+        {(settings.social || []).map((s) => <li><Link href={s.url}>{s.label}</Link></li>)}
+      </ul>
+      <p class="footer-legal">
+        {settings.mailingAddress && <span>{settings.mailingAddress}</span>}
+        <span>&copy; {year} SBWPC</span>
+        <a href="#main" class="to-top">Back to top</a>
+      </p>
+    </div>
+  </div>
+</footer>

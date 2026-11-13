@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+web/public/media/
+studio/dist/
+.env
+.env.*
+.DS_Store
+_transfer/
+studio/.sanity/

@@ -1,0 +1,21 @@
+---
+import Shell from './Shell.astro'
+const {s} = Astro.props
+const groups = s.groups || []
+---
+<Shell s={s}>
+  <div class="namegroups">
+    {groups.map((g, i) => (
+      <div class:list={['namegroup', {long: (g.items || []).length > 8}]} data-reveal style={`--d:${(i % 3) * 60}ms`}>
+        {g.kicker && <p class="kicker">{g.kicker}</p>}
+        {g.title && <h3 class="h4">{g.title}</h3>}
+        {g.body && <p class="ng-body">{g.body}</p>}
+        {g.items?.length > 0 && (
+          <ul class="names">
+            {g.items.map((n) => <li><span class="n">{n.name}</span>{n.detail && <span class="d">{n.detail}</span>}</li>)}
+          </ul>
+        )}
+      </div>
+    ))}
+  </div>
+</Shell>

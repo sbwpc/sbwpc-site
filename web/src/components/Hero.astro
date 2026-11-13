@@ -1,0 +1,57 @@
+---
+// Page header. Layouts: split (photo beside text), full (headline over a
+// full-width photo), text (no photo: shows the SBWPC logomark).
+import Img from './Img.astro'
+import Buttons from './Buttons.astro'
+const {hero = {}} = Astro.props
+const hasImage = Boolean(hero.image)
+const layout = hasImage ? hero.layout || 'split' : 'text'
+const tone = layout === 'full' ? 'navy' : hero.tone || 'grey'
+const contain = hero.imageFit === 'contain'
+const stats = hero.stats || []
+---
+<section class:list={['hero', `tone-${tone}`, `hero-${layout}`, {contain}]}>
+  {layout === 'full' && (
+    <div class="hero-bg" aria-hidden="true">
+      <Img image={hero.image} width={2400} sizes="100vw" eager class="hero-img" />
+    </div>
+  )}
+  <div class:list={['hero-grid', {wrap: layout !== 'split'}]}>
+    <div class="hero-copy" data-reveal>
+      {hero.eyebrow && <p class="eyebrow">{hero.eyebrow}</p>}
+      {hero.badges?.length > 0 && <div class:list={['badges', {neutral: hero.badges.length > 2}]}>{hero.badges.map((b) => <span class="badge">{b}</span>)}</div>}
+      <h1 class="h1">{hero.heading}</h1>
+      {hero.subheading && <p class="sub">{hero.subheading}</p>}
+      {hero.body && <p class="lede">{hero.body}</p>}
+      {stats.length > 0 && (
+        <div class="stats hero-stats" style={`--n:${Math.min(stats.length, 4)}`}>
+          {stats.map((s) => (
+            <div class="stat">
+              {s.label && <p class="label">{s.label}</p>}
+              <p class="value">{s.value}</p>
+              {s.note && <p class="note">{s.note}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+      <Buttons buttons={hero.buttons} />
+    </div>
+    {layout === 'split' && (
+      <div class="hero-media">
+        <Img image={hero.image} width={1800} sizes="(min-width: 64rem) 55vw, 100vw" eager class="hero-img" />
+        {hero.imageLabel?.title && (
+          <div class="hero-label" data-reveal style="--d:250ms">
+            {hero.imageLabel.kicker && <p class="kicker">{hero.imageLabel.kicker}</p>}
+            <p class="hero-label-title">{hero.imageLabel.title}</p>
+            {hero.imageLabel.subtitle && <p class="hero-label-sub">{hero.imageLabel.subtitle}</p>}
+          </div>
+        )}
+      </div>
+    )}
+    {layout === 'text' && (
+      <div class="hero-mark" aria-hidden="true">
+        <img src="/brand/sbwpc-logo-logomark-color.svg" alt="" width="84" height="57" />
+      </div>
+    )}
+  </div>
+</section>

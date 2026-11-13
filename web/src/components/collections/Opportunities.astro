@@ -1,0 +1,34 @@
+---
+import Link from '../Link.astro'
+import {slugify} from '../../lib/data.js'
+const {items} = Astro.props
+const juris = [...new Set(items.map((o) => o.jurisdiction).filter(Boolean))]
+const issues = [...new Set(items.flatMap((o) => o.issues || []))].sort()
+---
+<div class="opps" data-opps>
+  <div class="opp-filters">
+    <div class="chips" role="group" aria-label="Filter by jurisdiction">
+      <button class="chip" aria-pressed="true" data-j="all">All places</button>
+      {juris.map((j) => <button class="chip" aria-pressed="false" data-j={slugify(j)}>{j}</button>)}
+    </div>
+    <label class="select">
+      <span class="sr-only">Filter by issue</span>
+      <select data-issue>
+        <option value="all">All issues</option>
+        {issues.map((i) => <option value={slugify(i)}>{i}</option>)}
+      </select>
+    </label>
+    <p class="count" aria-live="polite" data-count></p>
+  </div>
+  <ul class="grid c3">
+    {items.map((o) => (
+      <li class:list={['card', {linked: o.url}]} data-j={slugify(o.jurisdiction)} data-issues={(o.issues || []).map(slugify).join(' ')}>
+        <p class="kicker">{o.jurisdiction}</p>
+        <h3 class="h3 card-title">{o.title}</h3>
+        {o.summary && <p class="body">{o.summary}</p>}
+        {o.issues?.length > 0 && <p class="issue-tags">{o.issues.map((t) => <span class="tag">{t}</span>)}</p>}
+        {o.url && <div class="links"><Link href={o.url} class="textlink stretch"><span class="arrow">Official page</span></Link></div>}
+      </li>
+    ))}
+  </ul>
+</div>

@@ -1,0 +1,85 @@
+---
+import Link from './Link.astro'
+const {settings, path = ''} = Astro.props
+const nav = settings.nav || []
+const current = '/' + (path === 'home' ? '' : path)
+const isActive = (item) => {
+  const urls = [item.url, ...(item.children || []).map((c) => c.url)].filter(Boolean)
+  return urls.some((u) => u === current || (u !== '/' && current.startsWith(u + '/')))
+}
+---
+<header class="site-header" data-header>
+  <div class="wrap header-inner">
+    <a class="brand" href="/" aria-label="Santa Barbara Women's Political Committee, home">
+      <img class="logo-full" src="/brand/sbwpc-logo-primary-tagline-color.svg" alt="" width="370" height="121" />
+      <img class="logo-compact" src="/brand/sbwpc-logo-primary-color.svg" alt="" width="370" height="86" />
+    </a>
+
+    <nav class="primary" aria-label="Main">
+      <ul class="menu">
+        {nav.map((item, i) => (
+          <li class:list={['menu-item', {active: isActive(item)}]} data-menu>
+            {item.children?.length ? (
+              <>
+                <button class="menu-trigger" aria-expanded="false" aria-controls={`sub-${i}`} data-trigger>
+                  {item.label}
+                  <svg aria-hidden="true" viewBox="0 0 12 12" width="12" height="12"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="submenu" id={`sub-${i}`} data-sub>
+                  <ul>
+                    {item.children.map((c) => (
+                      <li><Link href={c.url} class:list={['sublink', {current: c.url === current}]} aria-current={c.url === current ? 'page' : undefined}>{c.label}</Link></li>
+                    ))}
+                  </ul>
+                </div>
+              </>
+            ) : (
+              <Link href={item.url} class="menu-link" aria-current={item.url === current ? 'page' : undefined}>{item.label}</Link>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      {settings.joinUrl && <a class="btn small secondary hide-sm" href={settings.joinUrl}>Join</a>}
+      {settings.donateUrl && <a class="btn small accent" href={settings.donateUrl}>Donate</a>}
+      <button class="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" data-mobile-toggle>
+        <span class="sr-only">Menu</span>
+        <span class="bars" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="sheet" id="mobile-menu" data-sheet hidden>
+    <div class="sheet-scrim" data-sheet-close></div>
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-label="Menu">
+      <div class="sheet-top">
+        <img class="sheet-logo" src="/brand/sbwpc-logo-primary-color.svg" alt="SBWPC" width="370" height="86" />
+        <button class="sheet-close" data-sheet-close><span class="sr-only">Close menu</span><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+      </div>
+      <nav aria-label="Mobile">
+        <ul class="m-menu">
+          {nav.map((item) => (
+            <li>
+              {item.children?.length ? (
+                <details open={isActive(item)}>
+                  <summary>{item.label}</summary>
+                  <ul>
+                    {item.children.map((c) => <li><Link href={c.url} aria-current={c.url === current ? 'page' : undefined}>{c.label}</Link></li>)}
+                  </ul>
+                </details>
+              ) : (
+                <Link class="m-link" href={item.url}>{item.label}</Link>
+              )}
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div class="sheet-actions">
+        {settings.joinUrl && <a class="btn secondary" href={settings.joinUrl}>Join or Renew</a>}
+        {settings.donateUrl && <a class="btn accent" href={settings.donateUrl}>Donate</a>}
+      </div>
+    </div>
+  </div>
+</header>

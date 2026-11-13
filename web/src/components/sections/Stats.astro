@@ -1,0 +1,27 @@
+---
+import Shell from './Shell.astro'
+import StatGrid from './StatGrid.astro'
+import RichText from '../RichText.astro'
+import Buttons from '../Buttons.astro'
+const {s} = Astro.props
+const tone = s.tone || 'white'
+const hasBody = s.body?.length > 0
+---
+{hasBody ? (
+  <section class:list={['section', `tone-${tone}`, 's-sectionStats']} id={s.anchor || undefined}>
+    <div class="wrap stats-split">
+      <div class="stats-copy" data-reveal>
+        {s.eyebrow && <p class="eyebrow">{s.eyebrow}</p>}
+        {s.heading && <h2 class="h2">{s.heading}</h2>}
+        {s.intro && <p class="lede">{s.intro}</p>}
+        <div class="stats-body"><RichText value={s.body} /></div>
+        <Buttons buttons={s.buttons} />
+      </div>
+      <StatGrid stats={s.stats} />
+    </div>
+  </section>
+) : (
+  <Shell s={s} headSplit={false}>
+    <StatGrid stats={s.stats} />
+  </Shell>
+)}

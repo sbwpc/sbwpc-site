@@ -1,0 +1,11 @@
+---
+import Link from './Link.astro'
+const {buttons = [], class: cls = 'buttons'} = Astro.props
+---
+{buttons?.length > 0 && (
+  <div class={cls}>
+    {buttons.map((b) => (
+      <Link href={b.url} class:list={['btn', b.style && b.style !== 'primary' ? b.style : null]}>{b.label}</Link>
+    ))}
+  </div>
+)}

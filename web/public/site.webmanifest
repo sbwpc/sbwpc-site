@@ -1,0 +1,11 @@
+{
+  "name": "Santa Barbara Women's Political Committee",
+  "short_name": "SBWPC",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#1e2c5b",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}

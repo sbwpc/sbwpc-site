@@ -1,0 +1,9 @@
+---
+import Shell from './Shell.astro'
+import GalleryGrid from '../GalleryGrid.astro'
+const {s} = Astro.props
+const layout = s.layout || (s.showWhole ? 'whole' : 'mosaic')
+---
+<Shell s={s}>
+  <GalleryGrid images={s.images || []} layout={layout} />
+</Shell>

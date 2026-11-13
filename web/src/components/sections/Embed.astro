@@ -1,0 +1,57 @@
+---
+// YouTube links show the video's thumbnail and load the player only on play.
+// Other embeds (forms, calendars, slides) render as an iframe.
+import Shell from './Shell.astro'
+import Buttons from '../Buttons.astro'
+const {s} = Astro.props
+const aspect = s.aspect || '16:9'
+const src = s.url || ''
+const yt = src.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{6,})/)
+const ytId = yt?.[1]
+const start = (src.match(/[?&](?:start|t)=(\d+)/) || [])[1]
+const tall = aspect === 'tall'
+const title = s.title || s.heading || 'Embedded content'
+const ytSrc = ytId ? `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0${start ? '&start=' + start : ''}` : ''
+const side = Boolean(ytId) && (s.heading || s.intro)
+const tone = s.tone || 'white'
+let hires = false
+if (ytId) {
+  try {
+    const r = await fetch(`https://i.ytimg.com/vi/${ytId}/maxresdefault.jpg`, {method: 'HEAD'})
+    hires = r.ok
+  } catch {}
+}
+---
+{ytId ? (
+  <section class:list={['section', `tone-${tone}`, 's-video', {side}]} id={s.anchor || undefined}>
+    <div class="wrap video-grid">
+      {side && (
+        <div class="video-copy" data-reveal>
+          {s.eyebrow && <p class="eyebrow">{s.eyebrow}</p>}
+          {s.heading && <h2 class="h2">{s.heading}</h2>}
+          {s.intro && <p class="lede">{s.intro}</p>}
+          <Buttons buttons={s.buttons} />
+        </div>
+      )}
+      <figure class="embed-fig" data-reveal style="--d:100ms">
+        <button class="yt" data-yt={ytSrc} data-title={title} aria-label={`Play video: ${title}`}>
+          <img src={`https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`} srcset={hires ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg 480w, https://i.ytimg.com/vi/${ytId}/maxresdefault.jpg 1280w` : undefined} sizes="(min-width: 64rem) 58vw, 100vw" alt="" loading="lazy" decoding="async" width="1280" height="720" />
+          <span class="yt-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>
+        </button>
+        {s.caption && <figcaption class="caption">{s.caption}</figcaption>}
+      </figure>
+      {!side && <Buttons buttons={s.buttons} />}
+    </div>
+  </section>
+) : (
+  <Shell s={s} headSplit={false}>
+    {src && (
+      <figure class="embed-fig" data-reveal>
+        <div class:list={['embed', tall ? 'tall' : `ratio-${aspect.replace(':', 'x')}`]}>
+          <iframe src={src} title={title} loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        </div>
+        {s.caption && <figcaption class="caption">{s.caption}</figcaption>}
+      </figure>
+    )}
+  </Shell>
+)}

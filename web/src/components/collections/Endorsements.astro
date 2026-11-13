@@ -1,0 +1,54 @@
+---
+import Img from '../Img.astro'
+import Link from '../Link.astro'
+import {slugify, fmtDate} from '../../lib/data.js'
+const {items} = Astro.props
+const juris = [...new Set(items.map((e) => e.jurisdiction || 'Other'))]
+const initials = (n = '') => n.replace(/\(.*?\)|".*?"/g, '').split(/\s+/).filter((w) => /^[A-Z]/.test(w)).map((w) => w[0]).slice(0, 2).join('') || n[0]
+---
+<div class="endorse">
+  {juris.length > 1 && (
+    <nav class="chips jump" aria-label="Jump to jurisdiction">
+      {juris.map((j) => <a class="chip" href={`#j-${slugify(j)}`}>{j}</a>)}
+    </nav>
+  )}
+  {juris.map((j) => {
+    const list = items.filter((e) => (e.jurisdiction || 'Other') === j)
+    const yes = list.filter((e) => e.decision === 'Endorsed')
+    const no = list.filter((e) => e.decision !== 'Endorsed')
+    return (
+      <div class="juris" id={`j-${slugify(j)}`}>
+        <div class="juris-head" data-reveal>
+          <h3 class="h3 juris-title">{j}</h3>
+          <p class="juris-count">{yes.length} endorsed{no.length > 0 && <> · {no.length} no endorsement</>}</p>
+        </div>
+        {yes.length > 0 && (
+          <div class="grid c3">
+            {yes.map((e, i) => (
+              <article class:list={['card', 'endorsement', {linked: e.website}]} data-reveal style={`--d:${(i % 3) * 60}ms`}>
+                <div class:list={['media', 'endorse-media', {mono: !e.image}]}>
+                  {e.image ? <Img image={e.image} width={900} sizes="(min-width: 64rem) 33vw, 100vw" /> : (
+                    <div class="monogram"><span>{initials(e.candidate)}</span></div>
+                  )}
+                  <span class="endorse-badge">SBWPC Endorsed</span>
+                </div>
+                <p class="kicker">{e.office}</p>
+                <h4 class="h3 card-title">{e.candidate}{e.party && <span class="party"> ({e.party})</span>}</h4>
+                {e.decisionDate && <p class="decision yes">Endorsed {fmtDate(e.decisionDate, {month: 'short'})}</p>}
+                {e.note && <p class="body">{e.note}</p>}
+                {e.website && <div class="links"><Link href={e.website} class="textlink stretch"><span class="arrow">Visit candidate website</span></Link></div>}
+              </article>
+            ))}
+          </div>
+        )}
+        {no.length > 0 && (
+          <ul class="no-endorse" data-reveal>
+            {no.map((e) => (
+              <li><span class="ne-office">{e.office}</span><span class="ne-dec">{e.decision === 'Pending' ? 'Decision pending' : 'No endorsement'}</span>{e.note && <span class="ne-note">{e.note}</span>}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    )
+  })}
+</div>

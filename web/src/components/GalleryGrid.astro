@@ -1,0 +1,61 @@
+---
+// Shared photo layout for gallery sections and photo albums.
+// mosaic: mixed large and small photos | grid: even grid
+// whole: uncropped infographics in two columns | band: sideways photo strip
+import Img from './Img.astro'
+import {img} from '../lib/data.js'
+const {images = [], layout = 'mosaic'} = Astro.props
+const n = images.length
+let mode = n === 1 ? 'single' : layout
+if (mode === 'mosaic' && (n === 2 || n === 4)) mode = 'grid2'
+
+// Mosaic spans on a 6-column grid, repeating every 9 photos, with clean endings
+const A = {c: 4, r: 4, cs: 1}, P = {c: 2, r: 2, cs: 5}, T = {c: 2, r: 3}
+const cycle = [A, P, P, T, T, T, {c: 2, r: 2, cs: 1}, {c: 2, r: 2, cs: 1}, {c: 4, r: 4, cs: 3}]
+const full = {c: 6, r: 4, cs: 1}, half = {c: 3, r: 4}, third = {c: 3, r: 3}
+const tails = {0: [], 1: [full], 2: [half, half], 3: [A, P, P], 4: [third, third, third, third], 5: [A, P, P, third, third], 6: [A, P, P, T, T, T], 7: [A, P, P, T, T, T, full], 8: [A, P, P, T, T, T, half, half]}
+const spans = []
+if (mode === 'mosaic') {
+  for (let k = 0; k < Math.floor(n / 9); k++) spans.push(...cycle)
+  spans.push(...tails[n % 9])
+}
+// Phones: every third photo is wide; a lone last photo fills its row
+const mobile = (i) => {
+  const big = i % 3 === 0
+  const lastAlone = i === n - 1 && i % 3 === 1
+  return big || lastAlone ? {mc: 2, mr: big ? 2 : 1} : {mc: 1, mr: 1}
+}
+const styleFor = (i) => {
+  const d0 = `--d:${(i % 4) * 60}ms`
+  if (mode !== 'mosaic') return d0
+  const d = spans[i] || T
+  const m = mobile(i)
+  return `${d0};--c:${d.c};--r:${d.r};${d.cs ? `--cs:${d.cs};` : ''}--mc:${m.mc};--mr:${m.mr}`
+}
+const sizes = {
+  mosaic: '(min-width: 64rem) 60vw, 100vw',
+  grid2: '50vw',
+  grid: '(min-width: 64rem) 33vw, 50vw',
+  whole: '(min-width: 52rem) 50vw, 100vw',
+  band: '(min-width: 64rem) 34vw, 80vw',
+  single: '(min-width: 76rem) 76rem, 100vw',
+}
+const id = 'g' + Math.random().toString(36).slice(2, 8)
+const list = mode === 'band' ? [...images, ...images] : images
+---
+<div class:list={['gallery', `g-${mode}`]} data-gallery={id} style={`--count:${n}`}>
+  <div class="g-track">
+    {list.map((im, i) => {
+      const big = img(im, {width: 2400})
+      const dup = mode === 'band' && i >= n
+      return (
+        <figure class="g-item" data-reveal={mode === 'band' ? undefined : ''} style={styleFor(i)} aria-hidden={dup ? 'true' : undefined}>
+          <button class="g-open" tabindex={dup ? -1 : undefined} data-full={big?.src} data-srcset={big?.srcset} data-alt={im.alt || ''} data-caption={im.caption || ''} aria-label={`Open image${im.alt ? ': ' + im.alt : im.caption ? ': ' + im.caption : ''}`}>
+            <Img image={im} eager={mode === 'band' && i < 6} width={mode === 'single' ? 2000 : mode === 'mosaic' && (spans[i]?.c || 2) >= 4 ? 1800 : 1200} sizes={sizes[mode]} />
+          </button>
+          {im.caption && mode !== 'band' && <figcaption class="caption">{im.caption}</figcaption>}
+        </figure>
+      )
+    })}
+  </div>
+</div>

@@ -1,0 +1,19 @@
+---
+import Link from './Link.astro'
+const {banner} = Astro.props
+const items = banner.items || []
+---
+<div class="banner" role="region" aria-label="Announcement">
+  <div class="wrap banner-inner">
+    {banner.label && <span class="banner-label">{banner.label}</span>}
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track">
+        {[0, 1].map(() => (
+          <span class="ticker-group">{items.map((t) => <span class="ticker-item">{t}</span>)}</span>
+        ))}
+      </div>
+    </div>
+    <p class="sr-only">{items.join('. ')}</p>
+    {banner.link?.url && <Link class="btn small banner-btn" href={banner.link.url}>{banner.link.label}</Link>}
+  </div>
+</div>

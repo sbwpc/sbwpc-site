@@ -1,0 +1,40 @@
+---
+import RichText from '../RichText.astro'
+const {items} = Astro.props
+const areas = ['Rights & Equality', 'Families & Economic Security', 'Health, Autonomy & Safety', 'Environment & Peace']
+---
+<div class="positions">
+  {areas.map((a, i) => {
+    const list = items.filter((p) => p.area === a)
+    return list.length > 0 && (
+      <div class="pos-area" data-reveal>
+        <div class="pos-area-head">
+          <span class="num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <h3 class="h3">{a}</h3>
+        </div>
+        <div class="accordion">
+          {list.map((p) => (
+            <details class="acc" id={p.slug?.current}>
+              <summary>
+                <span class="acc-head">
+                  <span class="acc-title">{p.title}</span>
+                  {p.tags?.length > 0 && <span class="acc-tags">{p.tags.join(' · ')}</span>}
+                </span>
+                <span class="acc-icon" aria-hidden="true"></span>
+              </summary>
+              <div class="acc-body">
+                <div class="prose">{(p.summary || '').split(/\n\s*\n/).map((para) => <p>{para}</p>)}</div>
+                {p.fullText?.length > 0 && (
+                  <details class="paper">
+                    <summary>Read the full position paper</summary>
+                    <RichText value={p.fullText} />
+                  </details>
+                )}
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    )
+  })}
+</div>

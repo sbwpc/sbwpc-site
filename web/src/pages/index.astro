@@ -1,0 +1,12 @@
+---
+import Layout from '../layouts/Layout.astro'
+import Hero from '../components/Hero.astro'
+import Sections from '../components/Sections.astro'
+import {loadAll} from '../lib/data.js'
+const {pages} = await loadAll()
+const page = pages.find((p) => p.path === 'home')
+---
+<Layout title={page.seo?.title || page.title} description={page.seo?.description} image={page.seo?.image || page.hero?.image} path="home">
+  {page.hero && <Hero hero={page.hero} />}
+  <Sections sections={page.sections} />
+</Layout>

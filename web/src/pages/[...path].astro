@@ -1,0 +1,17 @@
+---
+import Layout from '../layouts/Layout.astro'
+import Hero from '../components/Hero.astro'
+import Sections from '../components/Sections.astro'
+import Breadcrumbs from '../components/Breadcrumbs.astro'
+import {loadAll} from '../lib/data.js'
+export async function getStaticPaths() {
+  const {pages} = await loadAll()
+  return pages.filter((p) => p.path && p.path !== 'home').map((page) => ({params: {path: page.path}, props: {page}}))
+}
+const {page} = Astro.props
+---
+<Layout title={page.seo?.title || page.title} description={page.seo?.description || page.hero?.body} image={page.seo?.image || page.hero?.image} path={page.path}>
+  <Breadcrumbs path={page.path} title={page.title} />
+  {page.hero && <Hero hero={page.hero} />}
+  <Sections sections={page.sections} />
+</Layout>

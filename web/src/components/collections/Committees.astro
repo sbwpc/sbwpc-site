@@ -1,0 +1,29 @@
+---
+import Link from '../Link.astro'
+const {items} = Astro.props
+const kinds = ['Standing', 'Ad Hoc', 'Governance']
+---
+{kinds.map((k) => {
+  const list = items.filter((c) => (c.kind || 'Standing') === k)
+  return list.length > 0 && (
+    <div class="committee-group">
+      {k !== 'Standing' && <p class="eyebrow gold group-label">{k === 'Ad Hoc' ? 'Ad Hoc Committee' : k}</p>}
+      <div class="grid c3">
+        {list.map((c, i) => (
+          <article class="card committee" data-reveal style={`--d:${(i % 3) * 60}ms`}>
+            <h3 class="h3 card-title">{c.name}</h3>
+            {c.summary && <p class="body">{c.summary}</p>}
+            <dl class="details">
+              {c.leaders && <div><dt>Leadership</dt><dd>{c.leaders}</dd></div>}
+              {c.meeting && <div><dt>Meeting</dt><dd>{c.meeting}</dd></div>}
+            </dl>
+            <div class="links">
+              {c.email && <a class="textlink" href={`mailto:${c.email}?subject=${encodeURIComponent('SBWPC ' + c.name)}`}><span class="arrow">Contact</span></a>}
+              {(c.links || []).map((l) => <Link class="textlink" href={l.url}><span class="arrow">{l.label}</span></Link>)}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  )
+})}

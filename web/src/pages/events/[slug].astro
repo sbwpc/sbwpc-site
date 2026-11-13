@@ -1,0 +1,30 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import Hero from '../../components/Hero.astro'
+import Sections from '../../components/Sections.astro'
+import Breadcrumbs from '../../components/Breadcrumbs.astro'
+import Link from '../../components/Link.astro'
+import {loadAll, eventParts} from '../../lib/data.js'
+export async function getStaticPaths() {
+  const {events} = await loadAll()
+  return events.filter((e) => e.hasPage && e.slug?.current).map((event) => ({params: {slug: event.slug.current}, props: {event}}))
+}
+const {event} = Astro.props
+const p = eventParts(event)
+const hero = event.hero || {heading: event.title, body: event.summary, image: event.image}
+---
+<Layout title={event.title} description={event.summary} image={event.image || hero.image} path={`events/${event.slug.current}`}>
+  <Breadcrumbs path={`events/${event.slug.current}`} title={event.title} />
+  <Hero hero={hero} />
+  <section class="section tone-white event-facts-wrap">
+    <div class="wrap">
+      <dl class="event-facts" data-reveal>
+        <div><dt>Date</dt><dd>{p.weekday}, {p.date}</dd></div>
+        {p.time && <div><dt>Time</dt><dd>{p.time}</dd></div>}
+        {event.location && <div><dt>Location</dt><dd>{event.location}{event.address && <><br /><span class="muted">{event.address}</span></>}</dd></div>}
+      </dl>
+      {event.links?.length > 0 && <div class="facts-links buttons">{event.links.map((l) => <Link href={l.url} class="btn small">{l.label}</Link>)}</div>}
+    </div>
+  </section>
+  <Sections sections={event.sections} />
+</Layout>

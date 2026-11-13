@@ -1,0 +1,25 @@
+---
+import Shell from './Shell.astro'
+import Link from '../Link.astro'
+import {isExternal} from '../../lib/data.js'
+const {s} = Astro.props
+const links = s.links || []
+const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, '') } catch { return '' } }
+---
+<Shell s={s}>
+  <ul class="resource-list">
+    {links.map((l, i) => (
+      <li data-reveal style={`--d:${(i % 3) * 50}ms`}>
+        <Link href={l.url} class="resource">
+          <span class="r-text">
+            {l.kicker && <span class="kicker">{l.kicker}</span>}
+            <span class="r-title">{l.title}</span>
+            {l.description && <span class="r-desc">{l.description}</span>}
+            {isExternal(l.url) && <span class="r-host">{host(l.url)}</span>}
+          </span>
+          <span class:list={['r-icon', {ext: isExternal(l.url)}]} aria-hidden="true"></span>
+        </Link>
+      </li>
+    ))}
+  </ul>
+</Shell>

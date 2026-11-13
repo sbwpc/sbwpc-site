@@ -1,0 +1,11 @@
+---
+import Shell from './Shell.astro'
+import RichText from '../RichText.astro'
+const {s} = Astro.props
+---
+<Shell s={s} headSplit={false}>
+  <div class:list={['text-layout', {'has-aside': s.aside?.length}]} data-reveal>
+    <RichText value={s.body} />
+    {s.aside?.length > 0 && <aside class="text-aside"><RichText value={s.aside} /></aside>}
+  </div>
+</Shell>

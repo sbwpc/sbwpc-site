@@ -1,0 +1,20 @@
+---
+import {img} from '../lib/data.js'
+const {image, width = 1600, sizes = '100vw', eager = false, class: cls, aspect, ...rest} = Astro.props
+const i = img(image, {width, aspect})
+---
+{i && (
+  <img
+    src={i.src}
+    srcset={i.srcset}
+    sizes={i.srcset ? sizes : undefined}
+    width={i.width}
+    height={i.height}
+    alt={i.alt || ''}
+    loading={eager ? 'eager' : 'lazy'}
+    decoding="async"
+    fetchpriority={eager ? 'high' : undefined}
+    class={cls}
+    {...rest}
+  />
+)}

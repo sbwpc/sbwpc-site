@@ -1,0 +1,58 @@
+---
+// Civic Action Center: choose a goal, filter actions, save up to three to a plan.
+import Link from '../Link.astro'
+import {slugify} from '../../lib/data.js'
+const {items} = Astro.props
+const goals = ['Vote', 'Speak Up', 'Participate', 'Lead', 'Support']
+const blurbs = {Vote: 'Election and voter tools', 'Speak Up': 'Contact leaders and act on issues', Participate: 'Events and community engagement', Lead: 'Run, serve and evaluate candidates', Support: 'Join, donate and stay connected'}
+---
+<div class="actions-tool" data-actions>
+  <div class="goal-tabs" role="tablist" aria-label="Choose a civic goal">
+    {goals.map((g, i) => (
+      <button class="goal" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-goal={slugify(g)}>
+        <span class="goal-n">{String(i + 1).padStart(2, '0')}</span>
+        <span class="goal-name">{g}</span>
+        <span class="goal-blurb">{blurbs[g]}</span>
+      </button>
+    ))}
+  </div>
+
+  <div class="actions-bar">
+    <label class="search">
+      <span class="sr-only">Search actions</span>
+      <input type="search" placeholder="Search voting, events, issues, leadership..." data-search />
+    </label>
+    <button class="chip" aria-pressed="false" data-all>Show all actions</button>
+    <p class="count" aria-live="polite" data-count></p>
+  </div>
+
+  <ul class="grid c2 action-list">
+    {items.map((a) => (
+      <li class:list={['card', 'action', {featured: a.featured}]} data-goal={slugify(a.goal)} data-id={a._id} data-title={a.title} data-url={a.link?.url} data-text={`${a.title} ${a.summary || ''} ${a.goal}`.toLowerCase()}>
+        <div class="action-top"><span class="tag">{a.goal}</span>{a.featured && <span class="tag best">Best next step</span>}</div>
+        <h3 class="h3 card-title">{a.title}</h3>
+        {a.summary && <p class="body">{a.summary}</p>}
+        <div class="links action-btns">
+          {a.link?.url && <Link href={a.link.url} class="btn small">{a.link.label || 'Open'}</Link>}
+          <button class="btn small secondary" data-add aria-pressed="false">Add to plan</button>
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  <div class="plan" data-plan>
+    <div class="plan-copy">
+      <p class="eyebrow">Your three-action plan</p>
+      <h3 class="h3">Small actions build public power.</h3>
+      <p class="body">Save up to three actions. Your plan stays on this device until you clear it.</p>
+    </div>
+    <div class="plan-box">
+      <ol class="plan-list" data-plan-list></ol>
+      <p class="plan-empty" data-plan-empty>No actions selected yet. Choose up to three from the cards above.</p>
+      <div class="buttons">
+        <button class="btn small" data-plan-download disabled>Download my plan</button>
+        <button class="btn small secondary" data-plan-clear disabled>Clear</button>
+      </div>
+    </div>
+  </div>
+</div>

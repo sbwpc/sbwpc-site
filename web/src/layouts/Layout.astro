@@ -1,0 +1,58 @@
+---
+import '../styles/global.css'
+import '../styles/components.css'
+import '../styles/brand.css'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import Banner from '../components/Banner.astro'
+import {loadAll, img} from '../lib/data.js'
+
+const {title, description, image, path = '', noBanner = false} = Astro.props
+const {settings} = await loadAll()
+const siteTitle = settings.title || "Santa Barbara Women's Political Committee"
+const fullTitle = title && path !== 'home' ? `${title} | SBWPC` : siteTitle
+const desc = description || settings.description || ''
+const share = image ? img(image, {width: 1200}) : null
+// Default link preview is the kit's 1200x630 social share image
+const shareUrl = new URL(share?.src || '/sbwpc-social-share-1200x630.jpg', Astro.site).href
+const canonical = new URL(Astro.url.pathname, Astro.site).href
+const showBanner = !noBanner && settings.banner?.enabled
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    {desc && <meta name="description" content={desc} />}
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteTitle} />
+    <meta property="og:title" content={title || siteTitle} />
+    {desc && <meta property="og:description" content={desc} />}
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={shareUrl} />
+    <meta name="twitter:image" content={shareUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#1e2c5b" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="preload" href="/fonts/outfit-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <script is:inline>document.documentElement.classList.add('js')</script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Header settings={settings} path={path} />
+    {showBanner && <Banner banner={settings.banner} />}
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer settings={settings} />
+    <script>
+      import '../scripts/site.js'
+    </script>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+---
+import GalleryGrid from '../GalleryGrid.astro'
+import {fmtDate} from '../../lib/data.js'
+const {items} = Astro.props
+---
+{items.map((a) => (
+  <div class="album" id={a.slug?.current}>
+    <div class="album-head" data-reveal>
+      <p class="eyebrow">{[a.eyebrow, a.date && fmtDate(a.date)].filter(Boolean).join(' · ')}</p>
+      <h3 class="h2">{a.title}</h3>
+      {a.summary && <p class="lede">{a.summary}</p>}
+      {a.photographers && <p class="caption">Photography: {a.photographers}</p>}
+    </div>
+    <GalleryGrid images={a.images || []} layout="mosaic" />
+  </div>
+))}

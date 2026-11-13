@@ -1,0 +1,32 @@
+---
+import Img from '../Img.astro'
+import Buttons from '../Buttons.astro'
+import RichText from '../RichText.astro'
+import {img} from '../../lib/data.js'
+const {s} = Astro.props
+const tone = s.tone || 'white'
+const side = s.imageSide || 'right'
+const i = s.image
+const big = i ? img(i, {width: 2400}) : null
+// Small source photos show as a framed print instead of an enlarged blur
+const small = big?.width && big.width < 700
+---
+<section class:list={['section', `tone-${tone}`, 's-split']} id={s.anchor || undefined}>
+  <div class:list={['split-grid', `img-${side}`, {'img-small': small}]}>
+    <div class="split-copy" data-reveal>
+      {s.eyebrow && <p class="eyebrow">{s.eyebrow}</p>}
+      {s.heading && <h2 class="h2">{s.heading}</h2>}
+      {s.intro && <p class="lede">{s.intro}</p>}
+      {s.body?.length > 0 && <RichText value={s.body} class="prose split-body" />}
+      <Buttons buttons={s.buttons} />
+    </div>
+    {i && (
+      <figure class="split-media" data-reveal style="--d:120ms" data-gallery="split">
+        <button class="frame g-open split-frame" data-full={big?.src} data-srcset={big?.srcset} data-alt={i.alt || ''} data-caption={i.caption || ''} aria-label={`Open image${i.alt ? ': ' + i.alt : ''}`}>
+          <Img image={i} width={1800} sizes="(min-width: 64rem) 55vw, 100vw" />
+        </button>
+        {i.caption && <figcaption class="caption">{i.caption}</figcaption>}
+      </figure>
+    )}
+  </div>
+</section>

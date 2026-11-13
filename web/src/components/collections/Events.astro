@@ -1,0 +1,35 @@
+---
+import Img from '../Img.astro'
+import Link from '../Link.astro'
+import {eventParts} from '../../lib/data.js'
+const {items, past = false} = Astro.props
+---
+{items.length === 0 ? (
+  <div class="empty" data-reveal>
+    <p class="h4">New dates are on the way.</p>
+    <p>Follow SBWPC on Substack or Instagram, or join the mailing list, to hear about the next gathering first.</p>
+  </div>
+) : (
+  <ul class:list={['events', {past}]}>
+    {items.map((e, i) => {
+      const p = eventParts(e)
+      const url = e.hasPage ? `/events/${e.slug.current}` : e.links?.[0]?.url
+      return (
+        <li class:list={['event', {linked: url}]} data-reveal style={`--d:${(i % 3) * 60}ms`}>
+          <div class="event-date" aria-hidden="true"><span class="m">{p.month}</span><span class="d">{p.day}</span></div>
+          <div class="event-body">
+            <p class="kicker">{[e.kind, e.status && e.status !== 'open' ? e.status : null].filter(Boolean).join(' · ')}</p>
+            <h3 class="h3">{url ? <Link href={url} class="stretch-link">{e.title}</Link> : e.title}</h3>
+            <p class="event-when">{p.weekday}, {p.date}{p.time && <> · {p.time}</>}</p>
+            {e.location && <p class="event-where">{e.location}{e.address && <span>, {e.address}</span>}</p>}
+            {e.summary && <p class="body">{e.summary}</p>}
+            {!past && e.links?.length > 0 && (
+              <div class="links">{e.links.map((l) => <Link href={l.url} class="textlink"><span class="arrow">{l.label}</span></Link>)}</div>
+            )}
+          </div>
+          {e.image && <div class="event-img frame"><Img image={e.image} width={600} sizes="(min-width: 64rem) 18rem, 100vw" /></div>}
+        </li>
+      )
+    })}
+  </ul>
+)}

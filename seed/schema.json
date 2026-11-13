@@ -1,0 +1,1484 @@
+{
+ "link": {
+  "base": "object",
+  "fields": {
+   "label": {
+    "type": "string"
+   },
+   "url": {
+    "type": "string"
+   },
+   "style": {
+    "type": "string",
+    "options": [
+     "primary",
+     "secondary",
+     "accent"
+    ]
+   }
+  }
+ },
+ "imageWithAlt": {
+  "base": "image",
+  "fields": {
+   "alt": {
+    "type": "string"
+   },
+   "caption": {
+    "type": "string"
+   }
+  }
+ },
+ "richText": {
+  "base": "array",
+  "of": [
+   "block",
+   "imageWithAlt"
+  ]
+ },
+ "stat": {
+  "base": "object",
+  "fields": {
+   "label": {
+    "type": "string"
+   },
+   "value": {
+    "type": "string"
+   },
+   "note": {
+    "type": "text"
+   }
+  }
+ },
+ "card": {
+  "base": "object",
+  "fields": {
+   "kicker": {
+    "type": "string"
+   },
+   "title": {
+    "type": "string"
+   },
+   "body": {
+    "type": "text"
+   },
+   "details": {
+    "type": "array",
+    "of": [
+     {
+      "type": "stat",
+      "name": "stat"
+     }
+    ]
+   },
+   "image": {
+    "type": "imageWithAlt"
+   },
+   "links": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   }
+  }
+ },
+ "hero": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "subheading": {
+    "type": "string"
+   },
+   "body": {
+    "type": "text"
+   },
+   "badges": {
+    "type": "array",
+    "of": [
+     {
+      "type": "string",
+      "name": "string"
+     }
+    ]
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "stats": {
+    "type": "array",
+    "of": [
+     {
+      "type": "stat",
+      "name": "stat"
+     }
+    ]
+   },
+   "image": {
+    "type": "imageWithAlt"
+   },
+   "imageLabel": {
+    "type": "object",
+    "fields": {
+     "kicker": {
+      "type": "string"
+     },
+     "title": {
+      "type": "string"
+     },
+     "subtitle": {
+      "type": "string"
+     }
+    }
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "cream",
+     "white",
+     "navy"
+    ]
+   },
+   "layout": {
+    "type": "string",
+    "options": [
+     "split",
+     "full"
+    ]
+   },
+   "imageFit": {
+    "type": "string",
+    "options": [
+     "cover",
+     "contain"
+    ]
+   }
+  }
+ },
+ "seo": {
+  "base": "object",
+  "fields": {
+   "title": {
+    "type": "string"
+   },
+   "description": {
+    "type": "text"
+   },
+   "image": {
+    "type": "image"
+   }
+  }
+ },
+ "sectionText": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "body": {
+    "type": "richText"
+   },
+   "aside": {
+    "type": "richText"
+   }
+  }
+ },
+ "sectionCards": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "cards": {
+    "type": "array",
+    "of": [
+     {
+      "type": "card",
+      "name": "card"
+     }
+    ]
+   },
+   "columns": {
+    "type": "number",
+    "options": [
+     2,
+     3,
+     4
+    ]
+   },
+   "variant": {
+    "type": "string",
+    "options": [
+     "bordered",
+     "numbered",
+     "filled",
+     "people"
+    ]
+   }
+  }
+ },
+ "sectionStats": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "stats": {
+    "type": "array",
+    "of": [
+     {
+      "type": "stat",
+      "name": "stat"
+     }
+    ]
+   },
+   "body": {
+    "type": "richText"
+   }
+  }
+ },
+ "sectionSplit": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "image": {
+    "type": "imageWithAlt"
+   },
+   "body": {
+    "type": "richText"
+   },
+   "imageSide": {
+    "type": "string",
+    "options": [
+     "left",
+     "right"
+    ]
+   }
+  }
+ },
+ "sectionQuote": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "quote": {
+    "type": "text"
+   },
+   "attribution": {
+    "type": "string"
+   },
+   "link": {
+    "type": "link"
+   }
+  }
+ },
+ "sectionTimeline": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "items": {
+    "type": "array",
+    "of": [
+     {
+      "type": "object",
+      "name": "timelineItem",
+      "fields": {
+       "label": {
+        "type": "string"
+       },
+       "title": {
+        "type": "string"
+       },
+       "body": {
+        "type": "text"
+       }
+      }
+     }
+    ]
+   }
+  }
+ },
+ "sectionNameList": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "groups": {
+    "type": "array",
+    "of": [
+     {
+      "type": "object",
+      "name": "nameGroup",
+      "fields": {
+       "kicker": {
+        "type": "string"
+       },
+       "title": {
+        "type": "string"
+       },
+       "body": {
+        "type": "text"
+       },
+       "items": {
+        "type": "array",
+        "of": [
+         {
+          "type": "object",
+          "name": "nameItem",
+          "fields": {
+           "name": {
+            "type": "string"
+           },
+           "detail": {
+            "type": "string"
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    ]
+   }
+  }
+ },
+ "sectionAccordion": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "items": {
+    "type": "array",
+    "of": [
+     {
+      "type": "object",
+      "name": "accordionItem",
+      "fields": {
+       "kicker": {
+        "type": "string"
+       },
+       "title": {
+        "type": "string"
+       },
+       "summary": {
+        "type": "text"
+       },
+       "body": {
+        "type": "richText"
+       }
+      }
+     }
+    ]
+   }
+  }
+ },
+ "sectionCta": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   }
+  }
+ },
+ "sectionEmbed": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "url": {
+    "type": "url"
+   },
+   "title": {
+    "type": "string"
+   },
+   "aspect": {
+    "type": "string",
+    "options": [
+     "16:9",
+     "4:3",
+     "1:1",
+     "tall"
+    ]
+   },
+   "caption": {
+    "type": "string"
+   }
+  }
+ },
+ "sectionGallery": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "images": {
+    "type": "array",
+    "of": [
+     {
+      "type": "imageWithAlt",
+      "name": "imageWithAlt"
+     }
+    ]
+   },
+   "layout": {
+    "type": "string",
+    "options": [
+     "mosaic",
+     "grid",
+     "whole",
+     "band"
+    ]
+   },
+   "showWhole": {
+    "type": "boolean"
+   }
+  }
+ },
+ "sectionLinks": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "links": {
+    "type": "array",
+    "of": [
+     {
+      "type": "object",
+      "name": "resourceLink",
+      "fields": {
+       "kicker": {
+        "type": "string"
+       },
+       "title": {
+        "type": "string"
+       },
+       "description": {
+        "type": "text"
+       },
+       "url": {
+        "type": "string"
+       }
+      }
+     }
+    ]
+   }
+  }
+ },
+ "sectionCollection": {
+  "base": "object",
+  "fields": {
+   "eyebrow": {
+    "type": "string"
+   },
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "collection": {
+    "type": "string",
+    "options": [
+     "people",
+     "committees",
+     "positions",
+     "events",
+     "pastEvents",
+     "posts",
+     "endorsements",
+     "actions",
+     "opportunities",
+     "explainers",
+     "albums"
+    ]
+   },
+   "filter": {
+    "type": "string"
+   },
+   "limit": {
+    "type": "number"
+   }
+  }
+ },
+ "siteSettings": {
+  "base": "document",
+  "fields": {
+   "title": {
+    "type": "string"
+   },
+   "tagline": {
+    "type": "string"
+   },
+   "description": {
+    "type": "text"
+   },
+   "logo": {
+    "type": "image"
+   },
+   "shareImage": {
+    "type": "image"
+   },
+   "email": {
+    "type": "string"
+   },
+   "mailingAddress": {
+    "type": "string"
+   },
+   "joinUrl": {
+    "type": "url"
+   },
+   "donateUrl": {
+    "type": "url"
+   },
+   "newsletterUrl": {
+    "type": "url"
+   },
+   "social": {
+    "type": "array",
+    "of": [
+     {
+      "type": "object",
+      "name": "socialLink",
+      "fields": {
+       "label": {
+        "type": "string"
+       },
+       "url": {
+        "type": "url"
+       }
+      }
+     }
+    ]
+   },
+   "nav": {
+    "type": "array",
+    "of": [
+     {
+      "type": "object",
+      "name": "navItem",
+      "fields": {
+       "label": {
+        "type": "string"
+       },
+       "url": {
+        "type": "string"
+       },
+       "children": {
+        "type": "array",
+        "of": [
+         {
+          "type": "link",
+          "name": "link"
+         }
+        ]
+       }
+      }
+     }
+    ]
+   },
+   "footerColumns": {
+    "type": "array",
+    "of": [
+     {
+      "type": "object",
+      "name": "footerColumn",
+      "fields": {
+       "title": {
+        "type": "string"
+       },
+       "links": {
+        "type": "array",
+        "of": [
+         {
+          "type": "link",
+          "name": "link"
+         }
+        ]
+       }
+      }
+     }
+    ]
+   },
+   "banner": {
+    "type": "object",
+    "fields": {
+     "enabled": {
+      "type": "boolean"
+     },
+     "label": {
+      "type": "string"
+     },
+     "items": {
+      "type": "array",
+      "of": [
+       {
+        "type": "string",
+        "name": "string"
+       }
+      ]
+     },
+     "link": {
+      "type": "link"
+     }
+    }
+   }
+  }
+ },
+ "page": {
+  "base": "document",
+  "fields": {
+   "title": {
+    "type": "string"
+   },
+   "path": {
+    "type": "string"
+   },
+   "hero": {
+    "type": "hero"
+   },
+   "sections": {
+    "type": "array",
+    "of": [
+     {
+      "type": "sectionText",
+      "name": "sectionText"
+     },
+     {
+      "type": "sectionCards",
+      "name": "sectionCards"
+     },
+     {
+      "type": "sectionStats",
+      "name": "sectionStats"
+     },
+     {
+      "type": "sectionSplit",
+      "name": "sectionSplit"
+     },
+     {
+      "type": "sectionQuote",
+      "name": "sectionQuote"
+     },
+     {
+      "type": "sectionTimeline",
+      "name": "sectionTimeline"
+     },
+     {
+      "type": "sectionNameList",
+      "name": "sectionNameList"
+     },
+     {
+      "type": "sectionAccordion",
+      "name": "sectionAccordion"
+     },
+     {
+      "type": "sectionLinks",
+      "name": "sectionLinks"
+     },
+     {
+      "type": "sectionCollection",
+      "name": "sectionCollection"
+     },
+     {
+      "type": "sectionGallery",
+      "name": "sectionGallery"
+     },
+     {
+      "type": "sectionEmbed",
+      "name": "sectionEmbed"
+     },
+     {
+      "type": "sectionCta",
+      "name": "sectionCta"
+     }
+    ]
+   },
+   "seo": {
+    "type": "seo"
+   }
+  }
+ },
+ "post": {
+  "base": "document",
+  "fields": {
+   "title": {
+    "type": "string"
+   },
+   "slug": {
+    "type": "slug"
+   },
+   "date": {
+    "type": "date"
+   },
+   "category": {
+    "type": "string",
+    "options": [
+     "News",
+     "Elections",
+     "Advocacy",
+     "Events",
+     "Newsletter"
+    ]
+   },
+   "excerpt": {
+    "type": "text"
+   },
+   "image": {
+    "type": "imageWithAlt"
+   },
+   "externalUrl": {
+    "type": "url"
+   },
+   "body": {
+    "type": "richText"
+   },
+   "seo": {
+    "type": "seo"
+   }
+  }
+ },
+ "event": {
+  "base": "document",
+  "fields": {
+   "title": {
+    "type": "string"
+   },
+   "slug": {
+    "type": "slug"
+   },
+   "start": {
+    "type": "datetime"
+   },
+   "end": {
+    "type": "datetime"
+   },
+   "timeText": {
+    "type": "string"
+   },
+   "location": {
+    "type": "string"
+   },
+   "address": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "options": [
+     "Signature event",
+     "Endorsement meeting",
+     "Voter education",
+     "Workshop",
+     "Member event",
+     "Community"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "options": [
+     "open",
+     "sold out",
+     "cancelled"
+    ]
+   },
+   "summary": {
+    "type": "text"
+   },
+   "image": {
+    "type": "imageWithAlt"
+   },
+   "links": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "hasPage": {
+    "type": "boolean"
+   },
+   "hero": {
+    "type": "hero"
+   },
+   "sections": {
+    "type": "array",
+    "of": [
+     {
+      "type": "sectionText",
+      "name": "sectionText"
+     },
+     {
+      "type": "sectionCards",
+      "name": "sectionCards"
+     },
+     {
+      "type": "sectionStats",
+      "name": "sectionStats"
+     },
+     {
+      "type": "sectionSplit",
+      "name": "sectionSplit"
+     },
+     {
+      "type": "sectionQuote",
+      "name": "sectionQuote"
+     },
+     {
+      "type": "sectionTimeline",
+      "name": "sectionTimeline"
+     },
+     {
+      "type": "sectionNameList",
+      "name": "sectionNameList"
+     },
+     {
+      "type": "sectionAccordion",
+      "name": "sectionAccordion"
+     },
+     {
+      "type": "sectionLinks",
+      "name": "sectionLinks"
+     },
+     {
+      "type": "sectionCollection",
+      "name": "sectionCollection"
+     },
+     {
+      "type": "sectionGallery",
+      "name": "sectionGallery"
+     },
+     {
+      "type": "sectionEmbed",
+      "name": "sectionEmbed"
+     },
+     {
+      "type": "sectionCta",
+      "name": "sectionCta"
+     }
+    ]
+   }
+  }
+ },
+ "person": {
+  "base": "document",
+  "fields": {
+   "name": {
+    "type": "string"
+   },
+   "role": {
+    "type": "string"
+   },
+   "group": {
+    "type": "string",
+    "options": [
+     "Executive Officer",
+     "Board Member"
+    ]
+   },
+   "image": {
+    "type": "imageWithAlt"
+   },
+   "shortBio": {
+    "type": "string"
+   },
+   "bio": {
+    "type": "richText"
+   },
+   "email": {
+    "type": "string"
+   },
+   "order": {
+    "type": "number"
+   }
+  }
+ },
+ "committee": {
+  "base": "document",
+  "fields": {
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "options": [
+     "Standing",
+     "Ad Hoc",
+     "Governance"
+    ]
+   },
+   "summary": {
+    "type": "string"
+   },
+   "leaders": {
+    "type": "string"
+   },
+   "meeting": {
+    "type": "string"
+   },
+   "email": {
+    "type": "string"
+   },
+   "links": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "order": {
+    "type": "number"
+   }
+  }
+ },
+ "position": {
+  "base": "document",
+  "fields": {
+   "title": {
+    "type": "string"
+   },
+   "slug": {
+    "type": "slug"
+   },
+   "area": {
+    "type": "string",
+    "options": [
+     "Rights & Equality",
+     "Families & Economic Security",
+     "Health, Autonomy & Safety",
+     "Environment & Peace"
+    ]
+   },
+   "tags": {
+    "type": "array",
+    "of": [
+     {
+      "type": "string",
+      "name": "string"
+     }
+    ]
+   },
+   "summary": {
+    "type": "text"
+   },
+   "fullText": {
+    "type": "richText"
+   },
+   "order": {
+    "type": "number"
+   }
+  }
+ },
+ "endorsement": {
+  "base": "document",
+  "fields": {
+   "election": {
+    "type": "string"
+   },
+   "jurisdiction": {
+    "type": "string"
+   },
+   "office": {
+    "type": "string"
+   },
+   "decision": {
+    "type": "string",
+    "options": [
+     "Endorsed",
+     "No Endorsement",
+     "Pending"
+    ]
+   },
+   "candidate": {
+    "type": "string"
+   },
+   "party": {
+    "type": "string"
+   },
+   "image": {
+    "type": "imageWithAlt"
+   },
+   "website": {
+    "type": "url"
+   },
+   "decisionDate": {
+    "type": "date"
+   },
+   "note": {
+    "type": "text"
+   },
+   "order": {
+    "type": "number"
+   }
+  }
+ },
+ "action": {
+  "base": "document",
+  "fields": {
+   "title": {
+    "type": "string"
+   },
+   "goal": {
+    "type": "string",
+    "options": [
+     "Vote",
+     "Speak Up",
+     "Participate",
+     "Lead",
+     "Support"
+    ]
+   },
+   "summary": {
+    "type": "text"
+   },
+   "link": {
+    "type": "link"
+   },
+   "featured": {
+    "type": "boolean"
+   },
+   "order": {
+    "type": "number"
+   }
+  }
+ },
+ "opportunity": {
+  "base": "document",
+  "fields": {
+   "title": {
+    "type": "string"
+   },
+   "jurisdiction": {
+    "type": "string",
+    "options": [
+     "City of Santa Barbara",
+     "Santa Barbara County",
+     "City of Carpinteria",
+     "City of Goleta"
+    ]
+   },
+   "issues": {
+    "type": "array",
+    "of": [
+     {
+      "type": "string",
+      "name": "string"
+     }
+    ]
+   },
+   "summary": {
+    "type": "text"
+   },
+   "url": {
+    "type": "url"
+   },
+   "order": {
+    "type": "number"
+   }
+  }
+ },
+ "album": {
+  "base": "document",
+  "fields": {
+   "title": {
+    "type": "string"
+   },
+   "slug": {
+    "type": "slug"
+   },
+   "date": {
+    "type": "date"
+   },
+   "eyebrow": {
+    "type": "string"
+   },
+   "summary": {
+    "type": "text"
+   },
+   "photographers": {
+    "type": "string"
+   },
+   "images": {
+    "type": "array",
+    "of": [
+     {
+      "type": "imageWithAlt",
+      "name": "imageWithAlt"
+     }
+    ]
+   },
+   "order": {
+    "type": "number"
+   }
+  }
+ }
+}

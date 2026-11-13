@@ -1,0 +1,21 @@
+---
+import Text from './sections/Text.astro'
+import Cards from './sections/Cards.astro'
+import Stats from './sections/Stats.astro'
+import Split from './sections/Split.astro'
+import Quote from './sections/Quote.astro'
+import Timeline from './sections/Timeline.astro'
+import NameList from './sections/NameList.astro'
+import Accordion from './sections/Accordion.astro'
+import Links from './sections/Links.astro'
+import Collection from './sections/Collection.astro'
+import Gallery from './sections/Gallery.astro'
+import Embed from './sections/Embed.astro'
+import Cta from './sections/Cta.astro'
+const map = {sectionText: Text, sectionCards: Cards, sectionStats: Stats, sectionSplit: Split, sectionQuote: Quote, sectionTimeline: Timeline, sectionNameList: NameList, sectionAccordion: Accordion, sectionLinks: Links, sectionCollection: Collection, sectionGallery: Gallery, sectionEmbed: Embed, sectionCta: Cta}
+const {sections = []} = Astro.props
+---
+{sections.map((s) => {
+  const C = map[s._type]
+  return C ? <C s={s} /> : null
+})}

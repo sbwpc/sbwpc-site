@@ -1,0 +1,21 @@
+---
+import {loadAll} from '../lib/data.js'
+const {path, title} = Astro.props
+const {pages, settings} = await loadAll()
+const navLabel = (u) => (settings.nav || []).find((n) => n.url === u)?.label
+const parts = path.split('/')
+const crumbs = parts.slice(0, -1).map((_, i) => {
+  const p = parts.slice(0, i + 1).join('/')
+  const page = pages.find((x) => x.path === p)
+  return page || navLabel('/' + p) ? {url: '/' + p, label: navLabel('/' + p) || page.title} : null
+}).filter(Boolean)
+---
+{crumbs.length > 0 && (
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <ol class="wrap">
+      <li><a href="/">Home</a></li>
+      {crumbs.map((c) => <li><a href={c.url}>{c.label}</a></li>)}
+      <li aria-current="page">{title}</li>
+    </ol>
+  </nav>
+)}

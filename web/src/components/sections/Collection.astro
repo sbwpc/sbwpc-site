@@ -1,0 +1,43 @@
+---
+import Shell from './Shell.astro'
+import People from '../collections/People.astro'
+import Committees from '../collections/Committees.astro'
+import Positions from '../collections/Positions.astro'
+import Events from '../collections/Events.astro'
+import Posts from '../collections/Posts.astro'
+import Endorsements from '../collections/Endorsements.astro'
+import Actions from '../collections/Actions.astro'
+import Opportunities from '../collections/Opportunities.astro'
+import Explainers from '../collections/Explainers.astro'
+import Albums from '../collections/Albums.astro'
+import {loadAll, upcomingEvents, pastEvents} from '../../lib/data.js'
+const {s} = Astro.props
+const d = await loadAll()
+const c = s.collection
+const lim = (arr) => (s.limit ? arr.slice(0, s.limit) : arr)
+let items = []
+if (c === 'people') items = d.people
+if (c === 'committees') items = d.committees
+if (c === 'positions') items = d.positions
+if (c === 'events') items = lim(upcomingEvents(d.events))
+if (c === 'pastEvents') items = lim(pastEvents(d.events))
+if (c === 'posts') items = lim(d.posts)
+if (c === 'endorsements') items = d.endorsements.filter((e) => !s.filter || e.election === s.filter)
+if (c === 'actions') items = d.actions
+if (c === 'opportunities') items = d.opportunities
+if (c === 'explainers') items = d.pages.filter((p) => p.path?.startsWith('advocacy/explainers/'))
+if (c === 'albums') items = d.albums
+const tone = s.tone || 'white'
+---
+<Shell s={s}>
+  {c === 'people' && <People items={items} />}
+  {c === 'committees' && <Committees items={items} />}
+  {c === 'positions' && <Positions items={items} />}
+  {(c === 'events' || c === 'pastEvents') && <Events items={items} past={c === 'pastEvents'} />}
+  {c === 'posts' && <Posts items={items} />}
+  {c === 'endorsements' && <Endorsements items={items} />}
+  {c === 'actions' && <Actions items={items} />}
+  {c === 'opportunities' && <Opportunities items={items} />}
+  {c === 'explainers' && <Explainers items={items} />}
+  {c === 'albums' && <Albums items={items} />}
+</Shell>

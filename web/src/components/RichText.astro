@@ -1,0 +1,28 @@
+---
+import {toHTML, escapeHTML} from '@portabletext/to-html'
+import {img, isExternal} from '../lib/data.js'
+const {value, class: cls = 'prose'} = Astro.props
+const html = value?.length
+  ? toHTML(value, {
+      components: {
+        types: {
+          imageWithAlt: ({value}) => {
+            const i = img(value, {width: 1200})
+            if (!i) return ''
+            return `<figure><img src="${i.src}" ${i.srcset ? `srcset="${i.srcset}" sizes="(min-width: 50rem) 44rem, 100vw"` : ''} alt="${escapeHTML(i.alt || '')}" loading="lazy" decoding="async" ${i.width ? `width="${i.width}" height="${i.height}"` : ''}/>${value.caption ? `<figcaption>${escapeHTML(value.caption)}</figcaption>` : ''}</figure>`
+          },
+        },
+        marks: {
+          link: ({children, value}) => {
+            const h = value?.href || '#'
+            return isExternal(h)
+              ? `<a href="${escapeHTML(h)}" target="_blank" rel="noopener">${children}<span class="sr-only"> (opens in a new tab)</span></a>`
+              : `<a href="${escapeHTML(h)}">${children}</a>`
+          },
+        },
+        unknownType: () => '',
+      },
+    })
+  : ''
+---
+{html && <div class={cls} set:html={html} />}

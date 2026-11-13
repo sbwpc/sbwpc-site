@@ -1,0 +1,19 @@
+---
+import Img from '../Img.astro'
+import Link from '../Link.astro'
+import {fmtDate} from '../../lib/data.js'
+const {items} = Astro.props
+---
+<div class="grid c3 posts">
+  {items.map((p, i) => {
+    const url = p.externalUrl || `/news/${p.slug.current}`
+    return (
+      <article class="card linked post-card" data-reveal style={`--d:${(i % 3) * 60}ms`}>
+        <div class="media">{p.image ? <Img image={p.image} width={800} sizes="(min-width: 64rem) 33vw, 100vw" /> : <div class="media-fallback"><img src="/logo-mark.webp" alt="" /></div>}</div>
+        <p class="kicker">{[p.category, fmtDate(p.date)].filter(Boolean).join(' · ')}</p>
+        <h3 class="h3 card-title"><Link href={url} class="stretch">{p.title}</Link></h3>
+        {p.excerpt && <p class="body">{p.excerpt}</p>}
+      </article>
+    )
+  })}
+</div>

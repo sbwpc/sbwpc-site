@@ -1,0 +1,39 @@
+---
+import Shell from './Shell.astro'
+import Img from '../Img.astro'
+import Link from '../Link.astro'
+const {s} = Astro.props
+const cards = s.cards || []
+const cols = s.columns || (cards.length % 3 === 0 ? 3 : cards.length === 4 ? 4 : cards.length <= 2 ? 2 : 3)
+const variant = s.variant || 'bordered'
+const numbered = variant === 'numbered'
+const pad = (n) => String(n).padStart(2, '0')
+---
+<Shell s={s}>
+  <div class:list={['grid', `c${cols}`, `v-${variant}`]}>
+    {cards.map((c, i) => {
+      const single = c.links?.length === 1 && !c.details?.length
+      return (
+        <article class:list={['card', {linked: single, 'has-media': c.image}]} data-reveal style={`--d:${(i % cols) * 70}ms`}>
+          {c.image && <div class="media"><Img image={c.image} width={800} sizes="(min-width: 64rem) 33vw, 100vw" /></div>}
+          {numbered && <span class="num" aria-hidden="true">{pad(i + 1)}</span>}
+          {c.kicker && !(numbered && /^\s*\d+\s*$/.test(c.kicker)) && <p class="kicker">{c.kicker}</p>}
+          {c.title && <h3 class={variant === 'people' ? 'h4' : 'h3 card-title'}>{c.title}</h3>}
+          {c.body && <p class="body">{c.body}</p>}
+          {c.details?.length > 0 && (
+            <dl class="details">
+              {c.details.map((d) => <div>{d.label && <dt>{d.label}</dt>}<dd>{d.value}{d.note && <span class="dnote">{d.note}</span>}</dd></div>)}
+            </dl>
+          )}
+          {c.links?.length > 0 && (
+            <div class="links">
+              {c.links.map((l) => (
+                <Link href={l.url} class:list={['textlink', {stretch: single}]}><span class="arrow">{l.label}</span></Link>
+              ))}
+            </div>
+          )}
+        </article>
+      )
+    })}
+  </div>
+</Shell>

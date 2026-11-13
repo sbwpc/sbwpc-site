@@ -29,3 +29,9 @@ A Supabase organization member opens Authentication, Users, picks the person, an
 ## To add or remove an admin
 1. Add or deactivate the email in the admins table (Supabase, Table Editor).
 2. Invite the person under Authentication, Users, Invite user.
+
+## Import of the sign-up sheet (done November 12, 2026)
+- Imported 61 people, 58 active memberships and 61 payments (dues $2,746, donations $550).
+- The cleanup script is supabase/import/build_import.py. Its output contains member data and is not kept in this repository.
+- The list of corrected rows is saved outside the repository, next to the site folder (membership-import-review.md).
+- First expirations fall in May 2027, so the first renewal reminders are due in April 2027.

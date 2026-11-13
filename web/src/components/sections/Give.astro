@@ -1,12 +1,19 @@
 ---
-// Donation amounts: each tile opens the JotForm donation form with the amount filled in
+// Amount or level tiles with the JotForm form shown right below them.
+// Donation amounts fill in the form's amount field; membership levels point people to the form.
+import JotForm from '../JotForm.astro'
 const {s} = Astro.props
 const tone = s.tone || 'white'
 const form = s.formUrl || ''
-const withAmount = (n) => form ? `${form}${form.includes('?') ? '&' : '?'}donationAmount=${n}` : '#'
+const prefill = s.prefill !== false && !s.period
+const embed = s.embed !== false && form
+const formId = `${s.anchor || 'give'}-form`
+const withAmount = (n) => (form && prefill ? `${form}${form.includes('?') ? '&' : '?'}donationAmount=${n}` : embed ? `#${formId}` : form || '#')
 const amounts = s.amounts || []
+const money = (n) => '$' + Number(n).toLocaleString('en-US')
+const levels = amounts.some((a) => a.title)
 ---
-<section class:list={['section', `tone-${tone}`, 's-give']} id={s.anchor || undefined}>
+<section class:list={['section', `tone-${tone}`, 's-give', {levels}]} id={s.anchor || undefined} data-give={embed ? formId : undefined} data-prefill={prefill ? '1' : undefined}>
   <div class="wrap give-grid">
     <div class="give-copy" data-reveal>
       {s.heading && <h2 class="h2">{s.heading}</h2>}
@@ -18,26 +25,66 @@ const amounts = s.amounts || []
       )}
     </div>
     <div class="give-panel" data-reveal style="--d:120ms">
-      <p class="give-panel-title" id="give-choose">Choose an amount</p>
-      <ul class="give-amounts" aria-labelledby="give-choose">
+      <p class="give-panel-title" id={`${formId}-choose`}>{levels ? 'Choose a level' : 'Choose an amount'}</p>
+      <ul class="give-amounts" aria-labelledby={`${formId}-choose`}>
         {amounts.map((a) => (
           <li>
-            <a class="give-tile" href={withAmount(a.amount)} target="_blank" rel="noopener">
-              <span class="give-amount">${a.amount.toLocaleString('en-US')}</span>
+            <a class="give-tile" href={withAmount(a.amount)} target={embed ? undefined : '_blank'} rel={embed ? undefined : 'noopener'} data-amount={a.amount} data-label={a.title || money(a.amount)}>
+              {a.title && <span class="give-name">{a.title}</span>}
+              <span class="give-amount">{money(a.amount)}{s.period && <span class="give-period"> {s.period}</span>}</span>
               {a.impact && <span class="give-impact">{a.impact}</span>}
-              <span class="sr-only"> (opens the secure donation form in a new tab)</span>
             </a>
           </li>
         ))}
-        <li class="give-other-li">
-          <a class="give-tile give-other" href={form} target="_blank" rel="noopener">
-            <span class="give-amount">{s.otherLabel || 'Give another amount'}</span>
-            <span class="give-impact">Enter your own on the form</span>
-            <span class="sr-only"> (opens in a new tab)</span>
-          </a>
-        </li>
+        {s.otherLabel && (
+          <li>
+            <a class="give-tile give-other" href={embed ? `#${formId}` : form} target={embed ? undefined : '_blank'} rel={embed ? undefined : 'noopener'} data-amount="">
+              <span class="give-amount">{s.otherLabel}</span>
+              <span class="give-impact">Enter your own on the form</span>
+            </a>
+          </li>
+        )}
       </ul>
       {s.note && <p class="give-note">{s.note}</p>}
     </div>
   </div>
+  {embed && (
+    <div class="wrap give-form-wrap">
+      <div class="give-form-card">
+        {s.formHeading && <h3 class="h3 give-form-title" id={`${formId}-title`}>{s.formHeading}</h3>}
+        <p class="give-choice" aria-live="polite" hidden></p>
+        {s.formIntro && <p class="give-form-intro">{s.formIntro}</p>}
+        <JotForm url={form} title={s.formHeading || 'Form'} id={formId} />
+      </div>
+    </div>
+  )}
 </section>
+<script>
+  document.querySelectorAll('[data-give]').forEach((sec) => {
+    const wrap = document.getElementById(sec.dataset.give)
+    const frame = wrap?.querySelector('iframe')
+    const choice = sec.querySelector('.give-choice')
+    if (!frame || !choice) return
+    const prefill = sec.dataset.prefill === '1'
+    sec.querySelectorAll('.give-tile').forEach((tile) => {
+      tile.addEventListener('click', (e) => {
+        e.preventDefault()
+        sec.querySelectorAll('.give-tile').forEach((t) => t.removeAttribute('aria-current'))
+        tile.setAttribute('aria-current', 'true')
+        const amt = tile.dataset.amount
+        const label = tile.dataset.label
+        if (prefill) {
+          const base = frame.dataset.base
+          const sep = base.includes('?') ? '&' : '?'
+          frame.src = `${base}${sep}isIframeEmbed=1${amt ? `&donationAmount=${amt}` : ''}`
+          choice.textContent = amt ? `You chose ${label}. Add your details below to finish.` : 'Enter your amount in the form below.'
+        } else {
+          choice.textContent = `You chose ${label}. Check ${label} in the form below, then add your details.`
+        }
+        choice.hidden = false
+        const top = wrap.parentElement.getBoundingClientRect().top + scrollY - 110
+        scrollTo({top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'})
+      })
+    })
+  })
+</script>

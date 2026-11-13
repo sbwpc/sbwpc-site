@@ -287,26 +287,33 @@ export const sectionAccordion = section('sectionAccordion', 'Expandable list', [
   }),
 ])
 
-export const sectionGive = section('sectionGive', 'Donation amounts', [
-  defineField({name: 'formUrl', title: 'Donation form link', type: 'url', description: 'The JotForm donation form. Each amount opens it with that amount filled in.'}),
+export const sectionGive = section('sectionGive', 'Donation or membership amounts with form', [
+  defineField({name: 'formUrl', title: 'Form link', type: 'url', description: 'The JotForm form for donations or membership'}),
+  defineField({name: 'embed', title: 'Show the form on this page', type: 'boolean', initialValue: true}),
+  defineField({name: 'prefill', title: 'Fill the chosen amount into the form', type: 'boolean', initialValue: true, description: 'Works with the donation form. Turn off for membership levels.'}),
+  defineField({name: 'period', title: 'Amount label', type: 'string', description: 'Optional, like per year'}),
   defineField({
     name: 'amounts',
+    title: 'Amounts or levels',
     type: 'array',
     of: [
       {
         type: 'object',
         name: 'giveAmount',
         fields: [
+          {name: 'title', title: 'Level name', type: 'string', description: 'Optional, for membership levels'},
           {name: 'amount', type: 'number', validation: (r) => r.required().positive()},
-          {name: 'impact', title: 'What it helps with', type: 'string'},
+          {name: 'impact', title: 'Short description', type: 'string'},
         ],
-        preview: {select: {title: 'amount', subtitle: 'impact'}, prepare: ({title, subtitle}) => ({title: `$${title}`, subtitle})},
+        preview: {select: {name: 'title', amount: 'amount', subtitle: 'impact'}, prepare: ({name, amount, subtitle}) => ({title: name ? `${name} $${amount}` : `$${amount}`, subtitle})},
       },
     ],
   }),
-  defineField({name: 'otherLabel', title: 'Other amount label', type: 'string', initialValue: 'Give another amount'}),
+  defineField({name: 'otherLabel', title: 'Other amount label', type: 'string', description: 'Leave empty to hide the other amount tile'}),
   defineField({name: 'points', title: 'Reassurance points', type: 'array', of: [{type: 'string'}]}),
   defineField({name: 'note', title: 'Small print', type: 'text', rows: 3}),
+  defineField({name: 'formHeading', title: 'Form heading', type: 'string'}),
+  defineField({name: 'formIntro', title: 'Form intro', type: 'text', rows: 2}),
 ])
 
 export const sectionCta = section('sectionCta', 'Call to action band', [])

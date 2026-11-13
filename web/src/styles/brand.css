@@ -1837,3 +1837,70 @@ body {
   font-weight: 500;
   color: var(--muted);
 }
+
+/* Donation and membership tiles: chosen state, level names, the form below */
+.give-tile[aria-current='true'] {
+  border-color: var(--purple);
+  background: #f6f2fc;
+  box-shadow: inset 0 0 0 1px var(--purple);
+}
+.give-other[aria-current='true'] {
+  background: var(--navy-deep);
+  border-color: var(--navy-deep);
+}
+.give-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--navy);
+}
+.give-period {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+.s-give.levels .give-amount {
+  font-size: clamp(1.4rem, 2.2vw, 1.7rem);
+}
+@media (min-width: 40rem) {
+  .s-give.levels .give-amounts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.give-form-wrap {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+.give-form-card {
+  max-width: 50rem;
+  margin-inline: auto;
+  background: var(--white);
+  padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem);
+  box-shadow: 0 1.5rem 3rem -1.5rem rgba(28, 12, 68, 0.28);
+  scroll-margin-top: calc(var(--header-h) + 1rem);
+}
+.give-form-title {
+  margin: 0;
+  color: var(--navy);
+}
+.give-form-intro {
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+}
+.give-choice {
+  margin: 0.9rem 0 0;
+  padding: 0.75rem 1rem;
+  background: #f6f2fc;
+  border-left: 4px solid var(--purple);
+  font-weight: 500;
+  color: var(--navy);
+}
+.jf-wrap {
+  margin-top: 1rem;
+}
+.jf-frame {
+  display: block;
+  width: 100%;
+  min-width: 100%;
+  min-height: 1400px;
+  border: 0;
+  background: transparent;
+}

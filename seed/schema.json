@@ -1534,6 +1534,9 @@
        },
        "impact": {
         "type": "string"
+       },
+       "title": {
+        "type": "string"
        }
       }
      }
@@ -1552,6 +1555,21 @@
     ]
    },
    "note": {
+    "type": "text"
+   },
+   "embed": {
+    "type": "boolean"
+   },
+   "prefill": {
+    "type": "boolean"
+   },
+   "period": {
+    "type": "string"
+   },
+   "formHeading": {
+    "type": "string"
+   },
+   "formIntro": {
     "type": "text"
    }
   }

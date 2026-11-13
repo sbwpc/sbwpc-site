@@ -1,0 +1,28 @@
+---
+// A JotForm form shown on the page. The JotForm script grows the frame to fit the form,
+// so visitors never scroll inside a box.
+const {url = '', title = 'Form', id} = Astro.props
+const formId = (url.match(/(\d{10,})/) || [])[1] || 'form'
+const origin = (() => { try { return new URL(url).origin + '/' } catch { return 'https://form.jotform.com/' } })()
+const sep = url.includes('?') ? '&' : '?'
+---
+<div class="jf-wrap" id={id}>
+  <iframe
+    id={`JotFormIFrame-${formId}`}
+    class="jf-frame"
+    title={title}
+    src={`${url}${sep}isIframeEmbed=1`}
+    data-base={url}
+    allow="payment; fullscreen"
+    allowtransparency="true"
+    scrolling="no"
+    loading="lazy"
+  ></iframe>
+  <noscript><p><a href={url}>Open the form</a></p></noscript>
+</div>
+<script is:inline src="https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js" defer></script>
+<script is:inline define:vars={{formId, origin}}>
+  addEventListener('DOMContentLoaded', () => {
+    if (window.jotformEmbedHandler) window.jotformEmbedHandler(`iframe[id='JotFormIFrame-${formId}']`, origin)
+  })
+</script>

@@ -1,0 +1,94 @@
+/* SBWPC site style for JotForm forms shown on sbwpc.org.
+   Paste into each form: Form Designer > Styles > Inject CSS. */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+
+html, body, .supernova, .jotform-form { background: transparent !important; }
+body, .form-all, .form-all * { font-family: 'Outfit', Helvetica, Arial, sans-serif !important; }
+
+/* The page already shows the logo and a heading, so hide the form's own */
+.formLogoWrapper, #formCoverLogo, .form-header-group, li[data-type='control_head'] { display: none !important; }
+/* Date field is not needed: JotForm records the submission date */
+li[data-type='control_datetime'] { display: none !important; }
+
+.form-all {
+  background: transparent !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  border: 0 !important;
+}
+.form-section, .page-section { padding: 0 !important; }
+.form-line { padding: 14px 4px !important; margin: 0 !important; }
+.form-line-active { background: transparent !important; }
+
+.form-label, .form-label-top {
+  color: #1e2c5b !important;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  margin-bottom: 8px !important;
+}
+.form-required { color: #cc2127 !important; }
+.form-sub-label { color: #5b5d63 !important; font-size: 14px !important; }
+.form-html, .form-html *, .form-line p { color: #383a39 !important; font-size: 16px !important; line-height: 1.55 !important; }
+
+.form-textbox, .form-textarea, .form-dropdown, input[type='text'], input[type='email'], input[type='tel'], select {
+  border: 2px solid #cfd0d9 !important;
+  border-radius: 4px !important;
+  height: 48px !important;
+  font-size: 17px !important;
+  color: #383a39 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  padding: 0 12px !important;
+}
+.form-textarea { height: auto !important; padding: 10px 12px !important; }
+.form-textbox:focus, .form-textarea:focus, .form-dropdown:focus, input:focus, select:focus {
+  border-color: #5e3795 !important;
+  outline: 2px solid rgba(94, 55, 149, 0.25) !important;
+  outline-offset: 0 !important;
+}
+.form-validation-error .form-textbox { border-color: #cc2127 !important; }
+
+/* Checkboxes, radios and product rows */
+.form-checkbox + label::before, .form-radio + label::before,
+.form-checkbox-item label::before, .form-radio-item label::before { border-color: #5e3795 !important; }
+.form-checkbox:checked + label::before, .form-radio:checked + label::before { background-color: #5e3795 !important; border-color: #5e3795 !important; }
+.form-checkbox-item label, .form-radio-item label, .form-product-name { color: #383a39 !important; font-size: 16px !important; }
+.form-product-item {
+  border: 2px solid #cfd0d9 !important;
+  border-radius: 4px !important;
+  padding: 14px 16px !important;
+  margin-bottom: 10px !important;
+}
+.form-product-item.p_selected, .form-product-item:has(input:checked) { border-color: #5e3795 !important; background: #f6f2fc !important; }
+.form-product-details b, .form-product-item .form-product-details span { color: #5e3795 !important; font-weight: 700 !important; }
+.form-payment-total, #payment_total { color: #1e2c5b !important; font-weight: 700 !important; }
+
+/* Submit */
+.form-buttons-wrapper, .form-submit-button-wrapper { border: 0 !important; padding: 24px 0 8px !important; text-align: left !important; }
+.form-submit-button, button.submit-button {
+  background: #cc2127 !important;
+  border: 0 !important;
+  border-radius: 4px !important;
+  color: #fff !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  min-width: 220px !important;
+  height: 54px !important;
+  box-shadow: none !important;
+}
+.form-submit-button:hover { background: #1c0c44 !important; }
+
+@media (max-width: 480px) {
+  .form-line { padding: 12px 0 !important; }
+  .form-submit-button { width: 100% !important; }
+}
+
+/* Membership is one per person: hide the quantity pickers */
+.form-product-item [class*='quantity'], .form-product-item .form-sub-label-container:has(select),
+.form-product-item .form-product-custom_quantity { display: none !important; }
+.form-product-name { font-weight: 600 !important; color: #1e2c5b !important; }
+li[data-type='control_paypalcomplete'] > .form-label { font-weight: 400 !important; color: #383a39 !important; font-size: 16px !important; line-height: 1.55 !important; }
+.form-product-item .select_border { border-color: #5e3795 !important; border-radius: 3px !important; }
+.form-product-item .form-product-container { padding-left: 14px !important; }

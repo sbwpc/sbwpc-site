@@ -36,8 +36,8 @@ A Supabase organization member opens Authentication, Users, picks the person, an
 - The list of corrected rows is saved outside the repository, next to the site folder (membership-import-review.md).
 - First expirations fall in May 2027, so the first renewal reminders are due in April 2027.
 
-## Stage 2 (admin back end, on-site forms, payments): built and tested locally, not deployed
-Branch: members2. Nothing in this stage is on the live site or the live database yet.
+## Stage 2 (admin back end, on-site forms, payments): deployed November 13, 2026
+The admin back end is live at /admin. The new forms are live only on the two test pages and cannot take payments until the Netlify settings below are entered. The live /join and /donate pages still use JotForm.
 
 ### What was built
 - Admin back end at /admin: overview, members list, donors and payments list, checks to confirm, one page per person, add and edit people, memberships and notes, record a check or cash payment by hand, CSV downloads (members, payments with FPPC fields, email list of people who gave permission). Every change is written to the audit log by the database.
@@ -45,7 +45,7 @@ Branch: members2. Nothing in this stage is on the live site or the live database
 - Three ways to pay: PayPal (including card through PayPal), Apple Pay (one-time payments), or a mailed check. A check is saved as a promise and only counts as paid when an admin marks it received.
 - Yearly auto-renew for memberships and monthly or yearly donations, as PayPal subscriptions.
 - Server functions (web/netlify/functions): checkout-config, checkout-create, checkout-capture, paypal-webhook, backup.
-- Database: supabase/migrations/002_checkout.sql (checkouts and settings tables, record_payment and confirm_check). NOT yet applied to the live project.
+- Database: supabase/migrations/002_checkout.sql (checkouts and settings tables, record_payment and confirm_check). Applied to the live project on November 13, 2026. Member counts were unchanged (61 people, 58 memberships, 61 payments).
 - Nightly encrypted backup: every table, AES-256-GCM, kept 30 nights in Netlify Blobs (store "member-backups"). Opens only with the backup key. To read one: supabase/backup/restore.mjs.
 
 ### Rules the system follows
@@ -77,9 +77,10 @@ Apple Pay also needs: Apple Pay turned on for the PayPal app, sbwpc.org register
 - Forms in a browser, desktop and phone, with accessibility scans: 57 of 57 pass.
 - How to run them: tests/membership/README.md.
 - Not yet tested, because it needs the real accounts: the real PayPal sandbox, and Apple Pay on a real iPhone.
+- Until SUPABASE_URL and SUPABASE_SECRET_KEY are set in Netlify, the test pages cannot save a check promise either, and the nightly backup skips its run.
 
 ### Steps to go live
-1. Luke says "deploy". Apply 002_checkout.sql to Supabase, merge members2, deploy. The admin back end works right away. The live forms stay on JotForm.
+1. Done November 13, 2026: 002_checkout.sql applied, members2 merged, site deployed. Checked live: admin screens load, test pages load, the public key is refused on every table.
 2. Luke signs in to developer.paypal.com with the SBWPC login, creates a sandbox app and webhook, and enters the settings above in Netlify.
 3. Test on /join-preview and /donate-preview with PayPal sandbox accounts, and Apple Pay on an iPhone.
 4. SBWPC confirms the open questions below.

@@ -8,7 +8,7 @@ Updated: November 12, 2026
 - Email: receipts and reminders will send from the Google Workspace mailbox info@sbwpc.org. Newsletters stay in Constant Contact.
 - Reminders: 30 days before, 7 days before, on the day, and one lapsed notice 14 days after.
 - Households: one primary member record, with the second person's name stored on the membership.
-- Code repository: private (changed November 12, 2026).
+- Code repository: public. It was made private on November 12, 2026, but Netlify's current plan will not build a private repository from outside contributors, so it was switched back the same day. No member data or secret keys are in the code.
 - Older member list (before May 2026): unknown. Ask the client.
 
 ## Accounts

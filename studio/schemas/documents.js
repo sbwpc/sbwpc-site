@@ -170,7 +170,7 @@ export const person = defineType({
   fields: [
     defineField({name: 'name', type: 'string', validation: (r) => r.required()}),
     defineField({name: 'role', type: 'string', description: 'President, Treasurer, Board Member...'}),
-    defineField({name: 'group', type: 'string', options: {list: ['Executive Officer', 'Board Member'], layout: 'radio'}, initialValue: 'Board Member'}),
+    defineField({name: 'group', type: 'string', options: {list: ['Leadership Team', 'Board Member'], layout: 'radio'}, initialValue: 'Board Member'}),
     defineField({name: 'image', type: 'imageWithAlt'}),
     defineField({name: 'shortBio', title: 'One-line description', type: 'string'}),
     defineField({name: 'bio', type: 'richText'}),

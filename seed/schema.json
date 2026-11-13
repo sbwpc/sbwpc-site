@@ -1258,7 +1258,7 @@
    "group": {
     "type": "string",
     "options": [
-     "Executive Officer",
+     "Leadership Team",
      "Board Member"
     ]
    },

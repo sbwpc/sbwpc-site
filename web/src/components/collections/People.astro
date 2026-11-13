@@ -9,7 +9,7 @@ const groups = [...new Set(items.map((p) => p.group).filter(Boolean))]
   {groups.length > 1 && (
     <div class="chips" role="group" aria-label="Filter leaders">
       <button class="chip" aria-pressed="true" data-filter="all">All leaders</button>
-      {groups.map((g) => <button class="chip" aria-pressed="false" data-filter={slugify(g)}>{g}s</button>)}
+      {groups.map((g) => <button class="chip" aria-pressed="false" data-filter={slugify(g)}>{/team$/i.test(g) ? g : `${g}s`}</button>)}
     </div>
   )}
   <ul class="people-grid">

@@ -12,6 +12,7 @@
     "@portabletext/to-html": "^6.0.0",
     "@sanity/client": "^8.9.0",
     "@sanity/image-url": "^2.1.1",
+    "@supabase/supabase-js": "^2.119.0",
     "astro": "^7.3.8",
     "sharp": "^0.35.5"
   }

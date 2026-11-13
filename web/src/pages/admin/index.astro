@@ -1,0 +1,143 @@
+---
+// SBWPC member admin. A standalone page: no site header, tracking or third-party scripts.
+import '../../styles/fonts.css'
+import '../../styles/admin.css'
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <title>SBWPC Admin</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="a-top">
+      <img src="/brand/sbwpc-logo-acronym-color.svg" alt="SBWPC" width="150" height="36" />
+      <div class="a-top-right" id="a-user" hidden>
+        <span id="a-user-email"></span>
+        <button type="button" class="a-btn ghost small" id="a-signout">Sign out</button>
+      </div>
+    </header>
+
+    <main class="a-main" id="a-main">
+      <p class="a-status" id="a-loading" role="status">Loading...</p>
+      <noscript><p class="a-status">This page needs JavaScript turned on.</p></noscript>
+
+      <!-- Sign in -->
+      <section class="a-card" id="v-signin" hidden aria-labelledby="h-signin">
+        <h1 id="h-signin">Sign in</h1>
+        <p class="a-sub">Member records for SBWPC board use only.</p>
+        <form id="f-signin" novalidate>
+          <label for="si-email">Email</label>
+          <input id="si-email" name="email" type="email" autocomplete="username" required />
+          <label for="si-pass">Password</label>
+          <input id="si-pass" name="password" type="password" autocomplete="current-password" required />
+          <p class="a-error" id="e-signin" role="alert" hidden></p>
+          <button type="submit" class="a-btn">Continue</button>
+        </form>
+        <button type="button" class="a-link" id="a-forgot">Forgot your password?</button>
+      </section>
+
+      <!-- Reset request -->
+      <section class="a-card" id="v-forgot" hidden aria-labelledby="h-forgot">
+        <h1 id="h-forgot">Reset your password</h1>
+        <p class="a-sub">Enter your admin email. If it has an account, we will send a link to set a new password.</p>
+        <form id="f-forgot" novalidate>
+          <label for="fg-email">Email</label>
+          <input id="fg-email" name="email" type="email" autocomplete="username" required />
+          <p class="a-error" id="e-forgot" role="alert" hidden></p>
+          <p class="a-ok" id="ok-forgot" role="status" hidden>If that address has an account, a reset link is on its way.</p>
+          <button type="submit" class="a-btn">Send reset link</button>
+        </form>
+        <button type="button" class="a-link" id="a-back-signin">Back to sign in</button>
+      </section>
+
+      <!-- Set password (invite or reset link) -->
+      <section class="a-card" id="v-password" hidden aria-labelledby="h-password">
+        <h1 id="h-password">Set your password</h1>
+        <p class="a-sub">Use at least 12 characters. A short sentence you can remember works well.</p>
+        <form id="f-password" novalidate>
+          <label for="pw-new">New password</label>
+          <input id="pw-new" name="new-password" type="password" autocomplete="new-password" minlength="12" required />
+          <label for="pw-again">Type it again</label>
+          <input id="pw-again" name="new-password-again" type="password" autocomplete="new-password" minlength="12" required />
+          <p class="a-error" id="e-password" role="alert" hidden></p>
+          <button type="submit" class="a-btn">Save password</button>
+        </form>
+      </section>
+
+      <!-- Two-factor setup -->
+      <section class="a-card" id="v-enroll" hidden aria-labelledby="h-enroll">
+        <h1 id="h-enroll">Set up two-factor sign-in</h1>
+        <p class="a-sub">Member records are protected by a second step. You need an authenticator app on your phone, such as Google Authenticator, Microsoft Authenticator or 1Password.</p>
+        <ol class="a-steps">
+          <li>Open the app and choose to add an account.</li>
+          <li>Scan this code:
+            <div class="a-qr"><img id="en-qr" alt="QR code for your authenticator app" width="200" height="200" /></div>
+            <details><summary>Can't scan? Enter this key by hand</summary><code id="en-secret"></code></details>
+          </li>
+          <li>Type the 6-digit code the app shows.</li>
+        </ol>
+        <form id="f-enroll" novalidate>
+          <label for="en-code">6-digit code</label>
+          <input id="en-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required />
+          <p class="a-error" id="e-enroll" role="alert" hidden></p>
+          <button type="submit" class="a-btn">Turn on two-factor</button>
+        </form>
+      </section>
+
+      <!-- Two-factor check -->
+      <section class="a-card" id="v-verify" hidden aria-labelledby="h-verify">
+        <h1 id="h-verify">Enter your code</h1>
+        <p class="a-sub">Open your authenticator app and type the 6-digit code for SBWPC.</p>
+        <form id="f-verify" novalidate>
+          <label for="vf-code">6-digit code</label>
+          <input id="vf-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required />
+          <p class="a-error" id="e-verify" role="alert" hidden></p>
+          <button type="submit" class="a-btn">Verify</button>
+        </form>
+        <p class="a-note">Lost your phone? Another admin can reset your two-factor setup.</p>
+      </section>
+
+      <!-- No access -->
+      <section class="a-card" id="v-denied" hidden aria-labelledby="h-denied">
+        <h1 id="h-denied">This account does not have access</h1>
+        <p class="a-sub">You are signed in, but this email is not on the SBWPC admin list. Ask an SBWPC admin to add you.</p>
+        <button type="button" class="a-btn" id="a-denied-out">Sign out</button>
+      </section>
+
+      <!-- Dashboard -->
+      <section id="v-dash" hidden aria-labelledby="h-dash">
+        <h1 id="h-dash">Members and donations</h1>
+        <p class="a-sub" id="dash-sub"></p>
+        <div class="a-tiles">
+          <div class="a-tile"><p class="a-num" id="n-active">0</p><p class="a-lab">Active members</p></div>
+          <div class="a-tile warn"><p class="a-num" id="n-expiring">0</p><p class="a-lab">Expiring in 30 days</p></div>
+          <div class="a-tile bad"><p class="a-num" id="n-expired">0</p><p class="a-lab">Expired</p></div>
+          <div class="a-tile"><p class="a-num" id="n-dues">$0</p><p class="a-lab">Dues this year</p></div>
+          <div class="a-tile"><p class="a-num" id="n-gifts">$0</p><p class="a-lab">Donations this year</p></div>
+          <div class="a-tile"><p class="a-num" id="n-report">0</p><p class="a-lab">Contributors at $100 or more</p></div>
+        </div>
+        <div class="a-panel">
+          <h2>Recent activity</h2>
+          <p class="a-empty" id="log-empty">No changes recorded yet.</p>
+          <table class="a-table" id="log-table" hidden>
+            <thead><tr><th scope="col">When</th><th scope="col">Who</th><th scope="col">What</th></tr></thead>
+            <tbody id="log-body"></tbody>
+          </table>
+        </div>
+        <div class="a-panel">
+          <h2>Admins</h2>
+          <ul class="a-list" id="admin-list"></ul>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      import '../../scripts/admin/app.js'
+    </script>
+  </body>
+</html>

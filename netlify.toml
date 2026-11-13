@@ -29,3 +29,13 @@
   for = "/fonts/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Member admin: never cached, never framed, and only allowed to talk to our own database
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    Cache-Control = "no-store"
+    X-Frame-Options = "DENY"
+    X-Robots-Tag = "noindex, nofollow"
+    Referrer-Policy = "no-referrer"
+    Content-Security-Policy = "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src https://rbvhmrsepsategvrmqcv.supabase.co wss://rbvhmrsepsategvrmqcv.supabase.co; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"

@@ -4,8 +4,8 @@ const {stats = []} = Astro.props
 <div class:list={['stat-grid', {single: stats.length === 1}]} data-reveal style="--d:120ms">
   {stats.map((st) => (
     <div>
-      {st.label && <p class="label">{st.label}</p>}
       <p class="value">{st.value}</p>
+      {st.label && <p class="stat-name">{st.label}</p>}
       {st.note && <p class="note">{st.note}</p>}
     </div>
   ))}

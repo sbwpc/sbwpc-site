@@ -1057,6 +1057,10 @@
      {
       "type": "sectionCta",
       "name": "sectionCta"
+     },
+     {
+      "type": "sectionGive",
+      "name": "sectionGive"
      }
     ]
    },
@@ -1222,6 +1226,10 @@
      {
       "type": "sectionCta",
       "name": "sectionCta"
+     },
+     {
+      "type": "sectionGive",
+      "name": "sectionGive"
      }
     ]
    }
@@ -1478,6 +1486,73 @@
    },
    "order": {
     "type": "number"
+   }
+  }
+ },
+ "sectionGive": {
+  "base": "object",
+  "fields": {
+   "heading": {
+    "type": "string"
+   },
+   "intro": {
+    "type": "text"
+   },
+   "buttons": {
+    "type": "array",
+    "of": [
+     {
+      "type": "link",
+      "name": "link"
+     }
+    ]
+   },
+   "tone": {
+    "type": "string",
+    "options": [
+     "white",
+     "cream",
+     "navy",
+     "blue"
+    ]
+   },
+   "anchor": {
+    "type": "string"
+   },
+   "formUrl": {
+    "type": "url"
+   },
+   "amounts": {
+    "type": "array",
+    "of": [
+     {
+      "type": "object",
+      "name": "giveAmount",
+      "fields": {
+       "amount": {
+        "type": "number"
+       },
+       "impact": {
+        "type": "string"
+       }
+      }
+     }
+    ]
+   },
+   "otherLabel": {
+    "type": "string"
+   },
+   "points": {
+    "type": "array",
+    "of": [
+     {
+      "type": "string",
+      "name": "string"
+     }
+    ]
+   },
+   "note": {
+    "type": "text"
    }
   }
  }

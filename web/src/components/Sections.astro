@@ -12,7 +12,8 @@ import Collection from './sections/Collection.astro'
 import Gallery from './sections/Gallery.astro'
 import Embed from './sections/Embed.astro'
 import Cta from './sections/Cta.astro'
-const map = {sectionText: Text, sectionCards: Cards, sectionStats: Stats, sectionSplit: Split, sectionQuote: Quote, sectionTimeline: Timeline, sectionNameList: NameList, sectionAccordion: Accordion, sectionLinks: Links, sectionCollection: Collection, sectionGallery: Gallery, sectionEmbed: Embed, sectionCta: Cta}
+import Give from './sections/Give.astro'
+const map = {sectionText: Text, sectionCards: Cards, sectionStats: Stats, sectionSplit: Split, sectionQuote: Quote, sectionTimeline: Timeline, sectionNameList: NameList, sectionAccordion: Accordion, sectionLinks: Links, sectionCollection: Collection, sectionGallery: Gallery, sectionEmbed: Embed, sectionCta: Cta, sectionGive: Give}
 const {sections = []} = Astro.props
 ---
 {sections.map((s) => {

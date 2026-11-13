@@ -17,7 +17,6 @@ const pad = (n) => String(n).padStart(2, '0')
         <article class:list={['card', {linked: single, 'has-media': c.image}]} data-reveal style={`--d:${(i % cols) * 70}ms`}>
           {c.image && <div class="media"><Img image={c.image} width={800} sizes="(min-width: 64rem) 33vw, 100vw" /></div>}
           {numbered && <span class="num" aria-hidden="true">{pad(i + 1)}</span>}
-          {c.kicker && !(numbered && /^\s*\d+\s*$/.test(c.kicker)) && <p class="kicker">{c.kicker}</p>}
           {c.title && <h3 class={variant === 'people' ? 'h4' : 'h3 card-title'}>{c.title}</h3>}
           {c.body && <p class="body">{c.body}</p>}
           {c.details?.length > 0 && (

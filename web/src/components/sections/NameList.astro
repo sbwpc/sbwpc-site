@@ -7,7 +7,6 @@ const groups = s.groups || []
   <div class="namegroups">
     {groups.map((g, i) => (
       <div class:list={['namegroup', {long: (g.items || []).length > 8}]} data-reveal style={`--d:${(i % 3) * 60}ms`}>
-        {g.kicker && <p class="kicker">{g.kicker}</p>}
         {g.title && <h3 class="h4">{g.title}</h3>}
         {g.body && <p class="ng-body">{g.body}</p>}
         {g.items?.length > 0 && (

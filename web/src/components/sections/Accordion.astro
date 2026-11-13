@@ -9,8 +9,8 @@ const {s} = Astro.props
       <details class="acc">
         <summary>
           <span class="acc-head">
-            {it.kicker && <span class="kicker">{it.kicker}</span>}
             <span class="acc-title">{it.title}</span>
+            {it.kicker && <span class="meta">{it.kicker}</span>}
             {it.summary && <span class="acc-sum">{it.summary}</span>}
           </span>
           <span class="acc-icon" aria-hidden="true"></span>

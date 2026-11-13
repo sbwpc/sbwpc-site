@@ -23,8 +23,8 @@ const issues = [...new Set(items.flatMap((o) => o.issues || []))].sort()
   <ul class="grid c3">
     {items.map((o) => (
       <li class:list={['card', {linked: o.url}]} data-j={slugify(o.jurisdiction)} data-issues={(o.issues || []).map(slugify).join(' ')}>
-        <p class="kicker">{o.jurisdiction}</p>
         <h3 class="h3 card-title">{o.title}</h3>
+        <p class="meta">{o.jurisdiction}</p>
         {o.summary && <p class="body">{o.summary}</p>}
         {o.issues?.length > 0 && <p class="issue-tags">{o.issues.map((t) => <span class="tag">{t}</span>)}</p>}
         {o.url && <div class="links"><Link href={o.url} class="textlink stretch"><span class="arrow">Official page</span></Link></div>}

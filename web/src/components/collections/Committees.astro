@@ -7,7 +7,7 @@ const kinds = ['Standing', 'Ad Hoc', 'Governance']
   const list = items.filter((c) => (c.kind || 'Standing') === k)
   return list.length > 0 && (
     <div class="committee-group">
-      {k !== 'Standing' && <p class="eyebrow gold group-label">{k === 'Ad Hoc' ? 'Ad Hoc Committee' : k}</p>}
+      {k !== 'Standing' && <h3 class="h3 group-label">{k === 'Ad Hoc' ? 'Ad hoc committee' : k}</h3>}
       <div class="grid c3">
         {list.map((c, i) => (
           <article class="card committee" data-reveal style={`--d:${(i % 3) * 60}ms`}>

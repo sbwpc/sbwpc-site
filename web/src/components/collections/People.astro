@@ -18,7 +18,6 @@ const groups = [...new Set(items.map((p) => p.group).filter(Boolean))]
         <button class="person-btn" data-dialog={`p-${p._id}`}>
           <div class="person-photo frame ratio-1x1">{p.image ? <Img image={p.image} width={600} sizes="(min-width: 64rem) 22vw, 45vw" aspect={1} /> : <span class="initials">{p.name.split(' ').map((w) => w[0]).join('')}</span>}</div>
           <span class="person-meta">
-            <span class="kicker">{p.group}</span>
             <span class="person-name">{p.name}</span>
             <span class="person-role">{p.role}</span>
             {p.shortBio && <span class="person-bio">{p.shortBio}</span>}
@@ -31,13 +30,12 @@ const groups = [...new Set(items.map((p) => p.group).filter(Boolean))]
             <div class="modal-head">
               {p.image && <div class="frame ratio-1x1 modal-photo"><Img image={p.image} width={400} sizes="10rem" aspect={1} /></div>}
               <div>
-                <p class="kicker">{p.group}</p>
                 <h3 class="h3" id={`pn-${p._id}`}>{p.name}</h3>
                 <p class="person-role">{p.role}</p>
               </div>
             </div>
             {p.bio?.length ? <RichText value={p.bio} /> : p.shortBio && <p>{p.shortBio}</p>}
-            {p.email && <p class="buttons"><a class="btn" href={`mailto:${p.email}`}>Email {p.name.split(' ')[0]}</a></p>}
+            {p.email && <p class="buttons"><a class="btn" href={`mailto:${p.email}?subject=${encodeURIComponent('Message for ' + p.name)}`}>Email {p.name.split(' ')[0]}</a></p>}
           </div>
         </dialog>
       </li>

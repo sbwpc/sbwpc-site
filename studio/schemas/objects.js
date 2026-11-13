@@ -287,6 +287,28 @@ export const sectionAccordion = section('sectionAccordion', 'Expandable list', [
   }),
 ])
 
+export const sectionGive = section('sectionGive', 'Donation amounts', [
+  defineField({name: 'formUrl', title: 'Donation form link', type: 'url', description: 'The JotForm donation form. Each amount opens it with that amount filled in.'}),
+  defineField({
+    name: 'amounts',
+    type: 'array',
+    of: [
+      {
+        type: 'object',
+        name: 'giveAmount',
+        fields: [
+          {name: 'amount', type: 'number', validation: (r) => r.required().positive()},
+          {name: 'impact', title: 'What it helps with', type: 'string'},
+        ],
+        preview: {select: {title: 'amount', subtitle: 'impact'}, prepare: ({title, subtitle}) => ({title: `$${title}`, subtitle})},
+      },
+    ],
+  }),
+  defineField({name: 'otherLabel', title: 'Other amount label', type: 'string', initialValue: 'Give another amount'}),
+  defineField({name: 'points', title: 'Reassurance points', type: 'array', of: [{type: 'string'}]}),
+  defineField({name: 'note', title: 'Small print', type: 'text', rows: 3}),
+])
+
 export const sectionCta = section('sectionCta', 'Call to action band', [])
 
 export const sectionEmbed = section('sectionEmbed', 'Embed (video, form, slides)', [
@@ -367,6 +389,7 @@ export const sectionTypes = [
   'sectionGallery',
   'sectionEmbed',
   'sectionCta',
+  'sectionGive',
 ]
 
 export const seo = defineType({
@@ -398,6 +421,7 @@ export default [
   sectionNameList,
   sectionAccordion,
   sectionCta,
+  sectionGive,
   sectionEmbed,
   sectionGallery,
   sectionLinks,

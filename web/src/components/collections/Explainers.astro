@@ -6,7 +6,6 @@ const {items} = Astro.props
   {items.map((p, i) => (
     <article class="card linked explainer" data-reveal style={`--d:${(i % 3) * 60}ms`}>
       <div class="media">{p.hero?.image && <Img image={p.hero.image} width={800} sizes="(min-width: 64rem) 33vw, 100vw" />}</div>
-      {p.hero?.eyebrow && <p class="kicker">{p.hero.eyebrow}</p>}
       <h3 class="h3 card-title"><a class="stretch" href={`/${p.path}`}>{p.hero?.heading || p.title}</a></h3>
       {p.seo?.description && <p class="body">{p.seo.description}</p>}
     </article>

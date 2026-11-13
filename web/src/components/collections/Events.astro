@@ -18,9 +18,8 @@ const {items, past = false} = Astro.props
         <li class:list={['event', {linked: url}]} data-reveal style={`--d:${(i % 3) * 60}ms`}>
           <div class="event-date" aria-hidden="true"><span class="m">{p.month}</span><span class="d">{p.day}</span></div>
           <div class="event-body">
-            <p class="kicker">{[e.kind, e.status && e.status !== 'open' ? e.status : null].filter(Boolean).join(' · ')}</p>
             <h3 class="h3">{url ? <Link href={url} class="stretch-link">{e.title}</Link> : e.title}</h3>
-            <p class="event-when">{p.weekday}, {p.date}{p.time && <> · {p.time}</>}</p>
+            <p class="event-when">{p.weekday}, {p.date}{p.time && <> · {p.time}</>}{e.status && e.status !== 'open' && <span class="event-status"> · {e.status}</span>}</p>
             {e.location && <p class="event-where">{e.location}{e.address && <span>, {e.address}</span>}</p>}
             {e.summary && <p class="body">{e.summary}</p>}
             {!past && e.links?.length > 0 && (

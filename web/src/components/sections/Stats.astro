@@ -11,7 +11,7 @@ const hasBody = s.body?.length > 0
   <section class:list={['section', `tone-${tone}`, 's-sectionStats']} id={s.anchor || undefined}>
     <div class="wrap stats-split">
       <div class="stats-copy" data-reveal>
-        {s.eyebrow && <p class="eyebrow">{s.eyebrow}</p>}
+        
         {s.heading && <h2 class="h2">{s.heading}</h2>}
         {s.intro && <p class="lede">{s.intro}</p>}
         <div class="stats-body"><RichText value={s.body} /></div>

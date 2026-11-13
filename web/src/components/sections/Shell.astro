@@ -3,7 +3,7 @@
 import Buttons from '../Buttons.astro'
 const {s, wide = false, headSplit, buttonsBelow = true, level = 2} = Astro.props
 const tone = s.tone || 'white'
-const hasHead = s.eyebrow || s.heading || s.intro
+const hasHead = s.heading || s.intro
 const split = headSplit ?? (s.intro && s.intro.length < 220 && s.heading)
 const H = level === 2 ? 'h2' : 'h3'
 ---
@@ -12,7 +12,7 @@ const H = level === 2 ? 'h2' : 'h3'
     {hasHead && (
       <div class:list={['section-head', {split}]} data-reveal>
         <div>
-          {s.eyebrow && <p class="eyebrow">{s.eyebrow}</p>}
+          
           {s.heading && <H class="h2">{s.heading}</H>}
         </div>
         {s.intro && <p class="lede">{s.intro}</p>}

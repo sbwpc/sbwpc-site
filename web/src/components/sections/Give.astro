@@ -1,0 +1,43 @@
+---
+// Donation amounts: each tile opens the JotForm donation form with the amount filled in
+const {s} = Astro.props
+const tone = s.tone || 'white'
+const form = s.formUrl || ''
+const withAmount = (n) => form ? `${form}${form.includes('?') ? '&' : '?'}donationAmount=${n}` : '#'
+const amounts = s.amounts || []
+---
+<section class:list={['section', `tone-${tone}`, 's-give']} id={s.anchor || undefined}>
+  <div class="wrap give-grid">
+    <div class="give-copy" data-reveal>
+      {s.heading && <h2 class="h2">{s.heading}</h2>}
+      {s.intro && <p class="lede">{s.intro}</p>}
+      {s.points?.length > 0 && (
+        <ul class="give-points">
+          {s.points.map((pt) => <li>{pt}</li>)}
+        </ul>
+      )}
+    </div>
+    <div class="give-panel" data-reveal style="--d:120ms">
+      <p class="give-panel-title" id="give-choose">Choose an amount</p>
+      <ul class="give-amounts" aria-labelledby="give-choose">
+        {amounts.map((a) => (
+          <li>
+            <a class="give-tile" href={withAmount(a.amount)} target="_blank" rel="noopener">
+              <span class="give-amount">${a.amount.toLocaleString('en-US')}</span>
+              {a.impact && <span class="give-impact">{a.impact}</span>}
+              <span class="sr-only"> (opens the secure donation form in a new tab)</span>
+            </a>
+          </li>
+        ))}
+        <li class="give-other-li">
+          <a class="give-tile give-other" href={form} target="_blank" rel="noopener">
+            <span class="give-amount">{s.otherLabel || 'Give another amount'}</span>
+            <span class="give-impact">Enter your own on the form</span>
+            <span class="sr-only"> (opens in a new tab)</span>
+          </a>
+        </li>
+      </ul>
+      {s.note && <p class="give-note">{s.note}</p>}
+    </div>
+  </div>
+</section>

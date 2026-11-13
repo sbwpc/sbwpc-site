@@ -16,8 +16,8 @@ const {post, more} = Astro.props
   <article class="article">
     <header class="section tone-cream article-head">
       <div class="wrap narrow" data-reveal>
-        <p class="eyebrow">{[post.category, fmtDate(post.date)].filter(Boolean).join(' · ')}</p>
         <h1 class="h1">{post.title}</h1>
+        <p class="meta article-date">{fmtDate(post.date)}</p>
         {post.excerpt && <p class="lede">{post.excerpt}</p>}
       </div>
     </header>
@@ -34,7 +34,7 @@ const {post, more} = Astro.props
   {more.length > 0 && (
     <section class="section tone-cream">
       <div class="wrap">
-        <div class="section-head split"><div><p class="eyebrow">Keep reading</p><h2 class="h2">More from SBWPC</h2></div><p class="lede"><a class="textlink" href="/news"><span class="arrow">All news</span></a></p></div>
+        <div class="section-head split"><div><h2 class="h2">More from SBWPC</h2></div><p class="lede"><a class="textlink" href="/news"><span class="arrow">All news</span></a></p></div>
         <Posts items={more} />
       </div>
     </section>

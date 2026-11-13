@@ -12,7 +12,6 @@ const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, '') } c
       <li data-reveal style={`--d:${(i % 3) * 50}ms`}>
         <Link href={l.url} class="resource">
           <span class="r-text">
-            {l.kicker && <span class="kicker">{l.kicker}</span>}
             <span class="r-title">{l.title}</span>
             {l.description && <span class="r-desc">{l.description}</span>}
             {isExternal(l.url) && <span class="r-host">{host(l.url)}</span>}

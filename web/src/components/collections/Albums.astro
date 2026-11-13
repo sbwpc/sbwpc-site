@@ -6,8 +6,8 @@ const {items} = Astro.props
 {items.map((a) => (
   <div class="album" id={a.slug?.current}>
     <div class="album-head" data-reveal>
-      <p class="eyebrow">{[a.eyebrow, a.date && fmtDate(a.date)].filter(Boolean).join(' · ')}</p>
       <h3 class="h2">{a.title}</h3>
+      {a.date && <p class="meta">{fmtDate(a.date)}</p>}
       {a.summary && <p class="lede">{a.summary}</p>}
       {a.photographers && <p class="caption">Photography: {a.photographers}</p>}
     </div>

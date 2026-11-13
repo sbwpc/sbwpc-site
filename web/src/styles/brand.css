@@ -1644,3 +1644,196 @@ body {
     padding-right: max(var(--gutter), calc((min(100vw, 100rem) - var(--wrap)) / 2));
   }
 }
+
+/* ---------- No eyebrows: plain details sit under titles ---------- */
+.meta {
+  margin: 0.35rem 0 0;
+  font: 400 0.95rem/1.45 var(--font-brand);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
+}
+.tone-navy .meta,
+.tone-blue .meta {
+  color: rgba(255, 255, 255, 0.82);
+}
+.acc-head .meta {
+  display: block;
+  margin-top: 0.2rem;
+}
+.t-date {
+  font-weight: 600;
+  color: var(--purple);
+}
+.tone-navy .t-date,
+.tone-blue .t-date {
+  color: var(--lav);
+}
+.article-date {
+  margin-top: 0.75rem;
+}
+.event-status {
+  font-weight: 600;
+  color: var(--red-text);
+}
+.stat-name {
+  margin: 0.35rem 0 0;
+  font: 600 0.95rem/1.35 var(--font-brand);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.group-label {
+  margin: 2.5rem 0 1rem;
+}
+.committee-group:first-child .group-label {
+  margin-top: 0;
+}
+.hero-copy .lede + .badges,
+.hero-copy .sub + .badges {
+  margin: 1.5rem 0 0;
+}
+
+/* ---------- Donation amounts ---------- */
+.give-grid {
+  display: grid;
+  gap: 2.5rem;
+  align-items: start;
+}
+.give-copy .lede {
+  margin-top: 1rem;
+}
+.give-points {
+  list-style: none;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.give-points li {
+  position: relative;
+  padding-left: 1.75rem;
+  font-weight: 500;
+}
+.give-points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.35em;
+  width: 1.05rem;
+  height: 0.6rem;
+  border-left: 3px solid var(--red-text);
+  border-bottom: 3px solid var(--red-text);
+  transform: rotate(-45deg) translateY(-0.1rem);
+}
+.give-panel {
+  background: var(--white);
+  border-top: 6px solid var(--red-text);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  box-shadow: 0 1.5rem 3rem -1.5rem rgba(28, 12, 68, 0.28);
+}
+.give-panel-title {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--navy);
+  margin: 0 0 1.25rem;
+}
+.give-amounts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+@media (min-width: 40rem) {
+  .give-amounts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.give-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  height: 100%;
+  padding: 1.1rem 1.15rem 1.2rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 200ms var(--ease-out), background-color 200ms var(--ease-out), transform 200ms var(--ease-out);
+}
+.give-tile:hover,
+.give-tile:focus-visible {
+  border-color: var(--purple);
+  background: #f6f2fc;
+  transform: translateY(-2px);
+}
+.give-amount {
+  font-size: clamp(1.6rem, 2.6vw, 2rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--purple);
+}
+.give-impact {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+.give-other {
+  background: var(--navy);
+  border-color: var(--navy);
+}
+.give-other .give-amount {
+  color: #fff;
+  font-size: clamp(1.2rem, 2vw, 1.4rem);
+  line-height: 1.2;
+}
+.give-other .give-impact {
+  color: #dfe3f1;
+}
+.give-other:hover,
+.give-other:focus-visible {
+  background: var(--navy-deep);
+  border-color: var(--navy-deep);
+}
+.give-note {
+  margin: 1.5rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+@media (min-width: 64rem) {
+  .give-grid {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(3rem, 6vw, 5.5rem);
+  }
+  .give-copy {
+    position: sticky;
+    top: calc(var(--header-h) + 2rem);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .give-tile { transition: none; }
+  .give-tile:hover, .give-tile:focus-visible { transform: none; }
+}
+
+/* ---------- No small-caps labels: status chips, tags and subheads read in normal case ---------- */
+.badge,
+.banner-label,
+.juris-count,
+.endorse-badge,
+.decision,
+.ne-dec,
+.tag,
+.details dt,
+.event-facts dt,
+.prose h4 {
+  text-transform: none;
+  letter-spacing: normal;
+}
+.details dt,
+.event-facts dt {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+}

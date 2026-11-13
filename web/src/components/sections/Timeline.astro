@@ -14,8 +14,8 @@ const isStep = (l) => typeof l === 'string' && /^\s*\d{1,2}\s*$/.test(l)
         {isStep(it.label)
           ? <span class="t-dot t-num" aria-hidden="true">{it.label.trim()}</span>
           : <span class="t-dot" aria-hidden="true"></span>}
-        {it.label && !isStep(it.label) && <p class="t-label">{it.label}</p>}
         {it.title && <h3 class="h4">{it.title}</h3>}
+        {it.label && !isStep(it.label) && <p class="meta t-date">{it.label}</p>}
         {it.body && <p class="t-body">{it.body}</p>}
       </li>
     ))}

@@ -32,8 +32,8 @@ const initials = (n = '') => n.replace(/\(.*?\)|".*?"/g, '').split(/\s+/).filter
                   )}
                   <span class="endorse-badge">SBWPC Endorsed</span>
                 </div>
-                <p class="kicker">{e.office}</p>
                 <h4 class="h3 card-title">{e.candidate}{e.party && <span class="party"> ({e.party})</span>}</h4>
+                <p class="meta">{e.office}</p>
                 {e.decisionDate && <p class="decision yes">Endorsed {fmtDate(e.decisionDate, {month: 'short'})}</p>}
                 {e.note && <p class="body">{e.note}</p>}
                 {e.website && <div class="links"><Link href={e.website} class="textlink stretch"><span class="arrow">Visit candidate website</span></Link></div>}

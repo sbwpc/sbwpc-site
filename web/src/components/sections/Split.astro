@@ -14,7 +14,6 @@ const small = big?.width && big.width < 700
 <section class:list={['section', `tone-${tone}`, 's-split']} id={s.anchor || undefined}>
   <div class:list={['split-grid', `img-${side}`, {'img-small': small}]}>
     <div class="split-copy" data-reveal>
-      {s.eyebrow && <p class="eyebrow">{s.eyebrow}</p>}
       {s.heading && <h2 class="h2">{s.heading}</h2>}
       {s.intro && <p class="lede">{s.intro}</p>}
       {s.body?.length > 0 && <RichText value={s.body} class="prose split-body" />}

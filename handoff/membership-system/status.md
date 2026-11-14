@@ -98,8 +98,8 @@ Apple Pay also needs: Apple Pay turned on for the PayPal app, sbwpc.org register
 - Branch sandbox-ready: labels sandbox payments. Deploy it together with the keys.
 - Branch forms-live: puts the new forms on /join and /donate, updates the Privacy, Cookie and Terms pages, removes the test pages. Deploy only after sandbox testing passes and PayPal is switched to live. Set the policy effective dates to the deploy date.
 
-## Stage 3 (email): built and tested locally, not deployed
-Branch: mailer (built on sandbox-ready). Decided November 14, 2026: send through a Google Cloud service account as info@sbwpc.org; Claude drafts the wording and the client approves it.
+## Stage 3 (email): deployed November 14, 2026, switched off until the Google settings are entered
+Branch: mailer (built on sandbox-ready), now part of main. Decided November 14, 2026: send through a Google Cloud service account as info@sbwpc.org; Claude drafts the wording and the client approves it.
 
 ### What was built
 - Receipts to members and donors after every online payment, and when an admin marks a check received or records a payment by hand (with a tick box to skip it).
@@ -108,7 +108,7 @@ Branch: mailer (built on sandbox-ready). Decided November 14, 2026: send through
 - Notices to info@sbwpc.org for each new member, renewal, donation, promised check, and failed or cancelled automatic payment.
 - Admin sign-in emails (invitation, password reset) sent from info@sbwpc.org through a Supabase Send Email hook.
 - Admin: an Emails list on each person page, and an "Email a renewal reminder" button.
-- Database: supabase/migrations/003_mail.sql (outbox table, updated record_payment, renewal_prefill). NOT yet applied to the live project.
+- Database: supabase/migrations/003_mail.sql (outbox table, updated record_payment, renewal_prefill). Applied to the live project on November 14, 2026.
 - Server: web/netlify/lib/mail.mjs, emails.mjs, outbox.mjs and the functions mail-queue (every 5 minutes), reminders (daily, 8:30 AM Pacific in winter), auth-email, checkout-renew.
 
 ### How it behaves
@@ -143,8 +143,8 @@ GMAIL_SA_EMAIL, GMAIL_SA_KEY, MAIL_MODE, MAIL_TEST_TO, and later SUPABASE_AUTH_H
 - Is there a smallest or largest gift SBWPC wants to accept online? The form allows $1 to $25,000 as a safety limit only.
 - Should the second household member name be offered at levels above Feminist Household too?
 
-## Stage 4 (members cancel their own automatic payments): built and tested locally, not deployed
-Branch: manage-plan (built on mailer). Built November 14, 2026.
+## Stage 4 (members cancel their own automatic payments): deployed November 14, 2026
+Branch: manage-plan (built on mailer), now part of main. Built November 14, 2026.
 
 ### What was built
 - A page at /manage where a member sees their automatic payments (yearly membership renewal, monthly or yearly gift) and can stop one. Not in the menu, hidden from search engines, left out of the sitemap.
@@ -152,7 +152,7 @@ Branch: manage-plan (built on mailer). Built November 14, 2026.
 - Stopping asks "are you sure" first. PayPal is told to stop charging. Only when PayPal agrees is the plan marked cancelled. A membership already paid for stays active until it expires, with automatic renewal off, and the normal renewal reminders then apply.
 - Emails: a confirmation to the member, and a notice to info@sbwpc.org that says whether it was cancelled on the website or in PayPal.
 - Admin: the Recurring plans panel on a person page shows the cancelled date and has an "Email them the manage link" button.
-- Database: supabase/migrations/004_manage_plan.sql (two new kinds of email, and the private link is hidden from everyone signed in to the admin). NOT yet applied to the live project.
+- Database: supabase/migrations/004_manage_plan.sql (two new kinds of email, and the private link is hidden from everyone signed in to the admin). Applied to the live project on November 14, 2026.
 - Server: web/netlify/lib/plans.mjs and the functions plan-view, plan-cancel, plan-link. The PayPal webhook now uses the same code, so a repeated message from PayPal never sends a second notice.
 
 ### Rules it follows
@@ -169,8 +169,18 @@ Branch: manage-plan (built on mailer). Built November 14, 2026.
 - All earlier suites still pass: payments 48, email 43, admin screens 52, forms 61, database rules unchanged.
 - Not yet tested, because it needs the real account: cancelling a real PayPal sandbox subscription.
 
-### To deploy
-Apply 003_mail.sql and then 004_manage_plan.sql in Supabase, then deploy the manage-plan branch (it contains sandbox-ready and mailer). The "email me my link" form only works once email is switched on (MAIL_MODE test or live). The page itself works as soon as the PayPal keys are in.
+### Deployed November 14, 2026
+- 003_mail.sql applied, then main moved to manage-plan and Netlify published it, then 004_manage_plan.sql applied. Each file was checked against the repository copy before it ran.
+- Member counts unchanged: 61 people, 58 memberships, 61 payments. No plans and no emails on record yet.
+- Checked live: /manage loads and is hidden from search engines and the sitemap. /join and /donate still use JotForm. /join-preview has the new tick-box wording. The public key is refused on every table, including the new outbox table.
+- Until the secret settings are in Netlify, /manage answers "not switched on yet" and no email is sent.
+- The "email me my link" form only works once email is switched on (MAIL_MODE test or live). The page itself works as soon as the Supabase and PayPal keys are in.
 
 ### Still to build
 - Nothing is outstanding in the build. What remains is setup (keys), testing against the real PayPal sandbox and Gmail, and the client's answers to the open questions above.
+
+## Where things stand (November 14, 2026)
+- Live: stages 1 to 4. Online payment, the nightly backup and all email stay off until Luke enters the settings.
+- Payment settings to enter: handoff/membership-system/keys-checklist.md. Email settings to enter: handoff/membership-system/mail-setup-checklist.md. Start email with MAIL_MODE=test.
+- After the keys: test in the PayPal sandbox on /join-preview, /donate-preview and /manage, then the Supabase Send Email hook step.
+- Branch forms-live is the only undeployed work. It puts the new forms on /join and /donate, updates the policy pages and removes the test pages. Deploy it only after sandbox testing passes and PayPal is switched to live.

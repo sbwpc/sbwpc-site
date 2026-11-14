@@ -95,12 +95,12 @@ async function join(name, opts) {
 
   // Arriving from the renew link in a reminder email
   const tok = (await sql(`select m.renew_token::text t from public.memberships m join public.people p on p.id = m.person_id where p.email = 'jordan.rivera@example.com'`))[0].t
-  await page.goto(origin + '/join-preview/?renew=' + tok + '#join'); await page.waitForSelector('.co-welcome:not([hidden])')
+  await page.goto(origin + '/join/?renew=' + tok + '#join'); await page.waitForSelector('.co-welcome:not([hidden])')
   await page.addStyleTag({content: '[data-reveal]{opacity:1!important;transform:none!important} .site-header,body>header{position:static!important} .consent,[class*=consent]{display:none!important}'})
   ok(`${name}: the renew link greets the member, selects their level and fills name and email only`, (await page.locator('.co-welcome').innerText()).includes('Welcome back, Jordan') && (await page.inputValue('input[name=level]:checked')) === 'Access' && (await page.inputValue('[name=email]')) === 'jordan.rivera@example.com' && (await page.inputValue('[name=address1]')) === '' && !page.url().includes('renew='), page.url())
   await page.locator('.co-welcome').scrollIntoViewIfNeeded(); await page.waitForTimeout(300)
   await page.screenshot({path: (await import('./browser.mjs')).OUT + `form-join-${name}-8-renew-link.png`})
-  await page.goto(origin + '/join-preview/?renew=00000000-0000-4000-8000-000000000000'); await page.waitForSelector('.co-welcome:not([hidden])')
+  await page.goto(origin + '/join/?renew=00000000-0000-4000-8000-000000000000'); await page.waitForSelector('.co-welcome:not([hidden])')
   ok(`${name}: an old or wrong renew link says so and the form still works`, (await page.locator('.co-welcome').innerText()).includes('no longer valid') && (await page.locator('label.co-tile').count()) === 8)
   await page.reload(); await page.waitForSelector('.co-form'); await page.addStyleTag({content: '[data-reveal]{opacity:1!important;transform:none!important} .site-header,body>header{position:static!important} .consent,[class*=consent]{display:none!important}'})
   await page.click('label.co-tile:has-text("Voice")')

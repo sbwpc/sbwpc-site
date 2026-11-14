@@ -79,7 +79,7 @@ ok('reminders reply to the SBWPC inbox', last('thirty@example.com').replyTo === 
 await reminders(); await reminders()
 ok('running the job again the same day sends nothing twice', mail.length === b4 + 6, `${mail.length - b4}`)
 ok('each reminder is logged against the membership', (await sql(`select count(*)::int n from public.reminders`))[0].n === 6)
-const link = last('seven@example.com').text.match(/http:\/\/localhost:4321(\/join-preview\/\?renew=([0-9a-f-]{36})#join)/)
+const link = last('seven@example.com').text.match(/http:\/\/localhost:4321(\/join\/\?renew=([0-9a-f-]{36})#join)/)
 const pre = link && await (await fetch(`${origin}/api/checkout/renew?token=${link[2]}`)).json()
 ok('the renew link opens the Join form knowing only name, email and level', pre?.ok && JSON.stringify(Object.keys(pre.member).sort()) === '["email","first_name","last_name","level"]' && pre.member.first_name === 'Seven' && pre.member.level === 'Friend', JSON.stringify(pre))
 await pay({kind: 'dues', level: 'Advocate', ...person({first_name: 'Seven', last_name: 'Member', email: 'seven@example.com'})})

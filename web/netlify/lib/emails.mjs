@@ -6,7 +6,8 @@ const ORG = "Santa Barbara Women's Political Committee"
 const ADDRESS = 'P.O. Box 90618, Santa Barbara, CA 93190-0618'
 const CONTACT = 'info@sbwpc.org'
 const METHODS = {paypal: 'PayPal', apple_pay: 'Apple Pay', card: 'Card', check: 'Check', cash: 'Cash', other: 'Other'}
-const NOT_DEDUCTIBLE = 'Membership dues and contributions to SBWPC are not tax deductible.'
+// Approved wording, November 14, 2026
+const NOT_DEDUCTIBLE = 'Thank you for making this work possible. Because SBWPC is a political committee and not a 501(c)(3) charity, dues and contributions are not tax deductible.'
 
 export const longDate = (iso) => (iso ? new Date(String(iso).slice(0, 10) + 'T12:00:00Z').toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'}) : '')
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]))

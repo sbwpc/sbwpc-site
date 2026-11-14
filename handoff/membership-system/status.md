@@ -128,6 +128,11 @@ GMAIL_SA_EMAIL, GMAIL_SA_KEY, MAIL_MODE, MAIL_TEST_TO, and later SUPABASE_AUTH_H
 - Email checks against a simulated Google mail service: 43 of 43 pass (tests/membership/mail.test.mjs).
 - Not yet tested, because it needs the real credential: sending through the real Gmail API, and the real Supabase hook.
 
+### Wording decisions (Luke, November 14, 2026)
+- Sign-off stays "Santa Barbara Women's Political Committee".
+- Tax line: "Thank you for making this work possible. Because SBWPC is a political committee and not a 501(c)(3) charity, dues and contributions are not tax deductible."
+- The member benefits line, the reminder timing, the check payee and address, and the notices to info@sbwpc.org are approved as drafted.
+
 ### Notes
 - Supabase email links (invitation, password reset) expire after 1 hour. The setting is Authentication, Sign In / Providers, Email, "Email OTP expiration" (3600 seconds, can be raised to 86400).
 - The client's admin invitation was resent November 14, 2026 at 2:36 PM Pacific.

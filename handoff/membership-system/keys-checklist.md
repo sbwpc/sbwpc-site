@@ -67,6 +67,10 @@ Then we test together on https://sbwpc.org/join-preview/ and https://sbwpc.org/d
 
 Test payments are saved with the note "SANDBOX TEST" and removed before the forms go on the live Join and Donate pages.
 
+## Email
+
+The email settings have their own checklist: mail-setup-checklist.md in this folder.
+
 ## Later: Apple Pay
 
 Apple Pay needs three more things, after PayPal works:

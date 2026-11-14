@@ -2521,3 +2521,12 @@ apple-pay-button {
   .s-checkout { background: #fff !important; padding: 0 !important; }
   .co-receipt { box-shadow: none; }
 }
+
+.co-welcome {
+  margin: 0 0 1.5rem;
+  padding: 0.9rem 1.1rem;
+  background: #f6f2fc;
+  border-left: 4px solid var(--purple);
+  font-weight: 600;
+  color: var(--navy);
+}

@@ -5,6 +5,7 @@ import {db, dbReady, must} from '../lib/db.mjs'
 import {validate, describe} from '../lib/validate.mjs'
 import {paypalEnv, paypalReady, createOrder, createProduct, createPlan, createSubscription} from '../lib/paypal.mjs'
 import {receiptFor} from '../lib/finish.mjs'
+import {kick, queue} from '../lib/outbox.mjs'
 
 async function planFor(kind, frequency) {
   const key = 'paypal_plans_' + paypalEnv()
@@ -19,7 +20,7 @@ async function planFor(kind, frequency) {
   return plans[slot]
 }
 
-export default async (req) => {
+export default async (req, context) => {
   if (!sameOrigin(req)) return fail(403, 'This request did not come from our website.')
   if (!dbReady()) return fail(503, 'The form is not switched on yet. Please email info@sbwpc.org.')
   let body
@@ -35,6 +36,10 @@ export default async (req) => {
     const [checkout] = await must(db().from('checkouts').insert({kind: v.kind, mode: v.mode, amount_cents: v.amountCents, payload: v.payload}).select())
     if (v.mode === 'check') {
       log('checkout.check', {checkout: checkout.id, kind: v.kind, cents: v.amountCents})
+      // Email the mailing instructions, and tell the SBWPC inbox a check is on its way
+      await queue({kind: 'check_instructions', checkout_id: checkout.id})
+      await queue({kind: 'staff_notice', checkout_id: checkout.id, data: {event: 'check_pledge'}})
+      kick(context)
       return json({ok: true, mode: 'check', checkoutId: checkout.id, receipt: receiptFor(checkout, {method: 'check'})})
     }
     if (v.mode === 'once') {

@@ -370,6 +370,25 @@ function setup(section) {
   })
   q('.co-print').addEventListener('click', () => print())
   refresh()
+  // Arriving from a renewal reminder: greet the member and fill in what we safely can
+  const token = dues ? new URLSearchParams(location.search).get('renew') : null
+  if (token) {
+    history.replaceState(null, '', location.pathname + location.hash)
+    fetch(API + 'renew?token=' + encodeURIComponent(token), {headers: {accept: 'application/json'}})
+      .then((r) => r.json())
+      .then((res) => {
+        const note = q('.co-welcome')
+        if (!res.ok) { note.textContent = res.message || 'That renewal link is no longer valid. You can still renew below.'; note.hidden = false; return }
+        const m = res.member
+        for (const key of ['first_name', 'last_name', 'email']) if (m[key] && !form.elements[key].value) form.elements[key].value = m[key]
+        const level = [...form.querySelectorAll('input[name=level]')].find((el) => el.value === m.level)
+        if (level) level.checked = true
+        note.textContent = `Welcome back${m.first_name ? ', ' + m.first_name : ''}. Your ${m.level} level is selected. Check your details, then pay below.`
+        note.hidden = false
+        refresh()
+      })
+      .catch(() => {})
+  }
 }
 
 document.querySelectorAll('[data-checkout]').forEach(setup)

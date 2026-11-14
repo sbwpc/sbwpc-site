@@ -378,6 +378,29 @@ async function person(id) {
     ]}))
   })
 
+  const emails = h('div', {}, h('p', {class: 'a-empty', text: 'Loading...'}))
+  const loadEmails = () => sb.from('outbox').select('*').eq('person_id', id).order('created_at', {ascending: false}).limit(30).then(({data}) => {
+    const kinds = {receipt: 'Receipt', reminder: 'Renewal reminder', staff_notice: 'Notice to the SBWPC inbox', check_instructions: 'Check instructions'}
+    const states = {queued: ['Waiting to send', 'warn'], sending: ['Sending', 'warn'], sent: ['Sent', 'good'], failed: ['Failed', 'bad'], skipped: ['Not sent', '']}
+    emails.replaceChildren(table({label: 'Emails', empty: 'No emails yet.', rows: data || [], columns: [
+      {key: 'at', label: 'When', cell: (r) => when(r.sent_at || r.created_at)},
+      {key: 'kind', label: 'Email', cell: (r) => r.subject || kinds[r.kind] || r.kind},
+      {key: 'status', label: 'Status', cell: (r) => [chip(...(states[r.status] || [r.status, ''])), r.status === 'failed' || r.status === 'skipped' ? ` ${r.error || ''}` : '']},
+      {key: 'by', label: 'Started by', cell: (r) => (r.created_by === 'system' ? 'Automatic' : r.created_by)},
+    ]}))
+  })
+  loadEmails()
+  const remind = async (m, btn) => {
+    if (!confirm(`Email a renewal reminder to ${fullName(p)} now?`)) return
+    btn.disabled = true
+    try {
+      await must(sb.from('outbox').insert({kind: 'reminder', person_id: id, membership_id: m.id, data: {type: 'manual', for_expires_on: m.expires_on}}))
+      flash('Reminder queued. It goes out within five minutes.')
+      loadEmails()
+    } catch (ex) { flash(nice(ex)) }
+    btn.disabled = false
+  }
+
   return h('div', {},
     h('p', {class: 'a-crumb'}, linkTo('#/members', 'Members'), ' / ', linkTo('#/payments', 'Donors and payments')),
     h('div', {class: 'a-head'},
@@ -397,7 +420,8 @@ async function person(id) {
         h('dl', {class: 'a-facts'},
           fact('Level', m.level), fact('Status', statusChip(m.status)), fact('Started', day(m.starts_on)), fact('Expires', m.expires_on ? `${day(m.expires_on)}${m.days_left != null && m.status !== 'cancelled' ? ` (${m.days_left >= 0 ? m.days_left + ' days left' : -m.days_left + ' days ago'})` : ''}` : ''),
           fact('Auto-renew', m.auto_renew ? 'Yes, through PayPal' : 'No'), fact('Second household member', m.household_name), fact('Committees', (m.committees || []).join(', ')), fact('Referred by', m.referred_by)),
-        canEdit() ? linkTo(`#/person/${id}/membership/${m.id}`, 'Edit membership', 'a-btn ghost small') : null))
+        canEdit() ? h('div', {class: 'a-row-actions'}, linkTo(`#/person/${id}/membership/${m.id}`, 'Edit membership', 'a-btn ghost small'),
+          p.email && m.state === 'active' && m.expires_on ? h('button', {type: 'button', class: 'a-btn ghost small', text: 'Email a renewal reminder', onclick: (e) => remind(m, e.target)}) : null) : null))
       : h('p', {class: 'a-empty', text: 'No membership on file.'}),
       canEdit() && !mine.length ? h('p', {}, linkTo(`#/person/${id}/pay`, 'Record a dues payment to start one', 'a-btn ghost small')) : null),
     plans.length ? panel('Recurring plans', table({label: 'Recurring plans', rows: plans, columns: [
@@ -421,6 +445,7 @@ async function person(id) {
       try { await must(sb.from('people').update({notes: blank(notes.value)}).eq('id', id)); p.notes = blank(notes.value); flash('Notes saved.') } catch (ex) { flash(nice(ex)) }
       e.target.disabled = false
     }})) : null),
+    panel('Emails', emails, h('p', {class: 'a-hint', text: 'Receipts and renewal reminders are sent from info@sbwpc.org.'})),
     panel('Change history', history))
 }
 
@@ -478,6 +503,9 @@ function paymentFields({kind = 'donation', level = '', required = true} = {}) {
     method: field('Paid by', select('method', [['check', 'Check'], ['cash', 'Cash'], ['other', 'Other']], 'check')),
     note: field('Check number or note', input('note', '', {maxlength: 200}), {optional: true}),
     honor: field('In honor or memory of', input('in_honor_of', '', {maxlength: 160}), {optional: true})}
+  const receiptBox = h('input', {type: 'checkbox', name: 'send_receipt'})
+  receiptBox.checked = true
+  wrap.receipt = h('label', {class: 'a-checkline wide'}, receiptBox, h('span', {text: 'Email them a receipt (only if we have their email address)'}))
   const sync = (touchAmount) => {
     const k = kindSel.value
     for (const [name, el] of Object.entries(wrap)) el.hidden = !k || (name === 'level' && k !== 'dues') || (name === 'honor' && k !== 'donation')
@@ -495,7 +523,7 @@ function paymentValues(fd) {
   if (!cents) throw new Error('Enter the payment amount.')
   if (!fd.get('paid_on')) throw new Error('Enter the date the payment was received.')
   if (fd.get('paid_on') > todayPT()) throw new Error('The payment date cannot be in the future.')
-  return {kind, level: kind === 'dues' ? fd.get('level') : null, amount_cents: cents, paid_on: fd.get('paid_on'), method: fd.get('method'), note: blank(fd.get('note')), in_honor_of: kind === 'donation' ? blank(fd.get('in_honor_of')) : null, source: 'manual'}
+  return {kind, level: kind === 'dues' ? fd.get('level') : null, amount_cents: cents, paid_on: fd.get('paid_on'), method: fd.get('method'), note: blank(fd.get('note')), in_honor_of: kind === 'donation' ? blank(fd.get('in_honor_of')) : null, source: 'manual', send_receipt: fd.get('send_receipt') === 'on'}
 }
 function newPerson() {
   return page('Add a person', 'For members and donors who paid by check or cash, or anyone you want on file. Website payments add people on their own.',

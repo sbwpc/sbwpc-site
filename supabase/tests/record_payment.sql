@@ -58,3 +58,32 @@ select 'audit rows for checkouts', count(*) from public.audit_log where table_na
 reset role; set role anon;
 select public.confirm_check('00000000-0000-0000-0000-0000000000c2');
 update public.checkouts set status = 'completed';
+
+\echo '--- 10. emails are queued with each payment, and only staff can see the queue'
+reset role;
+select kind, count(*) from public.outbox group by kind order by kind;
+select 'receipt for the confirmed check, queued by the admin', count(*) from public.outbox o join public.payments y on y.id = o.payment_id where y.note = 'Check 221' and o.kind = 'receipt' and o.created_by = 'luke@coolhandlook.com';
+select 'no notice to the inbox when an admin records it', count(*) from public.outbox o join public.payments y on y.id = o.payment_id where y.method = 'check' and o.kind = 'staff_notice';
+set role anon;
+select count(*) from public.outbox;
+reset role; set role authenticated;
+set request.jwt.claims = '{"email":"stranger@example.com","aal":"aal2"}';
+select 'stranger sees', count(*) from public.outbox;
+set request.jwt.claims = '{"email":"luke@coolhandlook.com","aal":"aal2"}';
+select 'admin sees', count(*) > 0 from public.outbox;
+insert into public.outbox (kind, person_id, data) select 'reminder', id, '{"type":"manual"}' from public.people limit 1;
+insert into public.outbox (kind, person_id, to_email) select 'receipt', id, 'elsewhere@example.com' from public.people limit 1;
+insert into public.outbox (kind, data) values ('staff_notice', '{}');
+update public.outbox set status = 'sent';
+delete from public.outbox;
+\echo '--- 11. a renew link returns only a name, email and level, and changes after each renewal'
+reset role; set role service_role;
+select public.renewal_prefill((select renew_token from public.memberships m join public.people p on p.id = m.person_id where p.email = 'ana@example.com')) - 'expires_on';
+select public.renewal_prefill('00000000-0000-0000-0000-000000000000') is null;
+with old as (select renew_token t from public.memberships m join public.people p on p.id = m.person_id where p.email = 'ana@example.com'),
+  pay as (select public.record_payment('{"kind":"dues","level":"Friend","amount_cents":1600,"email":"ana@example.com","paypal_capture_id":"CAP9","send_receipt":"false"}'::jsonb) r)
+select 'old link still valid until the payment commits', (select t from old) is not null, (select r from pay) ->> 'duplicate';
+select 'receipt skipped when asked', count(*) from public.outbox o join public.payments y on y.id = o.payment_id where y.paypal_capture_id = 'CAP9' and o.kind = 'receipt';
+reset role; set role authenticated;
+set request.jwt.claims = '{"email":"luke@coolhandlook.com","aal":"aal2"}';
+select public.renewal_prefill('00000000-0000-0000-0000-000000000000');

@@ -173,4 +173,4 @@ Branch: manage-plan (built on mailer). Built November 14, 2026.
 Apply 003_mail.sql and then 004_manage_plan.sql in Supabase, then deploy the manage-plan branch (it contains sandbox-ready and mailer). The "email me my link" form only works once email is switched on (MAIL_MODE test or live). The page itself works as soon as the PayPal keys are in.
 
 ### Still to build
-- Nothing is outstanding in the build. What remains is setup (keys), testing against the real PayPal sandbox and Gmail, and the client's answers below.
+- Nothing is outstanding in the build. What remains is setup (keys), testing against the real PayPal sandbox and Gmail, and the client's answers to the open questions above.

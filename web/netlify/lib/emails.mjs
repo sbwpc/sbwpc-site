@@ -1,6 +1,6 @@
 // The wording and layout of every email the system sends. Each function returns {subject, text, html}.
-// Change wording here. handoff/membership-system/email-wording.md is generated from this file.
-import {CHECK, JOIN_PATH, dollars} from '../../src/lib/giving.js'
+// Change wording here. The client's approval document (handoff/membership-system/SBWPC-email-wording-for-approval.docx) is built from this file.
+import {CHECK, JOIN_PATH, MANAGE_PATH, dollars} from '../../src/lib/giving.js'
 
 const ORG = "Santa Barbara Women's Political Committee"
 const ADDRESS = 'P.O. Box 90618, Santa Barbara, CA 93190-0618'
@@ -56,6 +56,9 @@ const paymentFacts = (payment, membership, plan) => [
   ...(payment.paypal_capture_id ? [['Transaction number', payment.paypal_capture_id]] : []),
   ...(payment.kind === 'dues' && membership?.expires_on ? [['Membership good through', longDate(membership.expires_on)]] : []),
 ]
+// The private link to the page where a member can see or cancel an automatic payment
+export const manageUrl = (siteUrl, plan) => `${siteUrl}${MANAGE_PATH}#plan=${plan.manage_token}`
+const every = (plan) => (plan.frequency === 'monthly' ? 'month' : 'year')
 const testLine = (payment) => (payment.note === 'SANDBOX TEST' ? ['This was a test payment. No real money moved.'] : [])
 
 // ---------- to members and donors ----------
@@ -71,9 +74,10 @@ export function receipt({person, payment, membership, plan, renewal, siteUrl}) {
         renewal
           ? `Thank you for renewing, ${first(person)}. ${byCheck ? 'We received your check. ' : ''}Your ${membership.level} membership now runs through ${through}.`
           : `Thank you for joining, ${first(person)}. ${byCheck ? 'We received your check. ' : ''}Your ${membership.level} membership is active through ${through}.`,
-        ...(plan ? ['Your membership renews automatically each year through PayPal. You can cancel any time in your PayPal account or by replying to this email.'] : []),
+        ...(plan ? ['Your membership renews automatically each year through PayPal. You can turn that off any time with the button below.'] : []),
       ],
       facts: paymentFacts(payment, membership, plan),
+      ...(plan ? {button: {label: 'Manage automatic renewal', url: manageUrl(siteUrl, plan)}} : {}),
       after: [
         ...(renewal ? [] : ['As a member you can vote on endorsements, join committees and take part in member programs. We are glad you are here.']),
         'Please keep this email as your receipt.',
@@ -88,9 +92,10 @@ export function receipt({person, payment, membership, plan, renewal, siteUrl}) {
       ...testLine(payment),
       `Thank you, ${first(person)}. ${byCheck ? 'We received your check for' : 'We received your gift of'} ${dollars(payment.amount_cents)}.`,
       'Your gift backs the candidates SBWPC members endorse and keeps voter education, advocacy and leadership training going across Santa Barbara County.',
-      ...(plan ? [`This gift repeats each ${plan.frequency === 'monthly' ? 'month' : 'year'} through PayPal. You can change or cancel it any time in your PayPal account or by replying to this email.`] : []),
+      ...(plan ? [`This gift repeats each ${every(plan)} through PayPal. You can cancel it any time with the button below.`] : []),
     ],
     facts: paymentFacts(payment, null, plan),
+    ...(plan ? {button: {label: `Manage my ${every(plan)}ly gift`, url: manageUrl(siteUrl, plan)}} : {}),
     after: ['Please keep this email as your receipt.'],
     note: NOT_DEDUCTIBLE,
   })
@@ -130,7 +135,8 @@ export function reminder({type, person, membership, plan, siteUrl}) {
         `Hi ${first(person)}, your ${membership.level} membership renews automatically on ${date}.`,
         `PayPal will charge ${plan ? dollars(plan.amount_cents) : 'your yearly dues'} to the payment method on your plan. You do not need to do anything.`,
       ],
-      after: [`To stop the renewal, cancel the automatic payment in your PayPal account before ${date}, or reply to this email and we will help.`],
+      ...(plan ? {button: {label: 'Manage automatic renewal', url: manageUrl(siteUrl, plan)}} : {}),
+      after: [plan ? `To stop the renewal, use the button above before ${date}, or reply to this email and we will help.` : `To stop the renewal, reply to this email before ${date} and we will help.`],
       note: because,
     })
   }
@@ -160,8 +166,54 @@ export function reminder({type, person, membership, plan, siteUrl}) {
   })
 }
 
+// The private link, sent when a member asks for it on the manage page or an admin sends it
+export function planLink({person, plan, membership, siteUrl}) {
+  const dues = plan.kind === 'dues'
+  return render({
+    subject: 'Your link to manage your SBWPC automatic payment',
+    heading: 'Manage your automatic payment',
+    lead: [
+      `Hi ${first(person)}, here is your private link. It opens a page where you can see your automatic ${dues ? 'membership renewal' : 'gift'} and cancel it if you want to.`,
+    ],
+    facts: [
+      [dues ? 'Membership' : 'Gift', dues ? `${membership?.level || 'SBWPC'} membership` : `${plan.frequency === 'monthly' ? 'Monthly' : 'Yearly'} donation`],
+      ['Amount', `${dollars(plan.amount_cents)} each ${every(plan)}`],
+    ],
+    button: {label: 'Open my page', url: manageUrl(siteUrl, plan)},
+    after: ['The link is private to you, so please do not forward this email.'],
+    note: 'You are getting this email because someone asked for this link on sbwpc.org. If that was not you, you can ignore it. Nothing has changed.',
+  })
+}
+
+// Confirmation after a member cancels an automatic payment on the manage page
+export function planStopped({person, plan, membership, siteUrl}) {
+  if (plan.kind === 'dues') {
+    const through = longDate(membership?.expires_on)
+    return render({
+      subject: 'Automatic renewal is off for your SBWPC membership',
+      heading: 'Automatic renewal is off',
+      lead: [
+        `Hi ${first(person)}, we turned off automatic renewal as you asked. PayPal will not charge you again for this membership.`,
+        through ? `Your ${membership.level} membership stays active through ${through}. We will email you a reminder before it expires.` : 'Your membership stays active until its expiration date.',
+      ],
+      after: ['Changed your mind? You can choose automatic renewal again the next time you renew.'],
+      note: 'If you did not ask for this, reply to this email and we will help.',
+    })
+  }
+  return render({
+    subject: `Your ${every(plan)}ly gift to SBWPC is cancelled`,
+    heading: `Your ${every(plan)}ly gift is cancelled`,
+    lead: [
+      `Hi ${first(person)}, we cancelled your ${dollars(plan.amount_cents)} ${every(plan)}ly gift as you asked. PayPal will not charge you again.`,
+      'Thank you for the support you have given SBWPC.',
+    ],
+    after: [`You are welcome back any time at ${siteUrl.replace(/^https?:\/\//, '')}/donate.`],
+    note: 'If you did not ask for this, reply to this email and we will help.',
+  })
+}
+
 // ---------- to the SBWPC inbox ----------
-export function staffNotice({event, person, payment, membership, plan, checkout, siteUrl}) {
+export function staffNotice({event, person, payment, membership, plan, checkout, siteUrl, by}) {
   const admin = (hash) => `${siteUrl}/admin/#/${hash}`
   if (event === 'check_pledge') {
     const p = checkout.payload || {}
@@ -181,7 +233,7 @@ export function staffNotice({event, person, payment, membership, plan, checkout,
       heading: failed ? 'An automatic payment failed' : 'An automatic payment was cancelled',
       lead: [failed
         ? `PayPal could not collect the ${plan?.kind === 'dues' ? 'yearly dues' : 'recurring gift'} from ${fullName(person)}. PayPal will usually try again. If it keeps failing, you may want to get in touch.`
-        : `${fullName(person)}'s ${plan?.kind === 'dues' ? 'membership will no longer renew automatically' : 'recurring gift has stopped'}. This was changed in PayPal.`],
+        : `${fullName(person)}'s ${plan?.kind === 'dues' ? 'membership will no longer renew automatically' : 'recurring gift has stopped'}. ${by === 'member' ? 'They cancelled it themselves on the website.' : 'This was changed in PayPal.'}${plan?.kind === 'dues' ? ' The membership stays active until it expires.' : ''}`],
       facts: [['Name', fullName(person)], ['Email', person?.email || ''], ['Plan', plan ? `${dollars(plan.amount_cents)} ${plan.frequency}` : '']],
       button: {label: 'Open their record', url: admin('person/' + person.id)},
     })

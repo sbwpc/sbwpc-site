@@ -73,3 +73,24 @@ select 'people', count(*) from public.people;
 reset role; set role service_role;
 insert into public.reminders (membership_id, kind, cycle_expires_on) select id, '30_day', expires_on from public.memberships limit 1;
 insert into public.reminders (membership_id, kind, cycle_expires_on) select id, '30_day', expires_on from public.memberships limit 1;
+
+\echo '--- 8. the private manage link on a plan: hidden from everyone signed in. An admin may queue the link email, not a cancellation notice'
+reset role;
+update public.admins set active=true where email='luke@coolhandlook.com';
+insert into public.recurring_plans (person_id, kind, amount_cents, frequency, status) select id, 'donation', 2500, 'monthly', 'active' from public.people limit 1;
+set role authenticated;
+set request.jwt.claims = '{"email":"luke@coolhandlook.com","aal":"aal2","sub":"33333333-3333-3333-3333-333333333333"}';
+select 'admin sees the plan', count(*), min(status) from (select id, status, amount_cents, cancelled_on from public.recurring_plans) x;
+\echo '    admin cannot read the manage link (two errors expected):'
+select manage_token from public.recurring_plans;
+select * from public.recurring_plans;
+\echo '    admin can queue the link email, not a cancellation notice (one error expected):'
+insert into public.outbox (kind, person_id, data) select 'plan_link', person_id, jsonb_build_object('plan_id', id) from (select id, person_id from public.recurring_plans limit 1) x;
+insert into public.outbox (kind, person_id, data) select 'plan_stopped', person_id, jsonb_build_object('plan_id', id) from (select id, person_id from public.recurring_plans limit 1) x;
+set request.jwt.claims = '{"email":"treasurer@example.com","aal":"aal2","sub":"44444444-4444-4444-4444-444444444444"}';
+\echo '    treasurer cannot read the link or queue an email (two errors expected):'
+select manage_token from public.recurring_plans;
+insert into public.outbox (kind, person_id, data) select 'plan_link', person_id, jsonb_build_object('plan_id', id) from (select id, person_id from public.recurring_plans limit 1) x;
+reset role; set role service_role;
+select 'server still reads the link', count(manage_token) from public.recurring_plans;
+select 'queued by admin', count(*) from public.outbox where kind = 'plan_link';

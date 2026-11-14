@@ -2,7 +2,7 @@
 // document the client approves. Run: node email-samples.mjs <output folder>
 import fs from 'node:fs'
 import path from 'node:path'
-import {receipt, checkInstructions, reminder, staffNotice, authEmail} from '../../web/netlify/lib/emails.mjs'
+import {receipt, checkInstructions, reminder, staffNotice, authEmail, planLink, planStopped} from '../../web/netlify/lib/emails.mjs'
 
 const out = process.argv[2] || './email-samples'
 fs.mkdirSync(out, {recursive: true})
@@ -11,8 +11,8 @@ const person = {id: '3f0c2a1e-0000-4000-8000-000000000001', first_name: 'Maria',
 const membership = {level: 'Advocate', expires_on: '2027-11-14', renew_token: '11111111-2222-4333-8444-555555555555', state: 'active'}
 const dues = {kind: 'dues', amount_cents: 4000, paid_on: '2026-11-14', method: 'paypal', paypal_capture_id: '8XK42719DP583021A'}
 const gift = {kind: 'donation', amount_cents: 10000, paid_on: '2026-11-14', method: 'paypal', paypal_capture_id: '5RT90212KL447710B', in_honor_of: 'In honor of Susan Rose'}
-const yearly = {kind: 'dues', frequency: 'yearly', amount_cents: 4000}
-const monthly = {kind: 'donation', frequency: 'monthly', amount_cents: 2500}
+const yearly = {kind: 'dues', frequency: 'yearly', amount_cents: 4000, manage_token: '66666666-7777-4888-8999-000000000001'}
+const monthly = {kind: 'donation', frequency: 'monthly', amount_cents: 2500, manage_token: '66666666-7777-4888-8999-000000000002'}
 const checkout = {id: 'a1b2c3d4-0000-4000-8000-000000000002', kind: 'dues', amount_cents: 4000, payload: {...person, level: 'Advocate'}}
 const soon = {...membership, expires_on: '2027-11-14'}
 
@@ -24,6 +24,9 @@ const list = [
   ['Members and donors', 'receipt-monthly', 'Donation receipt, monthly gift', 'After each monthly or yearly gift is charged.', receipt({person, payment: {...gift, amount_cents: 2500, in_honor_of: null}, plan: monthly, siteUrl})],
   ['Members and donors', 'receipt-check', 'Receipt for a mailed check', 'When an admin marks a check received.', receipt({person, payment: {...dues, method: 'check', paypal_capture_id: null}, membership, siteUrl})],
   ['Members and donors', 'check-instructions', 'How to mail your check', 'Right after someone fills in the form and chooses "Mail a check".', checkInstructions({checkout})],
+  ['Members and donors', 'plan-link', 'Link to manage an automatic payment', 'When someone asks for their link on the Manage page, or an admin sends it to them.', planLink({person, plan: yearly, membership, siteUrl})],
+  ['Members and donors', 'plan-stopped-membership', 'Automatic renewal turned off', 'Right after a member turns off automatic renewal on the Manage page.', planStopped({person, plan: yearly, membership, siteUrl})],
+  ['Members and donors', 'plan-stopped-gift', 'Recurring gift cancelled', 'Right after a donor cancels a monthly or yearly gift on the Manage page.', planStopped({person, plan: monthly, siteUrl})],
   ['Renewal reminders', 'reminder-30', 'Reminder, 30 days before', '30 days before a membership expires. Not sent to members on automatic renewal.', reminder({type: '30_day', person, membership: soon, siteUrl})],
   ['Renewal reminders', 'reminder-7', 'Reminder, 7 days before', '7 days before a membership expires, if they have not renewed.', reminder({type: '7_day', person, membership: soon, siteUrl})],
   ['Renewal reminders', 'reminder-day', 'Reminder, on the day', 'The day a membership expires, if they have not renewed.', reminder({type: 'day_of', person, membership: soon, siteUrl})],
@@ -35,13 +38,14 @@ const list = [
   ['Notices to the SBWPC inbox', 'notice-check', 'Check on the way', 'To info@sbwpc.org when someone chooses "Mail a check".', staffNotice({event: 'check_pledge', checkout, siteUrl})],
   ['Notices to the SBWPC inbox', 'notice-failed', 'Automatic payment failed', 'To info@sbwpc.org when PayPal cannot collect a recurring payment.', staffNotice({event: 'plan_failed', person, plan: monthly, siteUrl})],
   ['Notices to the SBWPC inbox', 'notice-cancelled', 'Automatic payment cancelled', 'To info@sbwpc.org when someone cancels a recurring payment in PayPal.', staffNotice({event: 'plan_cancelled', person, plan: yearly, siteUrl})],
+  ['Notices to the SBWPC inbox', 'notice-cancelled-member', 'Automatic payment cancelled by the member', 'To info@sbwpc.org when someone cancels a recurring payment on the website.', staffNotice({event: 'plan_cancelled', person, plan: yearly, by: 'member', siteUrl})],
   ['Admin sign-in', 'auth-invite', 'Admin invitation', 'When a new admin is invited to the members and donations admin.', authEmail({action: 'invite', link: 'https://sbwpc.org/admin/ (private link)'})],
   ['Admin sign-in', 'auth-reset', 'Password reset', 'When an admin asks to reset their password.', authEmail({action: 'recovery', link: 'https://sbwpc.org/admin/ (private link)'})],
 ]
 const index = []
 for (const [group, slug, name, when, mail] of list) {
   fs.writeFileSync(path.join(out, slug + '.html'), mail.html)
-  index.push({group, slug, name, when, subject: mail.subject, text: mail.text.replace(/https:\/\/sbwpc\.org\/[a-z-]+\/\?renew=[0-9a-f-]+#join/, 'https://sbwpc.org/join/ (with their private renewal code)')})
+  index.push({group, slug, name, when, subject: mail.subject, text: mail.text.replace(/https:\/\/sbwpc\.org\/[a-z-]+\/\?renew=[0-9a-f-]+#join/, 'https://sbwpc.org/join/ (with their private renewal code)').replace(/https:\/\/sbwpc\.org\/manage\/#plan=[0-9a-f-]+/, 'https://sbwpc.org/manage/ (with their private code)')})
 }
 fs.writeFileSync(path.join(out, 'index.json'), JSON.stringify(index, null, 1))
 console.log(index.length, 'emails written to', out)

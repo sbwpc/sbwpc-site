@@ -35,3 +35,5 @@ export const dollars = (cents) => {
 }
 // Where the renew link in reminder emails points. Becomes '/join/' when the new form replaces JotForm.
 export const JOIN_PATH = '/join-preview/'
+// The page where a member can see or cancel an automatic payment. Reached by a private link in their emails.
+export const MANAGE_PATH = '/manage/'

@@ -13,10 +13,12 @@ const thisYear = () => Number(todayPT().slice(0, 4))
 const REPORT_CENTS = 10000
 
 // ---------- data ----------
-async function all(table, order) {
+// The private manage link on a plan is never sent to the admin, so plans are read by column
+const PLAN_COLUMNS = 'id,person_id,kind,amount_cents,frequency,status,paypal_subscription_id,started_on,next_charge_on,cancelled_on,created_at,updated_at'
+async function all(table, order, columns = '*') {
   const rows = []
   for (let from = 0; ; from += 1000) {
-    let q = sb.from(table).select('*')
+    let q = sb.from(table).select(columns)
     if (order) q = q.order(order[0], {ascending: order[1] !== 'desc'})
     const {data, error} = await q.range(from, from + 999)
     if (error) throw error
@@ -30,7 +32,7 @@ async function load() {
     all('membership_status', ['expires_on']),
     all('payments', ['paid_on', 'desc']),
     sb.from('checkouts').select('*').eq('mode', 'check').eq('status', 'pending').order('created_at', {ascending: false}),
-    all('recurring_plans'),
+    all('recurring_plans', null, PLAN_COLUMNS),
     sb.from('audit_log').select('*').order('at', {ascending: false}).limit(15),
     sb.from('admins').select('*').order('email'),
   ])
@@ -380,7 +382,7 @@ async function person(id) {
 
   const emails = h('div', {}, h('p', {class: 'a-empty', text: 'Loading...'}))
   const loadEmails = () => sb.from('outbox').select('*').eq('person_id', id).order('created_at', {ascending: false}).limit(30).then(({data}) => {
-    const kinds = {receipt: 'Receipt', reminder: 'Renewal reminder', staff_notice: 'Notice to the SBWPC inbox', check_instructions: 'Check instructions'}
+    const kinds = {receipt: 'Receipt', reminder: 'Renewal reminder', staff_notice: 'Notice to the SBWPC inbox', check_instructions: 'Check instructions', plan_link: 'Link to manage their automatic payment', plan_stopped: 'Automatic payment cancelled'}
     const states = {queued: ['Waiting to send', 'warn'], sending: ['Sending', 'warn'], sent: ['Sent', 'good'], failed: ['Failed', 'bad'], skipped: ['Not sent', '']}
     emails.replaceChildren(table({label: 'Emails', empty: 'No emails yet.', rows: data || [], columns: [
       {key: 'at', label: 'When', cell: (r) => when(r.sent_at || r.created_at)},
@@ -396,6 +398,17 @@ async function person(id) {
     try {
       await must(sb.from('outbox').insert({kind: 'reminder', person_id: id, membership_id: m.id, data: {type: 'manual', for_expires_on: m.expires_on}}))
       flash('Reminder queued. It goes out within five minutes.')
+      loadEmails()
+    } catch (ex) { flash(nice(ex)) }
+    btn.disabled = false
+  }
+
+  const sendLink = async (plan, btn) => {
+    if (!confirm(`Email ${fullName(p)} the private link to see or cancel this automatic payment?`)) return
+    btn.disabled = true
+    try {
+      await must(sb.from('outbox').insert({kind: 'plan_link', person_id: id, data: {plan_id: plan.id}}))
+      flash('Link queued. It goes out within five minutes.')
       loadEmails()
     } catch (ex) { flash(nice(ex)) }
     btn.disabled = false
@@ -429,7 +442,9 @@ async function person(id) {
       {key: 'a', label: 'Amount', num: true, cell: (x) => `${money(x.amount_cents)} ${x.frequency}`},
       {key: 's', label: 'Status', cell: (x) => chip(x.status, x.status === 'active' ? 'good' : x.status === 'failed' ? 'bad' : '')},
       {key: 'd', label: 'Started', cell: (x) => day(x.started_on)},
-    ]}), h('p', {class: 'a-hint', text: 'Plans are changed or cancelled in PayPal. This list updates on its own.'})) : null,
+      {key: 'c', label: 'Cancelled', cell: (x) => day(x.cancelled_on)},
+      {key: 'l', label: 'Manage link', cell: (x) => (canEdit() && p.email && x.status !== 'cancelled' ? h('button', {type: 'button', class: 'a-btn ghost small', text: 'Email them the manage link', onclick: (e) => sendLink(x, e.target)}) : '')},
+    ]}), h('p', {class: 'a-hint', text: 'Members can cancel a plan themselves from the private link in their receipt, or in PayPal. This list updates on its own.'})) : null,
     panel('Payments',
       years.length ? h('p', {class: 'a-totals'}, years.map((y) => h('span', {}, `${y}: `, h('strong', {text: money(yearTotal(id, y))}), ' ', reportChip(yearTotal(id, y))))) : null,
       table({label: 'Payments', empty: 'No payments on file.', rows: pays, columns: [

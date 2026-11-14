@@ -2530,3 +2530,69 @@ apple-pay-button {
   font-weight: 600;
   color: var(--navy);
 }
+
+/* ---------- Manage my automatic payment ---------- */
+.s-manage .lede {
+  margin-bottom: 0;
+}
+.s-manage .co-status {
+  margin-top: 1.75rem;
+}
+.s-manage .co-status:focus {
+  outline: 3px solid rgba(94, 55, 149, 0.45);
+  outline-offset: 2px;
+}
+.s-manage .co-status a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+.s-manage .give-form-card {
+  max-width: none;
+  margin-top: 1.75rem;
+}
+.mg-plan .co-facts {
+  margin-top: 1.25rem;
+}
+.mg-plan[data-status='cancelled'] {
+  border-top: 6px solid var(--line);
+}
+.mg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+.mg-confirm {
+  margin-top: 1.5rem;
+  padding: 1.1rem 1.25rem 1.25rem;
+  background: #f6f2fc;
+  border-left: 4px solid var(--purple);
+}
+.mg-confirm .mg-actions {
+  margin-top: 1rem;
+}
+.mg-question {
+  margin: 0;
+  color: var(--navy);
+}
+.mg-question:focus {
+  outline: none;
+}
+.mg-after {
+  margin: 1.25rem 0 0;
+  color: var(--muted);
+}
+.mg-help {
+  margin: 1.75rem 0 0;
+  color: var(--muted);
+}
+.mg-help a {
+  color: var(--navy);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+.mg-email {
+  max-width: 28rem;
+  margin: 1.5rem 0 1.25rem;
+}

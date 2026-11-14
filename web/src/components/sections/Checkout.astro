@@ -126,7 +126,7 @@ const STATES = 'AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD M
         <h3 class="h3 give-form-title co-pay-title">Payment</h3>
         <p class="co-summary" aria-live="polite">{dues ? 'Choose a level above to see your total.' : 'Choose an amount above to see your total.'}</p>
         {dues && (
-          <label class="co-check co-renew"><input type="checkbox" name="auto_renew" /><span>Renew my membership automatically each year. I can cancel any time in my PayPal account.</span></label>
+          <label class="co-check co-renew"><input type="checkbox" name="auto_renew" /><span>Renew my membership automatically each year. I can cancel any time.</span></label>
         )}
         <label class="co-check co-attest"><input type="checkbox" name="attest" required aria-describedby={`${id}-attest-err`} /><span>I confirm that this {dues ? 'payment' : 'gift'} comes from my own funds, that I am a United States citizen or lawful permanent resident, and that the details above are true.</span></label>
         <p class="co-err" id={`${id}-attest-err`} hidden></p>

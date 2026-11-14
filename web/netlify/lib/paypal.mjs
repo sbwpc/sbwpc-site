@@ -70,6 +70,8 @@ export const createSubscription = ({planId, checkoutId, amountCents, person, sit
     application_context: {brand_name: 'SBWPC', shipping_preference: 'NO_SHIPPING', user_action: 'SUBSCRIBE_NOW', return_url: siteUrl + '/', cancel_url: siteUrl + '/'},
   }, {'paypal-request-id': 'sub-' + checkoutId})
 export const getSubscription = (id) => paypal('GET', `/v1/billing/subscriptions/${encodeURIComponent(id)}`)
+// Stops all future charges on a plan. PayPal answers with an empty 204.
+export const cancelSubscription = (id, reason) => paypal('POST', `/v1/billing/subscriptions/${encodeURIComponent(id)}/cancel`, {reason: String(reason).slice(0, 127)})
 export async function firstPayment(id) {
   const end = new Date(Date.now() + 86400000).toISOString()
   const start = new Date(Date.now() - 3 * 86400000).toISOString()

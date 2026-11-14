@@ -1,0 +1,38 @@
+---
+// Where a member sees or cancels an automatic payment (yearly membership renewal, or a monthly or yearly gift).
+// Opened from a private link in their emails. Not in the menu and hidden from search engines.
+// The browser never talks to PayPal or the database here: the server does, after checking the link.
+import Layout from '../layouts/Layout.astro'
+---
+<Layout title="Manage your automatic payment" description="See or cancel your automatic membership renewal or recurring gift to SBWPC." path="manage" noindex noBanner>
+  <section class="section tone-cream s-checkout s-manage" data-manage>
+    <div class="wrap narrow">
+      <h1 class="h1">Manage your automatic payment</h1>
+      <p class="lede">See your automatic membership renewal or recurring gift, and cancel it any time.</p>
+
+      <p class="co-status mg-note" role="status" tabindex="-1" hidden></p>
+
+      <div class="mg-plans" hidden>
+        <div class="mg-list"></div>
+        <p class="mg-help">To change the card PayPal charges, sign in to your PayPal account. Questions? Email <a href="mailto:info@sbwpc.org">info@sbwpc.org</a>.</p>
+      </div>
+
+      <form class="give-form-card co-card mg-ask" novalidate hidden>
+        <h2 class="h3 give-form-title">Email me my link</h2>
+        <p class="give-form-intro">This page opens from a private link, so only you can see your details. Enter the email address you used with SBWPC and we will send your link there.</p>
+        <div class="co-field mg-email">
+          <label for="mg-email">Email</label>
+          <input id="mg-email" name="email" type="email" autocomplete="email" required maxlength="160" aria-describedby="mg-email-err" />
+          <p class="co-err" id="mg-email-err" hidden></p>
+        </div>
+        <div class="co-hp" aria-hidden="true"><label for="mg-web">Leave this field empty</label><input id="mg-web" name="website" tabindex="-1" autocomplete="off" /></div>
+        <button type="submit" class="btn">Email me my link</button>
+      </form>
+
+      <noscript><p class="co-status">This page needs JavaScript. You can also email <a href="mailto:info@sbwpc.org">info@sbwpc.org</a> and we will help.</p></noscript>
+    </div>
+  </section>
+</Layout>
+<script>
+  import '../scripts/manage.js'
+</script>

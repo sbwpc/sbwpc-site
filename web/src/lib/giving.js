@@ -35,3 +35,5 @@ export const dollars = (cents) => {
 }
 // Where the renew link in reminder emails points
 export const JOIN_PATH = '/join/'
+// The page where a member can see or cancel an automatic payment. Reached by a private link in their emails.
+export const MANAGE_PATH = '/manage/'

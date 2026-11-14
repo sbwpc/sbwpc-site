@@ -43,10 +43,23 @@ export function startPayPalMock(port = 54331) {
       subs.set(id, {id, status: 'ACTIVE', custom_id: body.custom_id, plan_id: body.plan_id, value: body.plan.billing_cycles[0].pricing_scheme.fixed_price.value, sale: 'SALE' + ++n})
       return send(201, {id, status: 'APPROVAL_PENDING'})
     }
+    if ((m = path.match(/^\/v1\/billing\/subscriptions\/([^/]+)\/cancel$/)) && req.method === 'POST') {
+      const s = subs.get(m[1])
+      if (!s) return send(404, {name: 'RESOURCE_NOT_FOUND'})
+      // Tests set s.down to simulate PayPal being unreachable
+      if (s.down) return send(500, {name: 'INTERNAL_SERVER_ERROR', debug_id: 'dbg2'})
+      if (s.status !== 'ACTIVE' && s.status !== 'SUSPENDED') return send(422, {name: 'UNPROCESSABLE_ENTITY', details: [{issue: 'SUBSCRIPTION_STATUS_INVALID'}]})
+      if (!body.reason) return send(400, {name: 'INVALID_REQUEST'})
+      s.status = 'CANCELLED'
+      s.reason = body.reason
+      res.writeHead(204)
+      return res.end()
+    }
     if ((m = path.match(/^\/v1\/billing\/subscriptions\/([^/]+)(\/transactions)?$/))) {
       const s = subs.get(m[1])
       if (!s) return send(404, {name: 'RESOURCE_NOT_FOUND'})
-      if (!m[2]) return send(200, {id: s.id, status: s.status, custom_id: s.custom_id, plan_id: s.plan_id})
+      if (!m[2] && s.down) return send(500, {name: 'INTERNAL_SERVER_ERROR'})
+      if (!m[2]) return send(200, {id: s.id, status: s.status, custom_id: s.custom_id, plan_id: s.plan_id, billing_info: s.status === 'ACTIVE' ? {next_billing_time: s.next || '2027-06-15T10:00:00Z'} : {}})
       // A plan for exactly $77 simulates PayPal being slow to post the first charge
       return send(200, {transactions: s.value === '77.00' ? [] : [{id: s.sale, status: 'COMPLETED', amount_with_breakdown: {gross_amount: {currency_code: 'USD', value: s.value}}}]})
     }

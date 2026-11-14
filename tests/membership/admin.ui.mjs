@@ -203,6 +203,20 @@ async function run(name, opts, full) {
     await flashed(page, 'Payment saved')
     ok('a bounced check can be marked failed and drops out of the totals', (await sql(`select count(*)::int n from public.payments y join public.people p on p.id = y.person_id where p.last_name = 'Bennett' and status = 'failed'`))[0].n === 1)
 
+    // A donor with a monthly plan: the admin sees the plan but never its private link, and can email the link
+    const donor = (await sql(`select id from public.people where last_name = 'Fields'`))[0].id
+    await page.goto(origin + '/admin/#/person/' + donor)
+    await page.waitForSelector('#app table[aria-label="Recurring plans"]')
+    const planText = await page.locator('#app table[aria-label="Recurring plans"]').innerText()
+    const token = (await sql(`select manage_token::text t from public.recurring_plans where person_id = $1`, [donor]))[0].t
+    ok('a person with a plan shows it, without the private manage link', /Donation/.test(planText) && /\$25 monthly/.test(planText) && /active/.test(planText) && !(await page.content()).includes(token))
+    await page.click('button:has-text("Email them the manage link")')
+    await flashed(page, 'Link queued')
+    await page.waitForSelector('#app table[aria-label=Emails] td:has-text("Link to manage their automatic payment")')
+    ok('"Email them the manage link" queues it in the admin\'s name', (await sql(`select count(*)::int n from public.outbox where person_id = $1 and kind = 'plan_link' and created_by = 'luke@coolhandlook.com'`, [donor]))[0].n === 1)
+    await page.locator('#app table[aria-label="Recurring plans"]').scrollIntoViewIfNeeded()
+    await shot(page, `admin-${name}-15-person-plan`, false)
+
     // Add a person by hand, with their check
     await page.click('#nav-new')
     await page.waitForSelector('#app form')

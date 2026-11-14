@@ -1,6 +1,6 @@
 # SBWPC membership system: decisions and status
 
-Updated: November 13, 2026
+Updated: November 14, 2026
 
 ## Decisions
 - Membership term: 12 months from the payment date. A member who renews before the expiration date keeps the remaining time (the new term starts from the old expiration date). A lapsed member starts fresh from the payment date.
@@ -136,11 +136,41 @@ GMAIL_SA_EMAIL, GMAIL_SA_KEY, MAIL_MODE, MAIL_TEST_TO, and later SUPABASE_AUTH_H
 ### Notes
 - Supabase email links (invitation, password reset) expire after 1 hour. The setting is Authentication, Sign In / Providers, Email, "Email OTP expiration" (3600 seconds, can be raised to 86400).
 - The client's admin invitation was resent November 14, 2026 at 2:36 PM Pacific.
+- The wording document now has 24 emails. The four added on November 14 are the manage link, the two cancellation confirmations, and the notice to the inbox when a member cancels on the website.
 
 ### Open questions for SBWPC
 - Confirm the statement people tick before paying: own funds, US citizen or lawful permanent resident, details are true.
 - Is there a smallest or largest gift SBWPC wants to accept online? The form allows $1 to $25,000 as a safety limit only.
 - Should the second household member name be offered at levels above Feminist Household too?
 
-### Still to build (next stage)
-- A "manage my plan" link so members can cancel auto-renew without going to PayPal.
+## Stage 4 (members cancel their own automatic payments): built and tested locally, not deployed
+Branch: manage-plan (built on mailer). Built November 14, 2026.
+
+### What was built
+- A page at /manage where a member sees their automatic payments (yearly membership renewal, monthly or yearly gift) and can stop one. Not in the menu, hidden from search engines, left out of the sitemap.
+- The page opens from a private link. The link is in every receipt for an automatic payment and in the heads-up email before a yearly charge. A member without the link types their email on /manage and the link is sent to that address.
+- Stopping asks "are you sure" first. PayPal is told to stop charging. Only when PayPal agrees is the plan marked cancelled. A membership already paid for stays active until it expires, with automatic renewal off, and the normal renewal reminders then apply.
+- Emails: a confirmation to the member, and a notice to info@sbwpc.org that says whether it was cancelled on the website or in PayPal.
+- Admin: the Recurring plans panel on a person page shows the cancelled date and has an "Email them the manage link" button.
+- Database: supabase/migrations/004_manage_plan.sql (two new kinds of email, and the private link is hidden from everyone signed in to the admin). NOT yet applied to the live project.
+- Server: web/netlify/lib/plans.mjs and the functions plan-view, plan-cancel, plan-link. The PayPal webhook now uses the same code, so a repeated message from PayPal never sends a second notice.
+
+### Rules it follows
+- The page shows a first name and the plans. No email, address or PayPal number.
+- One person's link can never open or cancel another person's plan.
+- The "email me my link" form answers the same way whether or not the address has a plan, and sends at most one email per person every 15 minutes.
+- If PayPal cannot be reached, nothing is marked cancelled and the page says so.
+- A plan with no PayPal record is never marked cancelled by the page. The member is asked to email SBWPC.
+- The private link is kept out of the audit log, out of the admin, and out of web addresses sent to the server.
+
+### Tests
+- Server checks against the simulated PayPal and mail service: 40 of 40 pass (tests/membership/plan.test.mjs).
+- The page in a browser, desktop and phone, with accessibility scans and keyboard-only use: 49 of 49 pass (tests/membership/manage.ui.mjs).
+- All earlier suites still pass: payments 48, email 43, admin screens 52, forms 61, database rules unchanged.
+- Not yet tested, because it needs the real account: cancelling a real PayPal sandbox subscription.
+
+### To deploy
+Apply 003_mail.sql and then 004_manage_plan.sql in Supabase, then deploy the manage-plan branch (it contains sandbox-ready and mailer). The "email me my link" form only works once email is switched on (MAIL_MODE test or live). The page itself works as soon as the PayPal keys are in.
+
+### Still to build
+- Nothing is outstanding in the build. What remains is setup (keys), testing against the real PayPal sandbox and Gmail, and the client's answers below.

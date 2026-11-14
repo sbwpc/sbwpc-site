@@ -229,7 +229,8 @@ function setup(section) {
     }
     q('.co-mail').hidden = !isCheck
     if (isCheck) q('.co-mail-memo').textContent = `Please write ${r.reference} on the memo line so we can match it to your details.`
-    q('.co-done-note').textContent = (isCheck ? '' : 'Print or save this page for your records. If you paid with PayPal, PayPal also emails you a receipt. ') + 'Thank you for making this work possible. Because SBWPC is a political committee and not a 501(c)(3) charity, dues and contributions are not tax deductible. Questions? Email info@sbwpc.org.'
+    const repeats = !isCheck && (r.frequency === 'monthly' || r.frequency === 'yearly')
+    q('.co-done-note').textContent = (isCheck ? '' : 'Print or save this page for your records. If you paid with PayPal, PayPal also emails you a receipt. ') + (repeats ? 'You can stop the automatic payments any time at sbwpc.org/manage. ' : '') + 'Thank you for making this work possible. Because SBWPC is a political committee and not a 501(c)(3) charity, dues and contributions are not tax deductible. Questions? Email info@sbwpc.org.'
     form.hidden = true
     els.done.hidden = false
     const card = q('.co-receipt')

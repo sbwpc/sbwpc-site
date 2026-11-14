@@ -24,8 +24,10 @@ Needs a local Postgres 16 (socket in `PGHOST`, port in `PGPORT`) and `npm instal
 
 - `flow.test.mjs`: payment server end to end
 - `mail.test.mjs`: receipts, reminders, notices and admin sign-in emails
+- `plan.test.mjs`: the manage page's server side: private links, cancelling with PayPal, the emails that follow
 - `admin.ui.mjs`: admin screens in a browser, desktop and phone
 - `forms.ui.mjs`: membership and donation forms in a browser, desktop and phone, with accessibility scans
+- `manage.ui.mjs`: the manage page in a browser, desktop and phone, with accessibility scans
 - `supabase/tests/access_rules.sql` and `record_payment.sql`: database rules, run with psql
 
 Screenshots land in `shots/` (or `SHOTS_DIR`).

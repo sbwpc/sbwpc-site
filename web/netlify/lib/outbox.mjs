@@ -3,7 +3,7 @@
 import {env, log} from './http.mjs'
 import {db, must} from './db.mjs'
 import {mailMode, sendMail, staffInbox} from './mail.mjs'
-import {receipt, checkInstructions, reminder, staffNotice} from './emails.mjs'
+import {receipt, checkInstructions, reminder, staffNotice, planLink, planStopped} from './emails.mjs'
 
 export const siteUrl = () => (env('URL') || 'https://sbwpc.org').replace(/\/$/, '')
 const one = async (table, id) => (id ? (await must(db().from(table).select('*').eq('id', id).limit(1)))[0] || null : null)
@@ -32,7 +32,17 @@ async function compose(row) {
   if (row.kind === 'staff_notice') {
     const event = row.data?.event
     if (event === 'check_pledge' ? !checkout : !person || (!payment && !plan)) return null
-    return {to: staffInbox(), replyTo: person?.email || checkout?.payload?.email || undefined, ...staffNotice({...base, event})}
+    return {to: staffInbox(), replyTo: person?.email || checkout?.payload?.email || undefined, ...staffNotice({...base, event, by: row.data?.by})}
+  }
+  if (row.kind === 'plan_link') {
+    // No point sending a link to a plan that has already ended
+    if (!person?.email || !plan || plan.person_id !== person.id || plan.status === 'cancelled') return null
+    const current = plan.kind === 'dues' ? membership || (await must(db().from('memberships').select('*').eq('recurring_plan_id', plan.id).limit(1)))[0] : null
+    return {to: person.email, replyTo: staffInbox(), ...planLink({...base, membership: current})}
+  }
+  if (row.kind === 'plan_stopped') {
+    if (!person?.email || !plan || plan.person_id !== person.id) return null
+    return {to: person.email, replyTo: staffInbox(), ...planStopped(base)}
   }
   return null
 }

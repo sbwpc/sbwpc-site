@@ -29,7 +29,7 @@ export async function startSite({port = 4321, env = {}} = {}) {
   const context = {waitUntil: (p) => pending.push(p)}
   const settle = async () => { while (pending.length) await pending.shift() }
   const fns = {}
-  for (const f of ['checkout-config', 'checkout-create', 'checkout-capture', 'checkout-renew', 'paypal-webhook', 'auth-email']) {
+  for (const f of ['checkout-config', 'checkout-create', 'checkout-capture', 'checkout-renew', 'paypal-webhook', 'auth-email', 'plan-view', 'plan-cancel', 'plan-link']) {
     const mod = await import(`${WEB}/netlify/functions/${f}.mjs`)
     fns[mod.config.path] = mod
   }

@@ -4,6 +4,7 @@ import {json, fail, log} from '../lib/http.mjs'
 import {db, dbReady, must, getCheckout, recordPayment} from '../lib/db.mjs'
 import {verifyWebhook, paypalEnv} from '../lib/paypal.mjs'
 import {completeCheckout, SANDBOX_NOTE} from '../lib/finish.mjs'
+import {kick, queue} from '../lib/outbox.mjs'
 
 
 const cents = (value) => Math.round(Number(value) * 100)
@@ -36,7 +37,8 @@ async function planStatus(subId, status) {
   if (!subId) return 'ignored'
   const patch = {status}
   if (status === 'cancelled') patch.cancelled_on = new Date().toISOString().slice(0, 10)
-  const rows = await must(db().from('recurring_plans').update(patch).eq('paypal_subscription_id', subId).select('id'))
+  const rows = await must(db().from('recurring_plans').update(patch).eq('paypal_subscription_id', subId).select('id,person_id,status'))
+  if (rows[0] && status !== 'paused') await queue({kind: 'staff_notice', person_id: rows[0].person_id, data: {event: status === 'failed' ? 'plan_failed' : 'plan_cancelled', plan_id: rows[0].id}})
   if (rows[0] && status !== 'failed') await must(db().from('memberships').update({auto_renew: false}).eq('recurring_plan_id', rows[0].id))
   return rows[0] ? 'plan ' + status : 'unknown subscription'
 }
@@ -47,7 +49,7 @@ async function refunded(captureId) {
   return rows[0] ? 'payment marked refunded' : 'unknown payment'
 }
 
-export default async (req) => {
+export default async (req, context) => {
   if (!dbReady()) return fail(503, 'not configured')
   const raw = await req.text()
   if (raw.length > 200000) return fail(413, 'too large')
@@ -103,6 +105,7 @@ export default async (req) => {
     return fail(500, 'could not process')
   }
   log('webhook.done', {type: event.event_type, id: event.id, outcome})
+  kick(context)
   return json({ok: true, outcome})
 }
 

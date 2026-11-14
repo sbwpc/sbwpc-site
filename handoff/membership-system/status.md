@@ -98,11 +98,44 @@ Apple Pay also needs: Apple Pay turned on for the PayPal app, sbwpc.org register
 - Branch sandbox-ready: labels sandbox payments. Deploy it together with the keys.
 - Branch forms-live: puts the new forms on /join and /donate, updates the Privacy, Cookie and Terms pages, removes the test pages. Deploy only after sandbox testing passes and PayPal is switched to live. Set the policy effective dates to the deploy date.
 
+## Stage 3 (email): built and tested locally, not deployed
+Branch: mailer (built on sandbox-ready). Decided November 14, 2026: send through a Google Cloud service account as info@sbwpc.org; Claude drafts the wording and the client approves it.
+
+### What was built
+- Receipts to members and donors after every online payment, and when an admin marks a check received or records a payment by hand (with a tick box to skip it).
+- "How to mail your check" email to anyone who chooses Mail a check.
+- Renewal reminders 30 days before, 7 days before, on the day, and once 14 days after a membership expires. Each has a private renew link that opens the Join form with the level selected. The link changes after every renewal. Members on automatic renewal get one heads-up about the coming charge instead.
+- Notices to info@sbwpc.org for each new member, renewal, donation, promised check, and failed or cancelled automatic payment.
+- Admin sign-in emails (invitation, password reset) sent from info@sbwpc.org through a Supabase Send Email hook.
+- Admin: an Emails list on each person page, and an "Email a renewal reminder" button.
+- Database: supabase/migrations/003_mail.sql (outbox table, updated record_payment, renewal_prefill). NOT yet applied to the live project.
+- Server: web/netlify/lib/mail.mjs, emails.mjs, outbox.mjs and the functions mail-queue (every 5 minutes), reminders (daily, 8:30 AM Pacific in winter), auth-email, checkout-renew.
+
+### How it behaves
+- Every email is a row in the outbox table: queued, sent, failed or not sent, with the reason. That is the record.
+- A mail problem never blocks a payment. Failed sends are retried three times.
+- MAIL_MODE controls sending. Unset or off: nothing is sent and nothing piles up. test: everything goes to MAIL_TEST_TO, labelled with the real recipient. live: normal.
+- No reminder is due for the imported members until April 2027. Their memberships expire from May 14, 2027.
+
+### Settings Netlify needs for email (Luke enters these): handoff/membership-system/mail-setup-checklist.md
+GMAIL_SA_EMAIL, GMAIL_SA_KEY, MAIL_MODE, MAIL_TEST_TO, and later SUPABASE_AUTH_HOOK_SECRET.
+
+### Wording
+- All wording lives in web/netlify/lib/emails.mjs.
+- Draft for the client: "SBWPC-email-wording-for-approval.docx" in the project folder. Rebuild the examples with tests/membership/email-samples.mjs.
+
+### Tests
+- Email checks against a simulated Google mail service: 43 of 43 pass (tests/membership/mail.test.mjs).
+- Not yet tested, because it needs the real credential: sending through the real Gmail API, and the real Supabase hook.
+
+### Notes
+- Supabase email links (invitation, password reset) expire after 1 hour. The setting is Authentication, Sign In / Providers, Email, "Email OTP expiration" (3600 seconds, can be raised to 86400).
+- The client's admin invitation was resent November 14, 2026 at 2:36 PM Pacific.
+
 ### Open questions for SBWPC
 - Confirm the statement people tick before paying: own funds, US citizen or lawful permanent resident, details are true.
 - Is there a smallest or largest gift SBWPC wants to accept online? The form allows $1 to $25,000 as a safety limit only.
 - Should the second household member name be offered at levels above Feminist Household too?
 
 ### Still to build (next stage)
-- Receipt and renewal reminder emails from info@sbwpc.org (needs the Google mailbox connected).
 - A "manage my plan" link so members can cancel auto-renew without going to PayPal.

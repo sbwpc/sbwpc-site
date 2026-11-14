@@ -93,6 +93,15 @@ async function join(name, opts) {
   const again = await sql(`select m.level, m.auto_renew, m.expires_on::text e, (select count(*)::int from public.people where email = 'jordan.rivera@example.com') people, (select count(*)::int from public.memberships mm where mm.person_id = m.person_id) ms from public.memberships m join public.people p on p.id = m.person_id where p.email = 'jordan.rivera@example.com'`)
   ok(`${name}: renewing with the same email updates the member, no duplicate, one more year`, again.length === 1 && again[0].people === 1 && again[0].ms === 1 && again[0].level === 'Access' && again[0].auto_renew === true && Number(again[0].e.slice(0, 4)) === Number(m.e.slice(0, 4)) + 1 && (await page.locator('.co-receipt').innerText()).includes('renewed'), JSON.stringify(again))
 
+  // Arriving from the renew link in a reminder email
+  const tok = (await sql(`select m.renew_token::text t from public.memberships m join public.people p on p.id = m.person_id where p.email = 'jordan.rivera@example.com'`))[0].t
+  await page.goto(origin + '/join-preview/?renew=' + tok + '#join'); await page.waitForSelector('.co-welcome:not([hidden])')
+  await page.addStyleTag({content: '[data-reveal]{opacity:1!important;transform:none!important} .site-header,body>header{position:static!important} .consent,[class*=consent]{display:none!important}'})
+  ok(`${name}: the renew link greets the member, selects their level and fills name and email only`, (await page.locator('.co-welcome').innerText()).includes('Welcome back, Jordan') && (await page.inputValue('input[name=level]:checked')) === 'Access' && (await page.inputValue('[name=email]')) === 'jordan.rivera@example.com' && (await page.inputValue('[name=address1]')) === '' && !page.url().includes('renew='), page.url())
+  await page.locator('.co-welcome').scrollIntoViewIfNeeded(); await page.waitForTimeout(300)
+  await page.screenshot({path: (await import('./browser.mjs')).OUT + `form-join-${name}-8-renew-link.png`})
+  await page.goto(origin + '/join-preview/?renew=00000000-0000-4000-8000-000000000000'); await page.waitForSelector('.co-welcome:not([hidden])')
+  ok(`${name}: an old or wrong renew link says so and the form still works`, (await page.locator('.co-welcome').innerText()).includes('no longer valid') && (await page.locator('label.co-tile').count()) === 8)
   await page.reload(); await page.waitForSelector('.co-form'); await page.addStyleTag({content: '[data-reveal]{opacity:1!important;transform:none!important} .site-header,body>header{position:static!important} .consent,[class*=consent]{display:none!important}'})
   await page.click('label.co-tile:has-text("Voice")')
   await fill(page, {first_name: 'Check', last_name: 'Writer' + name, email: `check.${name}@example.com`}); await page.check('[name=attest]')
@@ -107,7 +116,8 @@ async function join(name, opts) {
   ok(`${name}: the check is waiting for an admin, with no member or payment yet`, (await sql(`select count(*)::int n from public.checkouts where mode = 'check' and status = 'pending' and payload->>'email' = $1`, [`check.${name}@example.com`]))[0].n === 1 && (await sql(`select count(*)::int n from public.people where email = $1`, [`check.${name}@example.com`]))[0].n === 0)
   await page.waitForTimeout(900)
   await page.locator('.co-receipt').screenshot({path: (await import('./browser.mjs')).OUT + `form-join-${name}-7-check-confirmation.png`})
-  ok(`${name}: join page has no script errors`, errors.length === 0, errors.join(' || '))
+  const realErrors = errors.filter((e) => !e.includes('status of 404')) // the wrong renew link test answers 404 on purpose
+  ok(`${name}: join page has no script errors`, realErrors.length === 0, realErrors.join(' || '))
   join.orders = paypal.orders.size
   await browser.close()
 }

@@ -4,6 +4,7 @@ import {json, fail, sameOrigin, readJson, log} from '../lib/http.mjs'
 import {dbReady, getCheckout} from '../lib/db.mjs'
 import {captureOrder, getOrder, getSubscription, firstPayment} from '../lib/paypal.mjs'
 import {completeCheckout, receiptFor} from '../lib/finish.mjs'
+import {kick} from '../lib/outbox.mjs'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const wait = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -13,7 +14,7 @@ const methodOf = (order) => {
   return src.apple_pay ? 'apple_pay' : src.card ? 'card' : 'paypal'
 }
 
-export default async (req) => {
+export default async (req, context) => {
   if (!sameOrigin(req)) return fail(403, 'This request did not come from our website.')
   if (!dbReady()) return fail(503, 'The form is not switched on yet.')
   let body
@@ -48,6 +49,7 @@ export default async (req) => {
       }
       const receipt = await completeCheckout(checkout, {captureId: capture.id, orderId: order.id, method: methodOf(order), amountCents: checkout.amount_cents})
       log('checkout.paid', {checkout: checkout.id, kind: checkout.kind, cents: checkout.amount_cents, method: receipt.method})
+      kick(context)
       return json({ok: true, receipt})
     }
 
@@ -65,6 +67,7 @@ export default async (req) => {
         }
         const receipt = await completeCheckout(checkout, {captureId: tx.id, subscriptionId: sub.id, method: 'paypal', amountCents: paid})
         log('checkout.paid', {checkout: checkout.id, kind: checkout.kind, cents: paid, method: 'paypal', recurring: true})
+        kick(context)
         return json({ok: true, receipt})
       }
       await wait(1500)

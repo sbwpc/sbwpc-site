@@ -8,6 +8,8 @@ const {origin, sql} = site
 let pass = 0, failed = 0
 const ok = (name, cond, detail = '') => { cond ? pass++ : failed++; console.log(`${cond ? 'PASS' : 'FAIL'}  ${name}${cond ? '' : '  -> ' + detail}`) }
 const text = (page, sel) => page.locator(sel).first().innerText()
+// Wait for the confirmation of one specific save, so a message from an earlier step is never mistaken for it
+const flashed = (page, text) => page.waitForFunction((t) => { const f = document.getElementById('a-flash'); return f && !f.hidden && f.textContent.includes(t) }, text)
 const colValues = (page, label) => page.$$eval(`#app table tbody td[data-label="${label}"]`, (tds) => tds.map((t) => t.innerText.trim()))
 
 async function run(name, opts, full) {
@@ -152,7 +154,7 @@ async function run(name, opts, full) {
     ok('person page shows contact, membership, payments, notes and history', ['maria.alvarez@example.com', 'Teacher', 'Santa Barbara Unified', 'Membership', 'Payments', 'Change history', 'Check'].every((s) => body.includes(s)) && noteText.includes('Prefers phone calls'), body.slice(0, 300))
     await page.fill('#app textarea', 'Prefers phone calls. Wants to join the Media committee.')
     await page.click('button:has-text("Save notes")')
-    await page.waitForSelector('#a-flash:not([hidden])')
+    await flashed(page, 'Notes saved')
     ok('notes save', (await sql(`select notes from public.people where last_name = 'Alvarez'`))[0].notes.includes('Media committee'))
 
     await page.click('a:has-text("Edit details")')
@@ -161,7 +163,7 @@ async function run(name, opts, full) {
     await page.fill('#app input[name=employer]', 'Goleta Union School District')
     await shot(page, `admin-${name}-9-edit-person`)
     await page.click('#app form button[type=submit]')
-    await page.waitForSelector('h1:has-text("Maria Alvarez")')
+    await flashed(page, 'Details saved')
     const audit = (await sql(`select actor, before->>'phone' b, after->>'phone' a from public.audit_log where table_name = 'people' and action = 'update' and after->>'phone' = '805-555-0199' order by at desc limit 1`))[0]
     ok('editing a person saves and is written to the audit log with who did it', audit && audit.actor === 'luke@coolhandlook.com' && audit.b !== audit.a, JSON.stringify(audit))
 
@@ -172,26 +174,33 @@ async function run(name, opts, full) {
     await page.click('a:has-text("Record a payment")')
     await page.waitForSelector('#app form')
     await page.fill('#app input[name=note]', 'Check 3301')
+    ok('recording a payment offers to email a receipt, ticked by default', await page.isChecked('#app input[name=send_receipt]'))
     await shot(page, `admin-${name}-10-record-payment`)
     await page.click('#app form button[type=submit]')
-    await page.waitForSelector('#a-flash:not([hidden])')
+    await flashed(page, 'Payment recorded')
     const after = (await sql(`select expires_on::text e from public.memberships m join public.people p on p.id = m.person_id where p.last_name = 'Bennett'`))[0].e
     ok('recording a check by hand extends the membership a year', Number(after.slice(0, 4)) === Number(before.slice(0, 4)) + 1 && (await sql(`select count(*)::int n from public.payments where note = 'Check 3301' and method = 'check' and source = 'manual'`))[0].n === 1, `${before} -> ${after}`)
 
+    ok('the hand-entered check queued a receipt email in the admin\'s name', (await sql(`select count(*)::int n from public.outbox o join public.payments y on y.id = o.payment_id where y.note = 'Check 3301' and o.kind = 'receipt' and o.created_by = 'luke@coolhandlook.com'`))[0].n === 1)
+    await page.click('button:has-text("Email a renewal reminder")')
+    await page.waitForSelector('#app table[aria-label=Emails] td:has-text("Renewal reminder")')
+    ok('"Email a renewal reminder" queues one and shows it in the Emails list', (await sql(`select count(*)::int n from public.outbox o join public.people p on p.id = o.person_id where p.last_name = 'Bennett' and o.kind = 'reminder' and o.data->>'type' = 'manual'`))[0].n === 1 && (await page.locator('#app table[aria-label=Emails]').innerText()).includes('Waiting to send'))
+    await page.locator('#app table[aria-label=Emails]').scrollIntoViewIfNeeded()
+    await shot(page, `admin-${name}-14-person-emails`, false)
     await page.click('a:has-text("Edit membership")')
     await page.waitForSelector('#app form')
     await page.selectOption('#app select[name=level]', 'Voice')
     await page.check('#app input[value="Young Femmes"]')
     await shot(page, `admin-${name}-11-edit-membership`)
     await page.click('#app form button[type=submit]')
-    await page.waitForSelector('#a-flash:not([hidden])')
+    await flashed(page, 'Membership saved')
     const mm = (await sql(`select level, committees from public.memberships m join public.people p on p.id = m.person_id where p.last_name = 'Bennett'`))[0]
     ok('editing a membership saves', mm.level === 'Voice' && mm.committees.includes('Young Femmes'))
     await page.click('#app table[aria-label=Payments] a:has-text("Edit")')
     await page.waitForSelector('#app form')
     await page.selectOption('#app select[name=status]', 'failed')
     await page.click('#app form button[type=submit]')
-    await page.waitForSelector('#a-flash:not([hidden])')
+    await flashed(page, 'Payment saved')
     ok('a bounced check can be marked failed and drops out of the totals', (await sql(`select count(*)::int n from public.payments y join public.people p on p.id = y.person_id where p.last_name = 'Bennett' and status = 'failed'`))[0].n === 1)
 
     // Add a person by hand, with their check

@@ -184,3 +184,10 @@ Branch: manage-plan (built on mailer), now part of main. Built November 14, 2026
 - Payment settings to enter: handoff/membership-system/keys-checklist.md. Email settings to enter: handoff/membership-system/mail-setup-checklist.md. Start email with MAIL_MODE=test.
 - After the keys: test in the PayPal sandbox on /join-preview, /donate-preview and /manage, then the Supabase Send Email hook step.
 - Branch forms-live is the only undeployed work. It puts the new forms on /join and /donate, updates the policy pages and removes the test pages. Deploy it only after sandbox testing passes and PayPal is switched to live.
+
+## PayPal sandbox setup (November 15, 2026)
+- Done in the SBWPC PayPal developer dashboard (signed in by Luke): sandbox app "SBWPC website" (Merchant), created 11:42 AM Pacific. Subscriptions and Apple Pay are on for the app.
+- Sandbox webhook: https://sbwpc.org/api/paypal/webhook, ID 85C34729EH0926315, subscribed to the ten events listed under stage 2.
+- Netlify now has PAYPAL_CLIENT_ID and PAYPAL_WEBHOOK_ID (neither is secret). Still for Luke to paste: PAYPAL_SECRET, SUPABASE_SECRET_KEY, BACKUP_KEY. A redeploy is needed after they are in.
+- The live site reads its content from Sanity now (SANITY_PROJECT_ID is set in Netlify). The swap of /join and /donate to the new forms therefore needs the "checkout" switch set on the two give sections in Sanity, not only in the seed file.
+- Nobody has the login for the old JotForm account. The two JotForm forms still load and take one-time PayPal payments, with no recurring option. They stay until the new forms replace them.

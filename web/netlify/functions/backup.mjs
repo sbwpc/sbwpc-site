@@ -5,7 +5,7 @@ import {env, log} from '../lib/http.mjs'
 import {db, dbReady, must} from '../lib/db.mjs'
 import {keyFrom, seal} from '../lib/backup-crypto.mjs'
 
-const TABLES = ['people', 'memberships', 'payments', 'recurring_plans', 'reminders', 'checkouts', 'settings', 'admins', 'audit_log']
+const TABLES = ['people', 'memberships', 'payments', 'recurring_plans', 'reminders', 'checkouts', 'settings', 'outbox', 'admins', 'audit_log']
 const KEEP_DAYS = 30
 
 async function all(table) {

@@ -57,3 +57,8 @@
 /get-involved/donate               /donate                         301
 /get-involved                      /join                           301
 /contact-2                         /contact                        301
+
+# Search engine entry points: one hop to the canonical host and the real sitemap
+/sitemap.xml                       /sitemap-index.xml              301
+http://www.sbwpc.org/*             https://sbwpc.org/:splat        301!
+https://www.sbwpc.org/*            https://sbwpc.org/:splat        301!

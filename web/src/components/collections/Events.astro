@@ -1,8 +1,10 @@
 ---
 import Img from '../Img.astro'
 import Link from '../Link.astro'
-import {eventParts} from '../../lib/data.js'
+import {eventParts, img} from '../../lib/data.js'
+import {eventLd, pageUrl, ldScript} from '../../lib/seo.js'
 const {items, past = false} = Astro.props
+const ldEvents = past ? [] : items.filter((e) => e.start).map((e) => eventLd(e, e.hasPage ? pageUrl(`events/${e.slug.current}`) : undefined, e.image ? img(e.image, {width: 1200})?.src : undefined))
 ---
 {items.length === 0 ? (
   <div class="empty" data-reveal>
@@ -10,6 +12,8 @@ const {items, past = false} = Astro.props
     <p>Follow SBWPC on Instagram or join the mailing list to hear about the next gathering first.</p>
   </div>
 ) : (
+  <>
+  {ldEvents.length > 0 && <script type="application/ld+json" set:html={ldScript({'@context': 'https://schema.org', '@graph': ldEvents.map(({'@context': _c, ...rest}) => rest)})} />}
   <ul class:list={['events', {past}]}>
     {items.map((e, i) => {
       const p = eventParts(e)
@@ -31,4 +35,5 @@ const {items, past = false} = Astro.props
       )
     })}
   </ul>
+  </>
 )}

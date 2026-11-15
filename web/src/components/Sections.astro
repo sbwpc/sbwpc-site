@@ -19,7 +19,7 @@ const map = {sectionText: Text, sectionCards: Cards, sectionStats: Stats, sectio
 const {sections = []} = Astro.props
 ---
 {sections.map((s) => {
-  // A give section marked checkout: true takes payment on the page instead of showing the JotForm form
-  const C = s._type === 'sectionGive' && s.checkout ? Checkout : map[s._type]
+  // Give sections take payment on the page with the SBWPC checkout. The JotForm form is no longer shown.
+  const C = s._type === 'sectionGive' ? Checkout : map[s._type]
   return C ? <C s={s} /> : null
 })}

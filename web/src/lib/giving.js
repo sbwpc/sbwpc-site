@@ -33,7 +33,7 @@ export const dollars = (cents) => {
   const n = cents / 100
   return '$' + n.toLocaleString('en-US', {minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2})
 }
-// Where the renew link in reminder emails points. Becomes '/join/' when the new form replaces JotForm.
-export const JOIN_PATH = '/join-preview/'
+// Where the renew link in reminder emails points.
+export const JOIN_PATH = '/join/'
 // The page where a member can see or cancel an automatic payment. Reached by a private link in their emails.
 export const MANAGE_PATH = '/manage/'

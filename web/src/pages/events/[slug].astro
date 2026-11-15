@@ -4,16 +4,20 @@ import Hero from '../../components/Hero.astro'
 import Sections from '../../components/Sections.astro'
 import Breadcrumbs from '../../components/Breadcrumbs.astro'
 import Link from '../../components/Link.astro'
-import {loadAll, eventParts} from '../../lib/data.js'
+import {loadAll, eventParts, img} from '../../lib/data.js'
+import {eventLd, pageUrl} from '../../lib/seo.js'
 export async function getStaticPaths() {
   const {events} = await loadAll()
   return events.filter((e) => e.hasPage && e.slug?.current).map((event) => ({params: {slug: event.slug.current}, props: {event}}))
 }
 const {event} = Astro.props
 const p = eventParts(event)
+const evImg = event.image || event.hero?.image
+const evImgUrl = evImg ? img(evImg, {width: 1200})?.src : null
+const ld = event.start ? eventLd(event, pageUrl(`events/${event.slug.current}`), evImgUrl) : undefined
 const hero = event.hero || {heading: event.title, body: event.summary, image: event.image}
 ---
-<Layout title={event.title} description={event.summary} image={event.image || hero.image} path={`events/${event.slug.current}`}>
+<Layout title={event.title} description={event.summary} image={event.image || hero.image} path={`events/${event.slug.current}`} jsonld={ld}>
   <Breadcrumbs path={`events/${event.slug.current}`} title={event.title} />
   <Hero hero={hero} />
   <section class="section tone-white event-facts-wrap">

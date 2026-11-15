@@ -1,5 +1,6 @@
 ---
 import {loadAll} from '../lib/data.js'
+import {breadcrumbLd, pageUrl, withSlash, absolute, ldScript} from '../lib/seo.js'
 const {path, title} = Astro.props
 const {pages, settings} = await loadAll()
 const navLabel = (u) => (settings.nav || []).find((n) => n.url === u)?.label
@@ -9,7 +10,9 @@ const crumbs = parts.slice(0, -1).map((_, i) => {
   const page = pages.find((x) => x.path === p)
   return page || navLabel('/' + p) ? {url: '/' + p, label: navLabel('/' + p) || page.title} : null
 }).filter(Boolean)
+const trail = [{name: 'Home', url: absolute('/')}, ...crumbs.map((c) => ({name: c.label, url: absolute(withSlash(c.url))})), {name: title, url: pageUrl(path)}]
 ---
+{crumbs.length > 0 && <script type="application/ld+json" set:html={ldScript(breadcrumbLd(trail))} />}
 {crumbs.length > 0 && (
   <nav class="crumbs" aria-label="Breadcrumb">
     <ol class="wrap">

@@ -1,20 +1,154 @@
-// Sidebar layout editors see in the Studio
-export const structure = (S) =>
-  S.list()
+// Sidebar layout editors see in the Studio.
+// Order: the jobs done most often first, then pages, then lists that rarely change.
+import {CalendarIcon} from '@sanity/icons/Calendar'
+import {CogIcon} from '@sanity/icons/Cog'
+import {ComposeIcon} from '@sanity/icons/Compose'
+import {DocumentsIcon} from '@sanity/icons/Documents'
+import {FolderIcon} from '@sanity/icons/Folder'
+import {HelpCircleIcon} from '@sanity/icons/HelpCircle'
+import {ImagesIcon} from '@sanity/icons/Images'
+import {StarIcon} from '@sanity/icons/Star'
+import {UsersIcon} from '@sanity/icons/Users'
+import {StartHere} from './components/StartHere.jsx'
+
+const API = {apiVersion: '2025-02-19'}
+
+// Pages grouped by the part of the site they belong to
+const PAGE_GROUPS = [
+  ['Home', '_type == "page" && path == "home"'],
+  ['About', '_type == "page" && path match "about/*"'],
+  ['Advocacy', '_type == "page" && (path == "advocacy" || path match "advocacy/*")'],
+  ['Elections', '_type == "page" && (path == "elections" || path match "elections/*")'],
+  ['Events and news', '_type == "page" && (path == "events" || path match "events/*" || path == "news")'],
+  ['Take action and join', '_type == "page" && (path == "take-action" || path match "take-action/*" || path match "get-involved/*" || path in ["join", "donate", "contact"])'],
+  ['Legal', '_type == "page" && path in ["privacy", "terms", "cookies"]'],
+]
+
+export const structure = (S, context) => {
+  const client = () => context.getClient(API)
+
+  const docs = (id, title, type, filter, ordering) =>
+    S.documentList()
+      .id(id)
+      .title(title)
+      .schemaType(type)
+      .filter(filter)
+      .params({})
+      .defaultOrdering(ordering)
+
+  const typeList = (id, title, type, ordering, icon) =>
+    S.listItem().id(id).title(title).icon(icon).schemaType(type).child(docs(id, title, type, `_type == "${type}"`, ordering))
+
+  const byOrder = [{field: 'order', direction: 'asc'}]
+
+  const news = S.listItem()
+    .id('news')
+    .title('News')
+    .icon(ComposeIcon)
+    .child(async () => {
+      const years = await client().fetch('array::unique(*[_type == "post" && defined(date)]{"y": string::split(date, "-")[0]}.y)')
+      const sorted = (years || []).sort().reverse()
+      return S.list()
+        .id('newsYears')
+        .title('News')
+        .items([
+          S.listItem().id('news-all').title('All news, newest first').schemaType('post').child(docs('news-all', 'All news', 'post', '_type == "post"', [{field: 'date', direction: 'desc'}])),
+          S.divider(),
+          ...sorted.map((y) =>
+            S.listItem()
+              .id(`news-${y}`)
+              .title(y)
+              .schemaType('post')
+              .child(docs(`news-${y}`, `News ${y}`, 'post', `_type == "post" && date >= "${y}-01-01" && date <= "${y}-12-31"`, [{field: 'date', direction: 'desc'}])),
+          ),
+        ])
+    })
+
+  const events = S.listItem()
+    .id('events')
+    .title('Events')
+    .icon(CalendarIcon)
+    .child(
+      S.list()
+        .id('eventLists')
+        .title('Events')
+        .items([
+          S.listItem().id('events-upcoming').title('Upcoming').schemaType('event').child(docs('events-upcoming', 'Upcoming events', 'event', '_type == "event" && start >= now()', [{field: 'start', direction: 'asc'}])),
+          S.listItem().id('events-past').title('Past').schemaType('event').child(docs('events-past', 'Past events', 'event', '_type == "event" && start < now()', [{field: 'start', direction: 'desc'}])),
+          S.listItem().id('events-all').title('All events').schemaType('event').child(docs('events-all', 'All events', 'event', '_type == "event"', [{field: 'start', direction: 'desc'}])),
+        ]),
+    )
+
+  const endorsements = S.listItem()
+    .id('endorsements')
+    .title('Endorsements')
+    .icon(StarIcon)
+    .child(async () => {
+      const elections = await client().fetch('array::unique(*[_type == "endorsement" && defined(election)].election)')
+      const sorted = (elections || []).sort().reverse()
+      return S.list()
+        .id('endorsementLists')
+        .title('Endorsements')
+        .items([
+          ...sorted.map((e) =>
+            S.listItem()
+              .id(`endorse-${e}`)
+              .title(e)
+              .schemaType('endorsement')
+              .child(S.documentList().id(`endorse-${e}`).title(e).schemaType('endorsement').filter('_type == "endorsement" && election == $e').params({e}).defaultOrdering(byOrder)),
+          ),
+          S.divider(),
+          S.listItem().id('endorse-all').title('All endorsements').schemaType('endorsement').child(docs('endorse-all', 'All endorsements', 'endorsement', '_type == "endorsement"', byOrder)),
+        ])
+    })
+
+  const pages = S.listItem()
+    .id('pages')
+    .title('Pages')
+    .icon(DocumentsIcon)
+    .child(
+      S.list()
+        .id('pageGroups')
+        .title('Pages')
+        .items([
+          ...PAGE_GROUPS.map(([title, filter]) =>
+            S.listItem().id(`pages-${title}`).title(title).schemaType('page').child(docs(`pages-${title}`, title, 'page', filter, [{field: 'path', direction: 'asc'}])),
+          ),
+          S.divider(),
+          S.listItem().id('pages-all').title('All pages, A to Z').schemaType('page').child(docs('pages-all', 'All pages', 'page', '_type == "page"', [{field: 'path', direction: 'asc'}])),
+        ]),
+    )
+
+  const otherLists = S.listItem()
+    .id('otherLists')
+    .title('Other lists')
+    .icon(FolderIcon)
+    .child(
+      S.list()
+        .id('otherListItems')
+        .title('Other lists')
+        .items([
+          typeList('committees', 'Committees', 'committee', byOrder, UsersIcon),
+          typeList('positions', 'Adopted positions', 'position', byOrder, DocumentsIcon),
+          typeList('actions', 'Civic actions', 'action', byOrder, StarIcon),
+          typeList('opportunities', 'Boards and commissions', 'opportunity', [{field: 'title', direction: 'asc'}], FolderIcon),
+        ]),
+    )
+
+  return S.list()
     .title('SBWPC')
     .items([
-      S.listItem().title('Site settings').id('siteSettings').child(S.document().schemaType('siteSettings').documentId('siteSettings')),
+      S.listItem().id('startHere').title('Start here').icon(HelpCircleIcon).child(S.component(StartHere).id('startHere').title('Start here')),
       S.divider(),
-      S.listItem().title('Pages').schemaType('page').child(S.documentTypeList('page').title('Pages').defaultOrdering([{field: 'path', direction: 'asc'}])),
-      S.listItem().title('News').schemaType('post').child(S.documentTypeList('post').title('News').defaultOrdering([{field: 'date', direction: 'desc'}])),
-      S.listItem().title('Events').schemaType('event').child(S.documentTypeList('event').title('Events').defaultOrdering([{field: 'start', direction: 'desc'}])),
-      S.listItem().title('Photo albums').schemaType('album').child(S.documentTypeList('album').title('Photo albums')),
+      news,
+      events,
+      endorsements,
+      typeList('board', 'Board of Directors', 'person', byOrder, UsersIcon),
       S.divider(),
-      S.listItem().title('Endorsements').schemaType('endorsement').child(S.documentTypeList('endorsement').title('Endorsements').defaultOrdering([{field: 'order', direction: 'asc'}])),
-      S.listItem().title('Civic actions').schemaType('action').child(S.documentTypeList('action').title('Civic actions').defaultOrdering([{field: 'order', direction: 'asc'}])),
-      S.listItem().title('Boards and commissions').schemaType('opportunity').child(S.documentTypeList('opportunity').title('Boards and commissions')),
+      pages,
+      typeList('albums', 'Photo albums', 'album', [{field: 'date', direction: 'desc'}], ImagesIcon),
       S.divider(),
-      S.listItem().title('Board of Directors').schemaType('person').child(S.documentTypeList('person').title('Board of Directors').defaultOrdering([{field: 'order', direction: 'asc'}])),
-      S.listItem().title('Committees').schemaType('committee').child(S.documentTypeList('committee').title('Committees').defaultOrdering([{field: 'order', direction: 'asc'}])),
-      S.listItem().title('Adopted positions').schemaType('position').child(S.documentTypeList('position').title('Adopted positions').defaultOrdering([{field: 'order', direction: 'asc'}])),
+      S.listItem().id('siteSettings').title('Site settings (menu, footer, banner)').icon(CogIcon).child(S.document().schemaType('siteSettings').documentId('siteSettings')),
+      otherLists,
     ])
+}

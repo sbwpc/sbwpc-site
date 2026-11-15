@@ -23,15 +23,13 @@ Rebuild of sbwpc.org: an Astro site on Netlify with a Sanity CMS. It keeps the c
 ## Going live checklist
 
 1. **Create the Sanity project.** Use an org-owned login (for example info@sbwpc.org) at https://www.sanity.io/manage. Use the free plan and a dataset named `production`. Copy the project ID.
-2. **Import the content.** Run these in `studio/`:
+2. **Import the content.** The Sanity project is `coo0nu6y`, dataset `production`, under the info@sbwpc.org login. Create an API token with Editor and Deploy Studio access (Sanity, API, Tokens), save it as `SANITY_AUTH_TOKEN=<token>` in `handoff/sanity/.env` (never committed), then run:
    ```
-   npm install
-   npx sanity login
-   SANITY_STUDIO_PROJECT_ID=<id> npx sanity dataset import ../seed production --replace
+   python3 handoff/sanity/go_live.py import
    ```
-   The importer reads `seed/data.ndjson` and uploads the files in `seed/images/`.
-3. **Deploy the Studio.** Run `SANITY_STUDIO_PROJECT_ID=<id> npx sanity deploy`. Editors then sign in at https://sbwpc.sanity.studio. Invite them under Members in sanity.io/manage.
-4. **Connect the code to Netlify.** Push this folder to a GitHub repo owned by the org, then link the repo to the Netlify `sbwpc` project. Base directory is `web`, build command is `npm run build`, publish directory is `dist`.
+   The script packs `seed/data.ndjson` and `seed/images/` together, because Sanity only uploads local images from a tarball. It replaces everything in the dataset, so run it once.
+3. **Deploy the Studio.** Run `python3 handoff/sanity/go_live.py deploy`. Editors then sign in at https://sbwpc.sanity.studio. Invite them under Members in sanity.io/manage. `go_live.py verify` counts the documents.
+4. **Connect the code to Netlify.** Push this folder to a GitHub repo owned by the org, then link the repo to the Netlify `sbwpc-org` project. Base directory is `web`, build command is `npm run build`, publish directory is `dist`.
 5. **Add environment variables in Netlify.** Set `SANITY_PROJECT_ID=<id>` and `SANITY_DATASET=production`.
 6. **Set up automatic rebuilds.** In Netlify, add a build hook under Site configuration, Build and deploy, Build hooks. In Sanity, add a webhook (API, Webhooks) that posts to that hook on create, update and delete.
 7. **Add the CORS origin.** In Sanity, under API, CORS origins, add `https://sbwpc.org`.

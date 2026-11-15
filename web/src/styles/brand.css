@@ -2596,3 +2596,18 @@ apple-pay-button {
   max-width: 28rem;
   margin: 1.5rem 0 1.25rem;
 }
+
+/* Headings whose tag was lowered at build time to avoid skipped levels keep the look of the original level */
+.prose :is(h2, h3)[data-h='3'] {
+  font: 400 1.5rem/1.3333 var(--font-brand);
+  color: var(--navy);
+  letter-spacing: 0;
+  margin: 2.25rem 0 0.75rem;
+}
+.prose :is(h3, h4)[data-h='4'] {
+  font: 600 1.125rem/1.4 var(--font-brand);
+  color: var(--navy);
+  letter-spacing: normal;
+  text-transform: none;
+  margin: 1.75rem 0 0.5rem;
+}

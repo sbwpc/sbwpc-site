@@ -6,12 +6,35 @@ import Breadcrumbs from '../components/Breadcrumbs.astro'
 import {loadAll} from '../lib/data.js'
 export async function getStaticPaths() {
   const {pages} = await loadAll()
-  return pages.filter((p) => p.path && p.path !== 'home').map((page) => ({params: {path: page.path}, props: {page}}))
+  const EX = 'advocacy/explainers/'
+  const list = pages.filter((p) => p.path?.startsWith(EX) && p.path.length > EX.length)
+  // Explainers link to the three that follow them (wrapping around) so none is a dead end.
+  const related = (page) => {
+    const i = list.findIndex((x) => x.path === page.path)
+    if (i < 0 || list.length < 2) return []
+    return Array.from({length: Math.min(3, list.length - 1)}, (_, k) => list[(i + 1 + k) % list.length])
+  }
+  return pages.filter((p) => p.path && p.path !== 'home').map((page) => ({params: {path: page.path}, props: {page, related: related(page)}}))
 }
-const {page} = Astro.props
+const {page, related} = Astro.props
 ---
 <Layout title={page.seo?.title || page.title} description={page.seo?.description || page.hero?.body} image={page.seo?.image || page.hero?.image} path={page.path}>
   <Breadcrumbs path={page.path} title={page.title} />
   {page.hero && <Hero hero={page.hero} />}
   <Sections sections={page.sections} />
+  {related.length > 0 && (
+    <section class="section tone-cream">
+      <div class="wrap">
+        <div class="section-head split"><div><h2 class="h2">More explainers</h2></div><p class="lede"><a class="textlink" href="/advocacy/explainers/"><span class="arrow">All explainers</span></a></p></div>
+        <div class="grid c3 v-bordered">
+          {related.map((r) => (
+            <article class="card linked">
+              <h3 class="h3 card-title">{r.title}</h3>
+              <div class="links"><a class="textlink stretch" href={`/${r.path}/`}><span class="arrow">Read the explainer</span></a></div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
 </Layout>

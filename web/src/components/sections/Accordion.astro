@@ -1,8 +1,11 @@
 ---
 import Shell from './Shell.astro'
 import RichText from '../RichText.astro'
+import {faqLd, ldScript} from '../../lib/seo.js'
 const {s} = Astro.props
+const faq = faqLd(s.items)
 ---
+{faq && <script type="application/ld+json" set:html={ldScript(faq)} />}
 <Shell s={s}>
   <div class="accordion" data-reveal>
     {(s.items || []).map((it) => (

@@ -13,6 +13,9 @@ import {StartHere} from './components/StartHere.jsx'
 
 const API = {apiVersion: '2025-02-19'}
 
+// Structure ids cannot contain spaces or odd characters
+const slug = (v) => String(v).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+
 // Pages grouped by the part of the site they belong to
 const PAGE_GROUPS = [
   ['Home', '_type == "page" && path == "home"'],
@@ -56,10 +59,10 @@ export const structure = (S, context) => {
           S.divider(),
           ...sorted.map((y) =>
             S.listItem()
-              .id(`news-${y}`)
+              .id(`news-${slug(y)}`)
               .title(y)
               .schemaType('post')
-              .child(docs(`news-${y}`, `News ${y}`, 'post', `_type == "post" && date >= "${y}-01-01" && date <= "${y}-12-31"`, [{field: 'date', direction: 'desc'}])),
+              .child(docs(`news-${slug(y)}`, `News ${y}`, 'post', `_type == "post" && date >= "${y}-01-01" && date <= "${y}-12-31"`, [{field: 'date', direction: 'desc'}])),
           ),
         ])
     })
@@ -92,10 +95,10 @@ export const structure = (S, context) => {
         .items([
           ...sorted.map((e) =>
             S.listItem()
-              .id(`endorse-${e}`)
+              .id(`endorse-${slug(e)}`)
               .title(e)
               .schemaType('endorsement')
-              .child(S.documentList().id(`endorse-${e}`).title(e).schemaType('endorsement').filter('_type == "endorsement" && election == $e').params({e}).defaultOrdering(byOrder)),
+              .child(S.documentList().id(`endorse-${slug(e)}`).title(e).schemaType('endorsement').filter('_type == "endorsement" && election == $e').params({e}).defaultOrdering(byOrder)),
           ),
           S.divider(),
           S.listItem().id('endorse-all').title('All endorsements').schemaType('endorsement').child(docs('endorse-all', 'All endorsements', 'endorsement', '_type == "endorsement"', byOrder)),
@@ -112,7 +115,7 @@ export const structure = (S, context) => {
         .title('Pages')
         .items([
           ...PAGE_GROUPS.map(([title, filter]) =>
-            S.listItem().id(`pages-${title}`).title(title).schemaType('page').child(docs(`pages-${title}`, title, 'page', filter, [{field: 'path', direction: 'asc'}])),
+            S.listItem().id(`pages-${slug(title)}`).title(title).schemaType('page').child(docs(`pages-${slug(title)}`, title, 'page', filter, [{field: 'path', direction: 'asc'}])),
           ),
           S.divider(),
           S.listItem().id('pages-all').title('All pages, A to Z').schemaType('page').child(docs('pages-all', 'All pages', 'page', '_type == "page"', [{field: 'path', direction: 'asc'}])),

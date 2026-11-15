@@ -1,5 +1,6 @@
 ---
 import Link from './Link.astro'
+import {ABOUT_TEXT} from '../lib/seo.js'
 const {settings} = Astro.props
 const year = new Date().getFullYear()
 ---
@@ -13,6 +14,10 @@ const year = new Date().getFullYear()
         {settings.joinUrl && <a class="btn accent small" href={settings.joinUrl}>Join or Renew</a>}
         {settings.donateUrl && <a class="btn small" href={settings.donateUrl}>Donate</a>}
       </div>
+    </div>
+    <div class="footer-about">
+      <p class="footer-h">About SBWPC</p>
+      <p>{ABOUT_TEXT}</p>
     </div>
     <div class="footer-cols">
       {(settings.footerColumns || []).map((col) => (

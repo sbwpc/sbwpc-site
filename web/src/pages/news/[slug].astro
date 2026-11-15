@@ -5,7 +5,7 @@ import RichText from '../../components/RichText.astro'
 import Img from '../../components/Img.astro'
 import Posts from '../../components/collections/Posts.astro'
 import {loadAll, fmtDate, img} from '../../lib/data.js'
-import {newsLd, pageUrl} from '../../lib/seo.js'
+import {newsLd, pageUrl, BYLINE} from '../../lib/seo.js'
 export async function getStaticPaths() {
   const {posts} = await loadAll()
   const list = posts.filter((p) => p.slug?.current && !p.externalUrl)
@@ -22,7 +22,7 @@ const ld = newsLd(post, pageUrl(`news/${post.slug.current}`), shareImg?.src)
     <header class="section tone-cream article-head">
       <div class="wrap narrow" data-reveal>
         <h1 class="h1">{post.title}</h1>
-        <p class="meta article-date"><time datetime={post.date}>{fmtDate(post.date)}</time></p>
+        <p class="meta article-date">By {BYLINE}, published <time datetime={post.date}>{fmtDate(post.date)}</time></p>
         {post.excerpt && <p class="lede">{post.excerpt}</p>}
       </div>
     </header>

@@ -2611,3 +2611,17 @@ apple-pay-button {
   text-transform: none;
   margin: 1.75rem 0 0.5rem;
 }
+
+/* Footer About block and explainer byline */
+.footer-about {
+  max-width: 48rem;
+  margin: 0 0 2rem;
+}
+.footer-about p:last-child {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.byline {
+  margin: 1.25rem 0 0;
+}

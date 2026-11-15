@@ -69,6 +69,11 @@ export const absolute = (p) => new URL(p.startsWith('/') ? p : '/' + p, SITE).hr
 export const withSlash = (p) => (p === '/' || p.endsWith('/') ? p : p + '/')
 export const pageUrl = (path) => (path === 'home' || !path ? SITE + '/' : SITE + '/' + path.replace(/^\/|\/$/g, '') + '/')
 
+// Shown as the byline on news posts and explainers, and as the About block in the footer.
+export const BYLINE = 'SBWPC'
+export const ABOUT_TEXT =
+  "The Santa Barbara Women's Political Committee (SBWPC) is a feminist political action committee serving Santa Barbara County, California. Founded in 1987 by Gayle Binion, Lois Phillips and Susan Rose, it endorses candidates and ballot measures that support gender, race and LGBTQ+ equality, helps women prepare to run for office, and advocates on local and state policy. Its motto is Access, Voice, Power."
+
 // ---------- JSON-LD ----------
 export function orgLd(settings = {}) {
   const org = {
@@ -80,6 +85,8 @@ export function orgLd(settings = {}) {
     logo: SITE + '/icon-512.png',
     description: HOME_DESC,
     areaServed: 'Santa Barbara County, California',
+    foundingDate: '1987',
+    founder: ['Gayle Binion', 'Lois Phillips', 'Susan Rose'].map((name) => ({'@type': 'Person', name})),
   }
   if (settings.email) org.email = settings.email
   const same = (settings.social || []).map((s) => s.url).filter((u) => /^https?:\/\//.test(u || ''))

@@ -5,7 +5,7 @@ import objects from './schemas/objects.js'
 import documents from './schemas/documents.js'
 import {structure} from './structure.js'
 
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'REPLACE_ME'
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'coo0nu6y'
 const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
 
 export default defineConfig({

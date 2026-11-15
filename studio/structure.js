@@ -10,6 +10,7 @@ import {ImagesIcon} from '@sanity/icons/Images'
 import {StarIcon} from '@sanity/icons/Star'
 import {UsersIcon} from '@sanity/icons/Users'
 import {StartHere} from './components/StartHere.jsx'
+import {MembersPane} from './components/MembersPane.jsx'
 
 const API = {apiVersion: '2025-02-19'}
 
@@ -142,6 +143,7 @@ export const structure = (S, context) => {
     .title('SBWPC')
     .items([
       S.listItem().id('startHere').title('Start here').icon(HelpCircleIcon).child(S.component(StartHere).id('startHere').title('Start here')),
+      S.listItem().id('members').title('Members and donations').icon(UsersIcon).child(S.component(MembersPane).id('members').title('Members and donations')),
       S.divider(),
       news,
       events,

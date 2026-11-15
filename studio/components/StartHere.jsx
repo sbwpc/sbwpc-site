@@ -61,6 +61,10 @@ export function StartHere() {
         intent={{type: 'endorsement', label: 'Add an endorsement'}}
       />
       <Job
+        title="Manage members and donations"
+        text="Open Members and donations in the left menu, then Open the member system. It has its own sign-in."
+      />
+      <Job
         title="Change a board member"
         text="Open Board of Directors in the left menu. Click the person, make your change, then click Publish."
       />

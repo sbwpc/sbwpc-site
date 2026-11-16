@@ -248,14 +248,14 @@ FAQS['join'] = {
     'items': [
         ('What does an SBWPC membership include?',
          "Members receive news about advocacy, elections and programs, invitations to member events, free or discounted entry to eligible programs, and special invitations to forums and workshops. Members can also help review candidates on Candidate Assessment Teams and attend candidate workshops that teach how to run a strong campaign."),
-        ('Can members vote on endorsements?',
-         "Yes. Every membership level includes full membership, which means you can vote on endorsements, join committees and take part in member programs. Members also interview candidates as part of Candidate Assessment Teams. The level you choose does not change your vote or your access to member programs."),
+        ('Do members vote on endorsements?',
+         "No. The Board votes on endorsements. Members are welcome to share their input at our endorsement meetings, which are for members only. Members can also join committees, interview candidates as part of Candidate Assessment Teams and take part in member programs. The level you choose does not change your access to member programs."),
         ('How much does SBWPC membership cost?',
          "Annual membership starts at $16 for the Friend level, with $40 for Advocate and $60 for a Feminist Household. Higher levels run from $125 to $5,000 a year, and the $500 and higher levels include VIP access to the annual event and Cosmopolitics. Choose the amount that works for you."),
         ('How do I join or renew?',
          "Choose a level and complete the form in the Join or renew today section of this page. If you need help picking a level or have a question about your membership, email info@sbwpc.org. Every level supports SBWPC's work, so choose the annual amount that fits your budget."),
         ('Can I support SBWPC without becoming a member?',
-         "Yes. You can make a separate [donation](/donate) at any time. A donation supports the candidates SBWPC endorses and the programs that help more women lead. Membership adds the right to vote on endorsements, join committees and take part in member programs."),
+         "Yes. You can make a separate [donation](/donate) at any time. A donation supports the candidates SBWPC endorses and the programs that help more women lead. Membership adds a place at members-only endorsement meetings, committee seats and member programs."),
     ],
 }
 

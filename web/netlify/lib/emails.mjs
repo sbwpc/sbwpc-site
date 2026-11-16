@@ -7,7 +7,7 @@ const ADDRESS = 'P.O. Box 90618, Santa Barbara, CA 93190-0618'
 const CONTACT = 'info@sbwpc.org'
 const METHODS = {paypal: 'PayPal', apple_pay: 'Apple Pay', card: 'Card', check: 'Check', cash: 'Cash', other: 'Other'}
 // Approved wording, November 14, 2026
-const NOT_DEDUCTIBLE = 'Thank you for making this work possible. Because SBWPC is a political committee and not a 501(c)(3) charity, dues and contributions are not tax deductible.'
+const NOT_DEDUCTIBLE = 'Thank you for making this work possible.'
 
 export const longDate = (iso) => (iso ? new Date(String(iso).slice(0, 10) + 'T12:00:00Z').toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'}) : '')
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]))
@@ -79,7 +79,7 @@ export function receipt({person, payment, membership, plan, renewal, siteUrl}) {
       facts: paymentFacts(payment, membership, plan),
       ...(plan ? {button: {label: 'Manage automatic renewal', url: manageUrl(siteUrl, plan)}} : {}),
       after: [
-        ...(renewal ? [] : ['As a member you can vote on endorsements, join committees and take part in member programs. We are glad you are here.']),
+        ...(renewal ? [] : ['As a member you are welcome to share your input at our members-only endorsement meetings, join committees and take part in member programs. We are glad you are here.']),
         'Please keep this email as your receipt.',
       ],
       note: NOT_DEDUCTIBLE,

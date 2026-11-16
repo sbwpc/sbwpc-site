@@ -7,6 +7,8 @@ import {friendly} from './schemas/friendly.js'
 import {structure} from './structure.js'
 import {Logo} from './components/Logo.jsx'
 import {withPublishNote} from './components/publishNote.js'
+import {helpTool} from './tools/help/index.js'
+import {withWatchHow} from './tools/help/WatchHow.jsx'
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'coo0nu6y'
 const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
@@ -27,16 +29,21 @@ const theme = buildLegacyTheme({
 const PROTECTED = ['page', 'siteSettings']
 const BLOCKED = ['delete', 'unpublish', 'duplicate']
 
+// Which how-to video sits above each kind of entry
+const WATCH = {siteSettings: 'settings', page: 'pages', post: 'news', event: 'events', endorsement: 'endorsements', person: 'directory', committee: 'directory', position: 'directory', action: 'directory', opportunity: 'directory', album: 'photos'}
+
 export default defineConfig({
   name: 'sbwpc',
   title: 'SBWPC Website',
+  // Local testing only: SANITY_STUDIO_TOKEN_LOGIN=1 signs in with a token kept in the browser
+  ...(process.env.SANITY_STUDIO_TOKEN_LOGIN ? {auth: {loginMethod: 'token'}} : {}),
   projectId,
   dataset,
   theme,
-  plugins: [structureTool({structure}), ...(showVision ? [visionTool()] : [])],
+  plugins: [structureTool({structure}), helpTool(), ...(showVision ? [visionTool()] : [])],
   studio: {components: {logo: Logo}},
   schema: {
-    types: friendly([...objects, ...documents]),
+    types: friendly([...objects, ...documents]).map((t) => (WATCH[t.name] ? {...t, components: {...(t.components || {}), input: withWatchHow(WATCH[t.name])}} : t)),
     // Site settings is a single document, so hide it from "create new"
     templates: (prev) => prev.filter((t) => t.schemaType !== 'siteSettings'),
   },

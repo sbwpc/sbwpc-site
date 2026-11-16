@@ -1,4 +1,5 @@
 import {IntentLink} from 'sanity/router'
+import {openHelp} from '../tools/help/videos.js'
 
 const wrap = {padding: '32px 40px', maxWidth: 760, lineHeight: 1.5, fontSize: 15}
 const card = {
@@ -44,6 +45,14 @@ export function StartHere() {
       <p style={muted}>
         Your changes stay private until you click Publish. You can stop at any time and come back later. Your work is saved as a draft.
       </p>
+
+      <div style={card}>
+        <h3 style={h3}>Watch the help videos</h3>
+        <p style={p}>Short videos show each job, step by step. They are also in the Help tab at the top.</p>
+        <button type="button" onClick={() => openHelp('start')} style={{...button, border: 0, cursor: 'pointer', fontSize: 15}}>
+          Watch the videos
+        </button>
+      </div>
 
       <Job
         title="Post news"

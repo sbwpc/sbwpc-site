@@ -9,6 +9,8 @@ import {HelpCircleIcon} from '@sanity/icons/HelpCircle'
 import {ImagesIcon} from '@sanity/icons/Images'
 import {StarIcon} from '@sanity/icons/Star'
 import {UsersIcon} from '@sanity/icons/Users'
+import {PlayIcon} from '@sanity/icons/Play'
+import {openHelp} from './tools/help/videos.js'
 import {StartHere} from './components/StartHere.jsx'
 import {MembersPane} from './components/MembersPane.jsx'
 
@@ -31,14 +33,17 @@ const PAGE_GROUPS = [
 export const structure = (S, context) => {
   const client = () => context.getClient(API)
 
-  const docs = (id, title, type, filter, ordering) =>
-    S.documentList()
-      .id(id)
-      .title(title)
-      .schemaType(type)
-      .filter(filter)
-      .params({})
-      .defaultOrdering(ordering)
+  // Which how-to video each kind of list points to (shown as a play button beside the + button)
+  const HELP_FOR = {post: ['news', 'writing a News post'], event: ['events', 'adding an Event'], endorsement: ['endorsements', 'adding an Endorsement'], person: ['directory', 'the directory'], committee: ['directory', 'the directory'], position: ['directory', 'the directory'], action: ['directory', 'the directory'], opportunity: ['directory', 'the directory'], album: ['photos', 'making a Photo album'], page: ['pages', 'pages and sections']}
+  const docs = (id, title, type, filter, ordering) => {
+    let list = S.documentList().id(id).title(title).schemaType(type).filter(filter).params({}).defaultOrdering(ordering)
+    const help = HELP_FOR[type]
+    if (help) {
+      const watch = S.menuItem().title(`Watch how: ${help[1]}`).icon(PlayIcon).showAsAction(true).action(() => openHelp(help[0]))
+      list = list.menuItems([...(list.getMenuItems() || []), watch])
+    }
+    return list
+  }
 
   const typeList = (id, title, type, ordering, icon) =>
     S.listItem().id(id).title(title).icon(icon).schemaType(type).child(docs(id, title, type, `_type == "${type}"`, ordering))

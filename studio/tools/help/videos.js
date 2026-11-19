@@ -19,7 +19,7 @@ export const HELP_VIDEOS = [
   {key: 'photos', n: 8, group: 'more', title: "How do I make a Photo album?", length: '1:05', file: 'sbwpc-studio-8-photo-albums', about: "A new album, adding photos, the photo description, and using photos elsewhere."},
   {key: 'publishing', n: 9, group: 'help', title: "How does publishing work?", length: '1:15', file: 'sbwpc-studio-9-publishing', about: "Draft and Published, the Publish button, the one minute wait, and History."},
   {key: 'fix', n: 10, group: 'help', title: "How do I fix a mistake?", length: '0:49', file: 'sbwpc-studio-10-fix-a-mistake', about: "Discard changes, restore from History, Unpublish and Delete."},
-  {key: 'members', n: 11, group: 'help', title: "How do I use the membership tool?", length: '1:23', file: 'sbwpc-studio-11-membership-tool', about: "Sign in, members, donors and payments, checks to confirm, and downloads."},
+  {key: 'members', n: 11, group: 'help', title: "How do I use the membership tool?", length: '1:16', file: 'sbwpc-studio-11-membership-tool', about: "Opening it from the Studio, members, donors and payments, checks to confirm, and downloads."},
 ]
 
 /** Opens the Help tab at one video, from places that cannot use the Studio's router themselves. */

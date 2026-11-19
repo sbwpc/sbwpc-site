@@ -35,8 +35,9 @@ const WATCH = {siteSettings: 'settings', page: 'pages', post: 'news', event: 'ev
 export default defineConfig({
   name: 'sbwpc',
   title: 'SBWPC Website',
-  // Local testing only: SANITY_STUDIO_TOKEN_LOGIN=1 signs in with a token kept in the browser
-  ...(process.env.SANITY_STUDIO_TOKEN_LOGIN ? {auth: {loginMethod: 'token'}} : {}),
+  // Sign in with a token kept in the browser. The member system uses it to confirm who is signing in
+  // from the Members and donations screen (web/netlify/functions/studio-login.mjs).
+  auth: {loginMethod: 'token'},
   projectId,
   dataset,
   theme,

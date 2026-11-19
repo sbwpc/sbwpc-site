@@ -26,80 +26,12 @@ import '../../styles/admin.css'
       <p class="a-status" id="a-loading" role="status">Loading...</p>
       <noscript><p class="a-status">This page needs JavaScript turned on.</p></noscript>
 
-      <!-- Sign in -->
+      <!-- Sign in: the member system opens from the Sanity Studio -->
       <section class="a-card" id="v-signin" hidden aria-labelledby="h-signin">
-        <h1 id="h-signin">Sign in</h1>
-        <p class="a-sub">Member records for SBWPC board use only.</p>
-        <form id="f-signin" novalidate>
-          <label for="si-email">Email</label>
-          <input id="si-email" name="email" type="email" autocomplete="username" required />
-          <label for="si-pass">Password</label>
-          <input id="si-pass" name="password" type="password" autocomplete="current-password" required />
-          <p class="a-error" id="e-signin" role="alert" hidden></p>
-          <button type="submit" class="a-btn">Continue</button>
-        </form>
-        <button type="button" class="a-link" id="a-forgot">Forgot your password?</button>
-      </section>
-
-      <!-- Reset request -->
-      <section class="a-card" id="v-forgot" hidden aria-labelledby="h-forgot">
-        <h1 id="h-forgot">Reset your password</h1>
-        <p class="a-sub">Enter your admin email. If it has an account, we will send a link to set a new password.</p>
-        <form id="f-forgot" novalidate>
-          <label for="fg-email">Email</label>
-          <input id="fg-email" name="email" type="email" autocomplete="username" required />
-          <p class="a-error" id="e-forgot" role="alert" hidden></p>
-          <p class="a-ok" id="ok-forgot" role="status" hidden>If that address has an account, a reset link is on its way.</p>
-          <button type="submit" class="a-btn">Send reset link</button>
-        </form>
-        <button type="button" class="a-link" id="a-back-signin">Back to sign in</button>
-      </section>
-
-      <!-- Set password (invite or reset link) -->
-      <section class="a-card" id="v-password" hidden aria-labelledby="h-password">
-        <h1 id="h-password">Set your password</h1>
-        <p class="a-sub">Use at least 12 characters. A short sentence you can remember works well.</p>
-        <form id="f-password" novalidate>
-          <label for="pw-new">New password</label>
-          <input id="pw-new" name="new-password" type="password" autocomplete="new-password" minlength="12" required />
-          <label for="pw-again">Type it again</label>
-          <input id="pw-again" name="new-password-again" type="password" autocomplete="new-password" minlength="12" required />
-          <p class="a-error" id="e-password" role="alert" hidden></p>
-          <button type="submit" class="a-btn">Save password</button>
-        </form>
-      </section>
-
-      <!-- Two-factor setup -->
-      <section class="a-card" id="v-enroll" hidden aria-labelledby="h-enroll">
-        <h1 id="h-enroll">Set up two-factor sign-in</h1>
-        <p class="a-sub">Member records are protected by a second step. You need an authenticator app on your phone, such as Google Authenticator, Microsoft Authenticator or 1Password.</p>
-        <ol class="a-steps">
-          <li>Open the app and choose to add an account.</li>
-          <li>Scan this code:
-            <div class="a-qr"><img id="en-qr" alt="QR code for your authenticator app" width="200" height="200" /></div>
-            <details><summary>Can't scan? Enter this key by hand</summary><code id="en-secret"></code></details>
-          </li>
-          <li>Type the 6-digit code the app shows.</li>
-        </ol>
-        <form id="f-enroll" novalidate>
-          <label for="en-code">6-digit code</label>
-          <input id="en-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required />
-          <p class="a-error" id="e-enroll" role="alert" hidden></p>
-          <button type="submit" class="a-btn">Turn on two-factor</button>
-        </form>
-      </section>
-
-      <!-- Two-factor check -->
-      <section class="a-card" id="v-verify" hidden aria-labelledby="h-verify">
-        <h1 id="h-verify">Enter your code</h1>
-        <p class="a-sub">Open your authenticator app and type the 6-digit code for SBWPC.</p>
-        <form id="f-verify" novalidate>
-          <label for="vf-code">6-digit code</label>
-          <input id="vf-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required />
-          <p class="a-error" id="e-verify" role="alert" hidden></p>
-          <button type="submit" class="a-btn">Verify</button>
-        </form>
-        <p class="a-note">Lost your phone? Another admin can reset your two-factor setup.</p>
+        <h1 id="h-signin">Open this from the Studio</h1>
+        <p class="a-sub">Member records for SBWPC board use only. Sign in to the website Studio, choose Members and donations, then press Open the member system. You will come back here already signed in.</p>
+        <p class="a-error" id="e-signin" role="alert" hidden></p>
+        <a class="a-btn" id="a-studio" href="https://sbwpc.sanity.studio/">Go to the Studio</a>
       </section>
 
       <!-- No access -->

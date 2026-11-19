@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "./resetdb.sh && node flow.test.mjs && ./resetdb.sh && node mail.test.mjs && ./resetdb.sh && node plan.test.mjs && ./resetdb.sh && node seed.mjs && node admin.ui.mjs && ./resetdb.sh && node forms.ui.mjs && ./resetdb.sh && node manage.ui.mjs"
+    "test": "./resetdb.sh && node flow.test.mjs && ./resetdb.sh && node mail.test.mjs && ./resetdb.sh && node plan.test.mjs && ./resetdb.sh && node studio-login.test.mjs && ./resetdb.sh && node seed.mjs && node admin.ui.mjs && ./resetdb.sh && node forms.ui.mjs && ./resetdb.sh && node manage.ui.mjs"
   },
   "devDependencies": {
     "axe-core": "^4.14.0",

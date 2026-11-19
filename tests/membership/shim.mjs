@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 // Test-only stand-in for Supabase's REST layer, in front of the local Postgres copy.
 // Runs each request as the role its key or token maps to, so the real access rules apply.
 import http from 'node:http'
@@ -74,6 +75,9 @@ async function handle(req, body) {
   return {sql, args}
 }
 
+// Test-only stand-in for the Supabase Auth admin calls the studio-login function makes
+export const authState = {users: [], links: new Map(), reset() { this.users = []; this.links = new Map() }}
+
 export function startShim(port = 54330) {
   const CORS = {'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*', 'access-control-expose-headers': '*'}
   const server = http.createServer(async (req, res) => {
@@ -81,6 +85,32 @@ export function startShim(port = 54330) {
     let raw = ''
     for await (const chunk of req) raw += chunk
     const send = (status, obj) => { res.writeHead(status, {...CORS, 'content-type': 'application/json'}); res.end(obj === undefined ? '' : JSON.stringify(obj)) }
+    const au = new URL(req.url, 'http://x')
+    if (au.pathname.startsWith('/auth/v1/admin/')) {
+      const body = raw ? JSON.parse(raw) : {}
+      const U = authState.users
+      const parts = au.pathname.split('/').filter(Boolean)
+      if (parts[3] === 'users' && req.method === 'GET') return send(200, {users: U, aud: 'authenticated'})
+      if (parts[3] === 'users' && req.method === 'POST') {
+        const u = {id: crypto.randomUUID(), aud: 'authenticated', email: body.email, app_metadata: {}, user_metadata: {}}
+        U.push(u)
+        return send(200, u)
+      }
+      if (parts[3] === 'users' && req.method === 'PUT') {
+        const u = U.find((x) => x.id === parts[4])
+        if (!u) return send(404, {message: 'not found'})
+        if (body.app_metadata) u.app_metadata = body.app_metadata
+        return send(200, u)
+      }
+      if (parts[3] === 'generate_link') {
+        const u = U.find((x) => x.email === body.email)
+        if (!u) return send(422, {message: 'no such user'})
+        const hashed = 'HASH-' + crypto.randomUUID()
+        authState.links.set(hashed, u.id)
+        return send(200, {action_link: 'x', email_otp: '123456', hashed_token: hashed, redirect_to: '', verification_type: 'magiclink', ...u})
+      }
+      return send(404, {})
+    }
     const client = await pool.connect()
     try {
       const {role, claims} = who(req)

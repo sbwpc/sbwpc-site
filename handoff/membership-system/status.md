@@ -20,11 +20,11 @@ Updated: November 14, 2026
 - Database tables, access rules and audit log: supabase/migrations/001_foundation.sql (applied to the live project).
 - Access tests: supabase/tests/access_rules.sql (run against a local copy; all pass). Checked again from outside against the live project: every table refuses the public key.
 - Public sign-ups are turned off. Accounts are created by invitation only.
-- Admin page: /admin (sign in, required two-factor, summary dashboard). Not linked from the site, hidden from search engines, never cached, session ends when the tab closes or after 30 minutes idle.
+- Admin page: /admin (opened from the Sanity Studio, no password or two-factor code, summary dashboard). Changed November 19, 2026, see the section at the end. Not linked from the site, hidden from search engines, never cached, session ends when the tab closes or after 30 minutes idle.
 - The foundation is live. The nightly backup is built in stage 2 below.
 
 ## If an admin loses their phone
-A Supabase organization member opens Authentication, Users, picks the person, and removes their two-factor factor. The person then signs in with their password and sets up two-factor again.
+No longer applies after November 19, 2026: there is no two-factor code. See "Sign in from the Studio" at the end.
 
 ## To add or remove an admin
 1. Add or deactivate the email in the admins table (Supabase, Table Editor).
@@ -194,3 +194,16 @@ Branch: manage-plan (built on mailer), now part of main. Built November 14, 2026
 - 12:40 PM Pacific: Luke pasted the three secret values and they were saved in Netlify. The site was redeployed (main@cc76c35) to pick them up.
 - Checked live after the redeploy: /api/checkout/config reports sandbox, online payment on, check pledges on. The server created a sandbox PayPal order (one-time gift) and two sandbox subscriptions (yearly membership, monthly gift). /join-preview shows the PayPal Subscribe and Debit or Credit Card buttons. These three checks left three unfinished "Sandbox Tester" checkouts in the database; they are deleted automatically after 30 days.
 - Still to do: one full test payment approved with a PayPal sandbox buyer account (Luke signs in to the sandbox buyer; Claude does not type passwords), then the live PayPal app, then the swap of /join and /donate.
+
+
+## Sign in from the Studio (built November 19, 2026, branch sanity-sso)
+The client asked for one click from the Sanity Studio into the member admin, with no second password or two-factor code.
+
+- How it works: the Studio (Members and donations, Open the member system) opens https://sbwpc.org/admin/#studio=<the person's Sanity session token>. The part after the # is never sent to a server. /admin removes it from the address bar and posts it to web/netlify/functions/studio-login.mjs.
+- That function asks Sanity who the token belongs to, checks the person is a member of the SBWPC Sanity project (coo0nu6y), checks the email is an active row in the admins table, writes app_metadata.studio_login_at on their Supabase account, and returns a one-time code. /admin exchanges the code for a session. The token is never stored or logged.
+- The database rule (supabase/migrations/005_studio_signin.sql, staff_role) no longer asks for two-factor. It asks for studio_login_at within the last 8 hours. Only the server can write that field, so a password or an email link alone opens nothing.
+- The Studio now signs in with a token (auth loginMethod token in studio/sanity.config.js). Each editor signs in to the Studio once more after the deploy.
+- The password, reset, invitation and two-factor screens are gone from /admin. The admins table still decides who has access, and a treasurer is still view-only.
+- Who gets in: anyone who can sign in to the Studio and is on the admins table. Sanity seats and admins table rows should match.
+- Run order for going live: merge and deploy the site, deploy the Studio, then run 005 in the Supabase SQL editor. Running 005 first locks everyone out until the function is live. To undo, put the aal2 line back in staff_role (001_foundation.sql has the old text).
+- Tests: studio-login.test.mjs (12), access_rules.sql cases 3a to 3e, admin.ui.mjs updated. flow, mail and plan suites still pass. The browser suite (admin.ui.mjs) has not been run since the change.

@@ -253,8 +253,8 @@ export function authEmail({action, link, code}) {
   if (action === 'invite') {
     return render({
       subject: 'You are invited to the SBWPC admin',
-      heading: 'Set up your SBWPC admin sign-in',
-      lead: ['You have been invited to the SBWPC members and donations admin.', 'Use the button to choose a password. Next you will set up two-step sign-in with an authenticator app on your phone, such as Google Authenticator.'],
+      heading: 'Your SBWPC admin access',
+      lead: ['You have been invited to the SBWPC members and donations admin.', 'To open it, sign in to the SBWPC website Studio, choose Members and donations, and press Open the member system. There is no separate password or code.'],
       button: {label: 'Accept the invitation', url: link},
       after: ['The link works once. If it has expired, ask for a new invitation.'],
       note: 'If you were not expecting this, you can ignore this email.',

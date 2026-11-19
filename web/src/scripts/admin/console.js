@@ -125,7 +125,7 @@ function overview() {
     const p = r.table_name === 'people' ? S.person.get(r.row_id) || row : S.person.get(row.person_id) || (row.payload ? row.payload : null)
     return p && (p.first_name || p.last_name) ? (p.id ? personLink(p) : fullName(p)) : ''
   }
-  return page('Members and donations', `Signed in as ${role === 'admin' ? 'an admin' : 'treasurer (view only)'} with two-factor. Money figures are for ${year}.`,
+  return page('Members and donations', `Signed in as ${role === 'admin' ? 'an admin' : 'treasurer (view only)'}. Money figures are for ${year}.`,
     h('div', {class: 'a-tiles'},
       tile(count('active') + count('expiring_soon'), 'Active members', '#/members?status=current'),
       tile(count('expiring_soon'), 'Expiring in 30 days', '#/members?status=expiring_soon', 'warn'),

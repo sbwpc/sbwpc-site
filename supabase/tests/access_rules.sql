@@ -26,20 +26,36 @@ reset role;
 
 \echo '--- 2. signed-in stranger with 2FA (not on admin list): sees 0 rows, cannot write'
 set role authenticated;
-set request.jwt.claims = '{"email":"stranger@example.com","aal":"aal2","sub":"11111111-1111-1111-1111-111111111111"}';
+set request.jwt.claims = '{"email":"stranger@example.com","app_metadata":{"studio_login_at":9999999999},"sub":"11111111-1111-1111-1111-111111111111"}';
 select 'people', count(*) from public.people;
 select 'admins', count(*) from public.admins;
 insert into public.people (first_name) values ('x');
 update public.people set first_name='hacked' returning id;
 
-\echo '--- 3. admin with password only (aal1, no 2FA): sees 0 rows, cannot write'
+\echo '--- 3a. admin with password only (no Studio sign-in mark): sees 0 rows, cannot write'
 set request.jwt.claims = '{"email":"info@sbwpc.org","aal":"aal1","sub":"22222222-2222-2222-2222-222222222222"}';
 select 'people', count(*) from public.people;
 select 'payments', count(*) from public.payments;
 insert into public.people (first_name) values ('x');
 
-\echo '--- 4. admin with 2FA (aal2): full access; email match is case-insensitive'
-set request.jwt.claims = '{"email":"Luke@CoolHandLook.com","aal":"aal2","sub":"33333333-3333-3333-3333-333333333333"}';
+\echo '--- 3b. admin with an old two-factor session (aal2, no Studio mark): sees 0 rows'
+set request.jwt.claims = '{"email":"info@sbwpc.org","aal":"aal2","sub":"22222222-2222-2222-2222-222222222222"}';
+select 'people', count(*) from public.people;
+
+\echo '--- 3c. admin whose Studio sign-in mark is 9 hours old: sees 0 rows'
+select set_config('request.jwt.claims', json_build_object('email','info@sbwpc.org','app_metadata',json_build_object('studio_login_at', extract(epoch from now())::bigint - 9*3600))::text, false);
+select 'people', count(*) from public.people;
+
+\echo '--- 3d. admin whose Studio sign-in mark is 7 hours old: still sees rows'
+select set_config('request.jwt.claims', json_build_object('email','info@sbwpc.org','app_metadata',json_build_object('studio_login_at', extract(epoch from now())::bigint - 7*3600))::text, false);
+select 'people', count(*) from public.people;
+
+\echo '--- 3e. a user cannot give themselves the mark through user_metadata'
+set request.jwt.claims = '{"email":"info@sbwpc.org","user_metadata":{"studio_login_at":9999999999},"sub":"22222222-2222-2222-2222-222222222222"}';
+select 'people', count(*) from public.people;
+
+\echo '--- 4. admin signed in from the Studio: full access; email match is case-insensitive'
+set request.jwt.claims = '{"email":"Luke@CoolHandLook.com","app_metadata":{"studio_login_at":9999999999},"sub":"33333333-3333-3333-3333-333333333333"}';
 select 'people', count(*) from public.people;
 select level, status, days_left from public.membership_status order by expires_on desc;
 select year, total_cents, reportable from public.contributor_totals;
@@ -57,7 +73,7 @@ select 'token in audit?', count(*) from public.audit_log where after ? 'renew_to
 reset role;
 insert into public.admins (email, role) values ('treasurer@example.com','treasurer');
 set role authenticated;
-set request.jwt.claims = '{"email":"treasurer@example.com","aal":"aal2","sub":"44444444-4444-4444-4444-444444444444"}';
+set request.jwt.claims = '{"email":"treasurer@example.com","app_metadata":{"studio_login_at":9999999999},"sub":"44444444-4444-4444-4444-444444444444"}';
 select 'people', count(*) from public.people;
 update public.people set phone='999' returning id;
 insert into public.payments (person_id, kind, amount_cents, method) values ('00000000-0000-0000-0000-000000000001','dues',100,'cash');
@@ -66,7 +82,7 @@ insert into public.payments (person_id, kind, amount_cents, method) values ('000
 reset role;
 update public.admins set active=false where email='luke@coolhandlook.com';
 set role authenticated;
-set request.jwt.claims = '{"email":"luke@coolhandlook.com","aal":"aal2","sub":"33333333-3333-3333-3333-333333333333"}';
+set request.jwt.claims = '{"email":"luke@coolhandlook.com","app_metadata":{"studio_login_at":9999999999},"sub":"33333333-3333-3333-3333-333333333333"}';
 select 'people', count(*) from public.people;
 
 \echo '--- 7. reminders go out once per cycle'
@@ -79,7 +95,7 @@ reset role;
 update public.admins set active=true where email='luke@coolhandlook.com';
 insert into public.recurring_plans (person_id, kind, amount_cents, frequency, status) select id, 'donation', 2500, 'monthly', 'active' from public.people limit 1;
 set role authenticated;
-set request.jwt.claims = '{"email":"luke@coolhandlook.com","aal":"aal2","sub":"33333333-3333-3333-3333-333333333333"}';
+set request.jwt.claims = '{"email":"luke@coolhandlook.com","app_metadata":{"studio_login_at":9999999999},"sub":"33333333-3333-3333-3333-333333333333"}';
 select 'admin sees the plan', count(*), min(status) from (select id, status, amount_cents, cancelled_on from public.recurring_plans) x;
 \echo '    admin cannot read the manage link (two errors expected):'
 select manage_token from public.recurring_plans;
@@ -87,7 +103,7 @@ select * from public.recurring_plans;
 \echo '    admin can queue the link email, not a cancellation notice (one error expected):'
 insert into public.outbox (kind, person_id, data) select 'plan_link', person_id, jsonb_build_object('plan_id', id) from (select id, person_id from public.recurring_plans limit 1) x;
 insert into public.outbox (kind, person_id, data) select 'plan_stopped', person_id, jsonb_build_object('plan_id', id) from (select id, person_id from public.recurring_plans limit 1) x;
-set request.jwt.claims = '{"email":"treasurer@example.com","aal":"aal2","sub":"44444444-4444-4444-4444-444444444444"}';
+set request.jwt.claims = '{"email":"treasurer@example.com","app_metadata":{"studio_login_at":9999999999},"sub":"44444444-4444-4444-4444-444444444444"}';
 \echo '    treasurer cannot read the link or queue an email (two errors expected):'
 select manage_token from public.recurring_plans;
 insert into public.outbox (kind, person_id, data) select 'plan_link', person_id, jsonb_build_object('plan_id', id) from (select id, person_id from public.recurring_plans limit 1) x;

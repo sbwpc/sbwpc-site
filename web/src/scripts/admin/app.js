@@ -1,25 +1,25 @@
-// SBWPC admin: sign-in with required two-factor, then the admin screens (console.js).
+// SBWPC admin: sign-in comes from the Sanity Studio, then the admin screens (console.js).
+// The Studio opens this page with the person's Sanity session in the address after the #.
+// That part of an address is never sent to a server. It is read once, removed from the address bar,
+// and sent to our own studio-login function, which checks it with Sanity and returns a one-time code.
 // The database enforces access. This script only decides which screen to show.
 import {createClient} from '@supabase/supabase-js'
 import {SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY} from '../../lib/members-config.js'
 import {startConsole, stopConsole} from './console.js'
 
 const $ = (id) => document.getElementById(id)
-const VIEWS = ['signin', 'forgot', 'password', 'enroll', 'verify', 'denied', 'dash']
+const VIEWS = ['signin', 'denied', 'dash']
 const IDLE_MS = 30 * 60 * 1000
 
-// What kind of email link brought the person here (invite, password reset), read before the client clears it
+// Take the Studio hand-off out of the address right away
 const hash = new URLSearchParams(location.hash.replace(/^#/, ''))
-let linkType = hash.get('type')
-const linkError = hash.get('error_description')
+const studioToken = hash.get('studio')
+if (studioToken !== null) history.replaceState(null, '', location.pathname + location.search)
 
 // The session lives only in this browser tab and ends when the tab closes
 const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {storage: window.sessionStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: true},
+  auth: {storage: window.sessionStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: false},
 })
-
-let factorId = null
-let needsPassword = linkType === 'invite' || linkType === 'recovery'
 
 function show(view) {
   $('a-loading').hidden = true
@@ -27,7 +27,7 @@ function show(view) {
   document.body.classList.toggle('wide', view === 'dash')
   if (view === 'dash') return
   const el = $('v-' + view)
-  const target = el.querySelector('input:not([type=hidden])') || el.querySelector('h1')
+  const target = el.querySelector('a, button') || el.querySelector('h1')
   if (target) {
     if (target.tagName === 'H1') target.tabIndex = -1
     target.focus()
@@ -38,19 +38,21 @@ function fail(id, msg) {
   el.textContent = msg
   el.hidden = !msg
 }
-function busy(form, on) {
-  const b = form.querySelector('button[type=submit]')
-  if (on) { b.dataset.label = b.textContent; b.textContent = 'Working...'; b.disabled = true }
-  else { b.textContent = b.dataset.label || b.textContent; b.disabled = false }
-}
-const friendly = (err) => {
-  const m = (err && err.message) || ''
-  if (/invalid login/i.test(m)) return 'That email and password do not match.'
-  if (/invalid totp|invalid.*code|expired/i.test(m)) return 'That code did not work. Wait for a new code and try again.'
-  if (/rate limit|too many/i.test(m)) return 'Too many tries. Wait a minute and try again.'
-  if (/weak|pwned|should be/i.test(m)) return 'Choose a longer, harder to guess password.'
-  if (/network|fetch/i.test(m)) return 'Could not reach the server. Check your connection and try again.'
-  return m || 'Something went wrong. Try again.'
+
+// Exchange the Studio hand-off for a database session. Returns an error message, or '' on success.
+async function studioSignIn(token) {
+  $('a-loading').textContent = 'Signing you in...'
+  $('a-loading').hidden = false
+  let res, out
+  try {
+    res = await fetch('/api/admin/studio-login', {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({token})})
+    out = await res.json()
+  } catch {
+    return 'Could not reach the server. Check your connection and try again from the Studio.'
+  }
+  if (!res.ok || !out.ok) return out.message || 'We could not sign you in. Try again from the Studio.'
+  const {error} = await sb.auth.verifyOtp({token_hash: out.token_hash, type: 'email'})
+  return error ? 'The sign-in code did not work. Try again from the Studio.' : ''
 }
 
 // Decide which screen comes next for the current session
@@ -59,109 +61,15 @@ async function route() {
   $('a-user').hidden = !session
   if (!session) return show('signin')
   $('a-user-email').textContent = session.user.email
-
-  const [{data: aal}, {data: factors}] = await Promise.all([
-    sb.auth.mfa.getAuthenticatorAssuranceLevel(),
-    sb.auth.mfa.listFactors(),
-  ])
-  const verified = (factors && factors.totp) || []
-  const atAal2 = aal && aal.currentLevel === 'aal2'
-
-  if (verified.length && !atAal2) {
-    factorId = verified[0].id
-    return show('verify')
-  }
-  if (needsPassword) return show('password')
-  if (!verified.length) return startEnroll(factors)
-  return loadDash()
-}
-
-async function startEnroll(factors) {
-  // Clear half-finished setups so a fresh code can be issued
-  for (const f of ((factors && factors.all) || []).filter((f) => f.status === 'unverified')) {
-    await sb.auth.mfa.unenroll({factorId: f.id})
-  }
-  const {data, error} = await sb.auth.mfa.enroll({factorType: 'totp', friendlyName: 'SBWPC admin ' + new Date().toISOString().slice(0, 10)})
-  show('enroll')
-  if (error) return fail('e-enroll', friendly(error))
-  factorId = data.id
-  // Re-encode the QR image so characters like # in the SVG cannot break it
-  const raw = data.totp.qr_code || ''
-  const comma = raw.indexOf(',')
-  const svg = raw.startsWith('data:image/svg+xml') && comma > -1 ? raw.slice(comma + 1) : raw
-  $('en-qr').src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.includes('%3C') ? decodeURIComponent(svg) : svg)
-  $('en-secret').textContent = data.totp.secret
-}
-
-async function loadDash() {
   const {data: role, error: roleErr} = await sb.rpc('staff_role')
   if (roleErr || !role) return show('denied')
   show('dash')
   await startConsole(sb, role)
 }
 
-// ---------- forms ----------
-$('f-signin').addEventListener('submit', async (e) => {
-  e.preventDefault()
-  const f = e.currentTarget
-  fail('e-signin', '')
-  busy(f, true)
-  const {error} = await sb.auth.signInWithPassword({email: f.email.value.trim(), password: f.password.value})
-  busy(f, false)
-  f.password.value = ''
-  if (error) return fail('e-signin', friendly(error))
-  route()
-})
-
-$('a-forgot').addEventListener('click', () => show('forgot'))
-$('a-back-signin').addEventListener('click', () => show('signin'))
-$('f-forgot').addEventListener('submit', async (e) => {
-  e.preventDefault()
-  const f = e.currentTarget
-  fail('e-forgot', '')
-  busy(f, true)
-  const {error} = await sb.auth.resetPasswordForEmail(f.email.value.trim(), {redirectTo: location.origin + '/admin/'})
-  busy(f, false)
-  if (error && /rate limit|too many/i.test(error.message)) return fail('e-forgot', friendly(error))
-  $('ok-forgot').hidden = false
-})
-
-$('f-password').addEventListener('submit', async (e) => {
-  e.preventDefault()
-  const f = e.currentTarget
-  const a = f['new-password'].value
-  const b = f['new-password-again'].value
-  fail('e-password', '')
-  if (a.length < 12) return fail('e-password', 'Use at least 12 characters.')
-  if (a !== b) return fail('e-password', 'The two passwords do not match.')
-  busy(f, true)
-  const {error} = await sb.auth.updateUser({password: a})
-  busy(f, false)
-  if (error) return fail('e-password', friendly(error))
-  f.reset()
-  needsPassword = false
-  route()
-})
-
-async function submitCode(form, errId) {
-  const code = form.code.value.replace(/\D/g, '')
-  fail(errId, '')
-  if (code.length !== 6) return fail(errId, 'Enter the 6-digit code.')
-  busy(form, true)
-  const {error} = await sb.auth.mfa.challengeAndVerify({factorId, code})
-  busy(form, false)
-  form.code.value = ''
-  if (error) return fail(errId, friendly(error))
-  route()
-}
-$('f-enroll').addEventListener('submit', (e) => { e.preventDefault(); submitCode(e.currentTarget, 'e-enroll') })
-$('f-verify').addEventListener('submit', (e) => { e.preventDefault(); submitCode(e.currentTarget, 'e-verify') })
-
 async function signOut() {
   stopConsole()
   await sb.auth.signOut()
-  needsPassword = false
-  factorId = null
   route()
 }
 $('a-signout').addEventListener('click', signOut)
@@ -180,13 +88,14 @@ for (const ev of ['pointerdown', 'keydown', 'scroll']) addEventListener(ev, rese
 resetIdle()
 
 // ---------- start ----------
-sb.auth.onAuthStateChange((event) => {
-  if (event === 'PASSWORD_RECOVERY') { needsPassword = true; linkType = 'recovery' }
-})
-if (linkError) {
-  show('signin')
-  fail('e-signin', linkError.replace(/\+/g, ' ') + '. Ask for a new link and try again.')
-} else {
-  // Give the client a moment to pick up a session from an email link
-  sb.auth.getSession().then(() => route())
-}
+;(async () => {
+  if (studioToken) {
+    const problem = await studioSignIn(studioToken)
+    if (problem) {
+      await sb.auth.signOut()
+      show('signin')
+      return fail('e-signin', problem)
+    }
+  }
+  route()
+})()

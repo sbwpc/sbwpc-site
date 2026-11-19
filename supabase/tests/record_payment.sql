@@ -29,10 +29,10 @@ set role anon;
 select public.record_payment('{"kind":"donation","amount_cents":100,"email":"x@example.com"}'::jsonb);
 select count(*) from public.checkouts;
 reset role; set role authenticated;
-set request.jwt.claims = '{"email":"stranger@example.com","aal":"aal2"}';
+set request.jwt.claims = '{"email":"stranger@example.com","app_metadata":{"studio_login_at":9999999999}}';
 select public.record_payment('{"kind":"donation","amount_cents":100,"email":"x@example.com"}'::jsonb);
 \echo '--- 8. an admin records a check for an existing person'
-set request.jwt.claims = '{"email":"luke@coolhandlook.com","aal":"aal2"}';
+set request.jwt.claims = '{"email":"luke@coolhandlook.com","app_metadata":{"studio_login_at":9999999999}}';
 select public.record_payment(jsonb_build_object('kind','dues','level','Voice','amount_cents',30000,'method','check','source','manual','note','Check 1042','paid_on','2029-06-01','person_id',(select id from public.people where email = 'bo@example.com'))) ->> 'expires_on';
 select method, created_by, note from public.payments where method = 'check';
 
@@ -43,11 +43,11 @@ insert into public.checkouts (id, kind, mode, amount_cents, payload) values ('00
 insert into public.checkouts (id, kind, mode, amount_cents, payload) values ('00000000-0000-0000-0000-0000000000c2', 'donation', 'check', 2500, '{"first_name":"No","last_name":"Show","email":"ns@example.com"}');
 select 'people before', count(*) from public.people where email = 'cy@example.com';
 reset role; set role authenticated;
-set request.jwt.claims = '{"email":"treasurer@example.com","aal":"aal2"}';
+set request.jwt.claims = '{"email":"treasurer@example.com","app_metadata":{"studio_login_at":9999999999}}';
 select public.confirm_check('00000000-0000-0000-0000-0000000000c1');
 set request.jwt.claims = '{"email":"luke@coolhandlook.com","aal":"aal1"}';
 select public.confirm_check('00000000-0000-0000-0000-0000000000c1');
-set request.jwt.claims = '{"email":"luke@coolhandlook.com","aal":"aal2"}';
+set request.jwt.claims = '{"email":"luke@coolhandlook.com","app_metadata":{"studio_login_at":9999999999}}';
 select public.confirm_check('00000000-0000-0000-0000-0000000000c1', '{"paid_on":"2029-07-04","note":"Check 221"}') ->> 'expires_on';
 select public.confirm_check('00000000-0000-0000-0000-0000000000c1');
 select p.first_name, m.level, m.household_name, m.committees, y.method, y.amount_cents, y.note, y.created_by, c.status
@@ -67,9 +67,9 @@ select 'no notice to the inbox when an admin records it', count(*) from public.o
 set role anon;
 select count(*) from public.outbox;
 reset role; set role authenticated;
-set request.jwt.claims = '{"email":"stranger@example.com","aal":"aal2"}';
+set request.jwt.claims = '{"email":"stranger@example.com","app_metadata":{"studio_login_at":9999999999}}';
 select 'stranger sees', count(*) from public.outbox;
-set request.jwt.claims = '{"email":"luke@coolhandlook.com","aal":"aal2"}';
+set request.jwt.claims = '{"email":"luke@coolhandlook.com","app_metadata":{"studio_login_at":9999999999}}';
 select 'admin sees', count(*) > 0 from public.outbox;
 insert into public.outbox (kind, person_id, data) select 'reminder', id, '{"type":"manual"}' from public.people limit 1;
 insert into public.outbox (kind, person_id, to_email) select 'receipt', id, 'elsewhere@example.com' from public.people limit 1;
@@ -85,5 +85,5 @@ with old as (select renew_token t from public.memberships m join public.people p
 select 'old link still valid until the payment commits', (select t from old) is not null, (select r from pay) ->> 'duplicate';
 select 'receipt skipped when asked', count(*) from public.outbox o join public.payments y on y.id = o.payment_id where y.paypal_capture_id = 'CAP9' and o.kind = 'receipt';
 reset role; set role authenticated;
-set request.jwt.claims = '{"email":"luke@coolhandlook.com","aal":"aal2"}';
+set request.jwt.claims = '{"email":"luke@coolhandlook.com","app_metadata":{"studio_login_at":9999999999}}';
 select public.renewal_prefill('00000000-0000-0000-0000-000000000000');

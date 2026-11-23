@@ -4,9 +4,12 @@
   base = "web"
   command = "npm run build"
   publish = "dist"
-  # Build when the site code (web/) or the seed content (seed/) changes.
-  # Without this, Netlify skips builds that only touch seed/.
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ../seed ../netlify.toml"
+  # Always build when the Sanity webhook fires the build hook. Netlify sets
+  # INCOMING_HOOK_URL for hook builds, and exit 1 means "go ahead and build".
+  # Otherwise build only when the site code (web/), the seed content (seed/)
+  # or this file changed. Without the hook check, publishing in Sanity looked
+  # like "nothing changed" and the build was skipped.
+  ignore = "[ -n \"$INCOMING_HOOK_URL\" ] && exit 1; git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ../seed ../netlify.toml"
 
 [build.environment]
   NODE_VERSION = "22"

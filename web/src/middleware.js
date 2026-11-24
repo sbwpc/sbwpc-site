@@ -3,7 +3,7 @@ import {defineMiddleware} from 'astro:middleware'
 import {previewStore} from './lib/data.js'
 import {checkKey, carryKey} from './lib/preview-link.js'
 
-const FRAMES = "frame-ancestors 'self' https://sbwpc.sanity.studio https://*.sanity.studio http://localhost:3333"
+const FRAMES = "frame-ancestors 'self' https://sbwpc.sanity.studio https://*.sanity.studio https://www.sanity.io https://*.sanity.io http://localhost:3333"
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const {pathname, searchParams} = context.url

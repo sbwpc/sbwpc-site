@@ -3,6 +3,7 @@
 // be built and previewed before the Sanity project exists.
 import fs from 'node:fs'
 import path from 'node:path'
+import {AsyncLocalStorage} from 'node:async_hooks'
 import {createClient} from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
 
@@ -15,23 +16,24 @@ const client = useSanity
   : null
 const builder = client ? imageUrlBuilder(client) : null
 
-let cache
-export async function loadAll() {
-  if (cache) return cache
-  let docs
-  if (useSanity) {
-    docs = await client.fetch(`*[!(_id in path("drafts.**")) && !(_type match "system.*") && !(_type match "sanity.*")]`)
-  } else {
-    const file = path.resolve(process.cwd(), '../seed/data.ndjson')
-    docs = fs
-      .readFileSync(file, 'utf8')
-      .split('\n')
-      .filter(Boolean)
-      .map((l) => JSON.parse(l))
-  }
+// Draft preview: the /preview/ pages run inside previewStore (see src/middleware.js), and loadAll()
+// then reads unpublished drafts live with a read token instead of the published copy built into the site.
+export const previewStore = new AsyncLocalStorage()
+const previewToken = () => process.env.SANITY_READ_TOKEN || ''
+// Where the Studio previews things, kept next to the loader so the live pages and the preview share one rule.
+export function explainersAfter(pages, page) {
+  const EX = 'advocacy/explainers/'
+  const list = pages.filter((p) => p.path?.startsWith(EX) && p.path.length > EX.length)
+  const i = list.findIndex((x) => x.path === page.path)
+  if (i < 0 || list.length < 2) return []
+  return Array.from({length: Math.min(3, list.length - 1)}, (_, k) => list[(i + 1 + k) % list.length])
+}
+export const previewReady = () => Boolean(previewToken())
+
+function shape(docs) {
   const by = (t) => docs.filter((d) => d._type === t)
   const sortOrder = (a, b) => (a.order ?? 999) - (b.order ?? 999)
-  cache = {
+  return {
     settings: docs.find((d) => d._type === 'siteSettings') || {},
     pages: by('page'),
     posts: by('post').sort((a, b) => (b.date || '').localeCompare(a.date || '')),
@@ -44,7 +46,33 @@ export async function loadAll() {
     opportunities: by('opportunity').sort(sortOrder),
     albums: by('album').sort((a, b) => (b.date || '').localeCompare(a.date || '')),
   }
+}
+
+let cache
+export async function loadAll() {
+  if (previewStore.getStore()) return loadDrafts()
+  if (cache) return cache
+  let docs
+  if (useSanity) {
+    docs = await client.fetch(`*[!(_id in path("drafts.**")) && !(_type match "system.*") && !(_type match "sanity.*")]`)
+  } else {
+    const file = path.resolve(process.cwd(), '../seed/data.ndjson')
+    docs = fs
+      .readFileSync(file, 'utf8')
+      .split('\n')
+      .filter(Boolean)
+      .map((l) => JSON.parse(l))
+  }
+  cache = shape(docs)
   return cache
+}
+
+// Never cached: every preview request sees the latest saved draft.
+async function loadDrafts() {
+  if (!previewReady()) throw new Error('Preview is not switched on yet.')
+  const draftClient = createClient({projectId: projectId || 'coo0nu6y', dataset, apiVersion: '2026-09-01', useCdn: false, perspective: 'drafts', token: previewToken()})
+  const docs = await draftClient.fetch(`*[!(_type match "system.*") && !(_type match "sanity.*")]`)
+  return shape(docs)
 }
 
 export const now = () => new Date()

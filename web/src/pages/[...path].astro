@@ -1,45 +1,11 @@
 ---
-import Layout from '../layouts/Layout.astro'
-import Hero from '../components/Hero.astro'
-import Sections from '../components/Sections.astro'
-import Breadcrumbs from '../components/Breadcrumbs.astro'
-import {loadAll, fmtDate} from '../lib/data.js'
-import {BYLINE} from '../lib/seo.js'
+import PageView from '../views/PageView.astro'
+import {loadAll, explainersAfter} from '../lib/data.js'
 export async function getStaticPaths() {
   const {pages} = await loadAll()
-  const EX = 'advocacy/explainers/'
-  const list = pages.filter((p) => p.path?.startsWith(EX) && p.path.length > EX.length)
   // Explainers link to the three that follow them (wrapping around) so none is a dead end.
-  const related = (page) => {
-    const i = list.findIndex((x) => x.path === page.path)
-    if (i < 0 || list.length < 2) return []
-    return Array.from({length: Math.min(3, list.length - 1)}, (_, k) => list[(i + 1 + k) % list.length])
-  }
-  return pages.filter((p) => p.path && p.path !== 'home').map((page) => ({params: {path: page.path}, props: {page, related: related(page)}}))
+  return pages.filter((p) => p.path && p.path !== 'home').map((page) => ({params: {path: page.path}, props: {page, related: explainersAfter(pages, page)}}))
 }
 const {page, related} = Astro.props
-const isExplainer = Boolean(page.path?.startsWith('advocacy/explainers/') && page.path.length > 'advocacy/explainers/'.length)
 ---
-<Layout title={page.seo?.title || page.title} description={page.seo?.description || page.hero?.body} image={page.seo?.image || page.hero?.image} path={page.path}>
-  <Breadcrumbs path={page.path} title={page.title} />
-  {page.hero && <Hero hero={page.hero} />}
-  {isExplainer && (
-    <div class="wrap narrow"><p class="meta byline">By {BYLINE}{page._updatedAt && <>, updated <time datetime={page._updatedAt}>{fmtDate(page._updatedAt)}</time></>}</p></div>
-  )}
-  <Sections sections={page.sections} />
-  {related.length > 0 && (
-    <section class="section tone-cream">
-      <div class="wrap">
-        <div class="section-head split"><div><h2 class="h2">More explainers</h2></div><p class="lede"><a class="textlink" href="/advocacy/explainers/"><span class="arrow">All explainers</span></a></p></div>
-        <div class="grid c3 v-bordered">
-          {related.map((r) => (
-            <article class="card linked">
-              <h3 class="h3 card-title">{r.title}</h3>
-              <div class="links"><a class="textlink stretch" href={`/${r.path}/`}><span class="arrow">Read the explainer</span></a></div>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  )}
-</Layout>
+<PageView page={page} related={related} />

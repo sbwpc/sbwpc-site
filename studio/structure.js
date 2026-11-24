@@ -13,6 +13,7 @@ import {PlayIcon} from '@sanity/icons/Play'
 import {openHelp} from './tools/help/videos.js'
 import {StartHere} from './components/StartHere.jsx'
 import {MembersPane} from './components/MembersPane.jsx'
+import {PreviewPane} from './components/PreviewPane.jsx'
 
 const API = {apiVersion: '2025-02-19'}
 
@@ -158,7 +159,7 @@ export const structure = (S, context) => {
       pages,
       typeList('albums', 'Photo albums', 'album', [{field: 'date', direction: 'desc'}], ImagesIcon),
       S.divider(),
-      S.listItem().id('siteSettings').title('Site settings (menu, footer, banner)').icon(CogIcon).child(S.document().schemaType('siteSettings').documentId('siteSettings')),
+      S.listItem().id('siteSettings').title('Site settings (menu, footer, banner)').icon(CogIcon).child(S.document().schemaType('siteSettings').documentId('siteSettings').views([S.view.form().title('Edit'), S.view.component(PreviewPane).title('Preview')])),
       otherLists,
     ])
 }

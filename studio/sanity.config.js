@@ -9,6 +9,7 @@ import {Logo} from './components/Logo.jsx'
 import {withPublishNote} from './components/publishNote.js'
 import {helpTool} from './tools/help/index.js'
 import {withWatchHow} from './tools/help/WatchHow.jsx'
+import {PreviewPane} from './components/PreviewPane.jsx'
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'coo0nu6y'
 const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
@@ -29,6 +30,11 @@ const theme = buildLegacyTheme({
 const PROTECTED = ['page', 'siteSettings']
 const BLOCKED = ['delete', 'unpublish', 'duplicate']
 
+// Documents that get a Preview tab (the website renders the draft before it is published)
+const PREVIEW = ['page', 'post', 'event', 'endorsement', 'person', 'committee', 'position', 'action', 'opportunity', 'album', 'siteSettings']
+const defaultDocumentNode = (S, {schemaType}) =>
+  PREVIEW.includes(schemaType) ? S.document().views([S.view.form().title('Edit'), S.view.component(PreviewPane).title('Preview')]) : S.document().views([S.view.form()])
+
 // Which how-to video sits above each kind of entry
 const WATCH = {siteSettings: 'settings', page: 'pages', post: 'news', event: 'events', endorsement: 'endorsements', person: 'directory', committee: 'directory', position: 'directory', action: 'directory', opportunity: 'directory', album: 'photos'}
 
@@ -41,7 +47,7 @@ export default defineConfig({
   projectId,
   dataset,
   theme,
-  plugins: [structureTool({structure}), helpTool(), ...(showVision ? [visionTool()] : [])],
+  plugins: [structureTool({structure, defaultDocumentNode}), helpTool(), ...(showVision ? [visionTool()] : [])],
   studio: {components: {logo: Logo}},
   schema: {
     types: friendly([...objects, ...documents]).map((t) => (WATCH[t.name] ? {...t, components: {...(t.components || {}), input: withWatchHow(WATCH[t.name])}} : t)),

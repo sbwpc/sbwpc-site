@@ -1,0 +1,48 @@
+---
+// Draft preview for the Sanity Studio. Rendered on request (not built into the site), always with the latest
+// saved draft. src/middleware.js checks the signed link and puts this request into draft mode.
+export const prerender = false
+import PageView from '../../views/PageView.astro'
+import HomeView from '../../views/HomeView.astro'
+import NewsView from '../../views/NewsView.astro'
+import EventView from '../../views/EventView.astro'
+import {loadAll, explainersAfter, previewReady} from '../../lib/data.js'
+
+const raw = (Astro.params.path || '').replace(/^\/+|\/+$/g, '')
+let view = null
+let props = {}
+let message = ''
+if (!previewReady()) {
+  message = 'Preview is not switched on yet.'
+} else {
+  const {pages, posts, events} = await loadAll()
+  if (raw === '' || raw === 'home') {
+    view = HomeView
+    props = {page: pages.find((p) => p.path === 'home')}
+  } else if (raw.startsWith('news/') && raw.length > 5) {
+    const list = posts.filter((p) => p.slug?.current && !p.externalUrl)
+    const i = list.findIndex((p) => p.slug.current === raw.slice(5))
+    if (i >= 0) {
+      view = NewsView
+      props = {post: list[i], more: list.length > 1 ? Array.from({length: Math.min(3, list.length - 1)}, (_, k) => list[(i + 1 + k) % list.length]) : []}
+    }
+  } else if (raw.startsWith('events/') && raw.length > 7 && events.some((e) => e.slug?.current === raw.slice(7))) {
+    view = EventView
+    props = {event: events.find((e) => e.slug?.current === raw.slice(7))}
+  }
+  if (!view) {
+    const page = pages.find((p) => p.path === raw)
+    if (page) {
+      view = PageView
+      props = {page, related: explainersAfter(pages, page)}
+    }
+  }
+  if (!view && !message) message = 'There is nothing to preview at this address yet. Save the document and try again.'
+}
+Astro.response.headers.set('cache-control', 'no-store')
+const View = view
+---
+{View ? <View {...props} noindex /> : (
+  <html lang="en"><head><meta charset="utf-8" /><meta name="robots" content="noindex, nofollow" /><title>Preview</title></head>
+  <body style="font-family: sans-serif; padding: 48px; max-width: 40rem; line-height: 1.5"><h1 style="font-size: 1.4rem">Preview</h1><p>{message}</p></body></html>
+)}
